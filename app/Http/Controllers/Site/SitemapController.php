@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Gallery;
+use App\Models\Journal;
+use App\Models\Lecturer;
 use App\Models\Page;
 use App\Models\Post;
+use App\Models\Program;
+use App\Models\Publication;
 use App\Models\Site;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -50,7 +54,16 @@ class SitemapController extends Controller
     {
         $urls = collect();
 
-        foreach (['events' => 'site.events.index', 'galleries' => 'site.galleries.index', 'faqs' => 'site.faqs', 'leaders' => 'site.leaders', 'admissions' => 'site.admissions.show'] as $module => $route) {
+        $indexes = [
+            'events' => 'site.events.index', 'galleries' => 'site.galleries.index', 'faqs' => 'site.faqs',
+            'leaders' => 'site.leaders', 'admissions' => 'site.admissions.show', 'facilities' => 'site.facilities',
+            'extracurriculars' => 'site.extracurriculars', 'achievements' => 'site.achievements',
+            'lecturers' => 'site.lecturers.index', 'programs' => 'site.programs.index',
+            'publications' => 'site.publications.index', 'journals' => 'site.journals.index',
+            'organizations' => 'site.organizations',
+        ];
+
+        foreach ($indexes as $module => $route) {
             if ($site->hasModule($module)) {
                 $urls->push(['loc' => route($route), 'lastmod' => null]);
             }
@@ -64,6 +77,24 @@ class SitemapController extends Controller
         if ($site->hasModule('galleries')) {
             $urls = $urls->concat($this->indexable(Gallery::query()->published())->get(['slug', 'updated_at'])
                 ->map(fn (Gallery $gallery) => ['loc' => route('site.galleries.show', $gallery->slug), 'lastmod' => $gallery->updated_at]));
+        }
+
+        if ($site->hasModule('publications')) {
+            $urls = $urls->concat($this->indexable(Publication::query()->published())->get(['slug', 'updated_at'])
+                ->map(fn (Publication $publication) => ['loc' => route('site.publications.show', $publication->slug), 'lastmod' => $publication->updated_at]));
+        }
+
+        $details = [
+            'programs' => [Program::class, 'site.programs.show'],
+            'lecturers' => [Lecturer::class, 'site.lecturers.show'],
+            'journals' => [Journal::class, 'site.journals.show'],
+        ];
+
+        foreach ($details as $module => [$modelClass, $route]) {
+            if ($site->hasModule($module)) {
+                $urls = $urls->concat($modelClass::query()->published()->get(['slug', 'updated_at'])
+                    ->map(fn (Program|Lecturer|Journal $item) => ['loc' => route($route, $item->slug), 'lastmod' => $item->updated_at]));
+            }
         }
 
         return $urls;

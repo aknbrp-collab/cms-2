@@ -67,6 +67,17 @@
                     </section>
                 @endforeach
 
+                @if ($achievements->isNotEmpty())
+                    <section class="flex flex-col gap-6">
+                        @include('sites.pondok.section-heading', ['title' => __('Prestasi'), 'url' => route('site.achievements')])
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            @foreach ($achievements as $achievement)
+                                <x-site.achievement-card :achievement="$achievement" />
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
                 @if ($videos->isNotEmpty())
                     <section class="flex flex-col gap-6">
                         @include('sites.pondok.section-heading', ['title' => $videos->first()->gallery->title, 'url' => route('site.galleries.index', ['jenis' => 'video'])])

@@ -56,14 +56,22 @@
                         ['admissions', 'admin.admissions.index', 'admin.admissions.*', 'academic-cap', __('Admissions')],
                         ['leaders', 'admin.leaders', 'admin.leaders', 'user-group', __('Leadership')],
                         ['faqs', 'admin.faqs', 'admin.faqs', 'question-mark-circle', __('FAQ')],
+                        ['publications', 'admin.publications.index', 'admin.publications.*', 'document-text', __('Publications')],
                     ];
+                    foreach (App\Cms\Resources::all() as $key => $cmsResource) {
+                        $moduleLinks[] = [$key, ['admin.resources', $key], null, $cmsResource->icon(), $cmsResource->label()];
+                    }
                     $currentSite = current_site();
                     $moduleLinks = array_filter($moduleLinks, fn ($link) => auth()->user()->can($link[0].'.view') && (! $currentSite || $currentSite->hasModule($link[0])));
                 @endphp
                 @if ($moduleLinks !== [])
                     <flux:sidebar.group :heading="__('Modules')" class="grid">
                         @foreach ($moduleLinks as [$module, $route, $pattern, $icon, $label])
-                            <flux:sidebar.item :icon="$icon" :href="route($route)" :current="request()->routeIs($pattern)" wire:navigate>
+                            @php
+                                $href = is_array($route) ? route(...$route) : route($route);
+                                $current = $pattern ? request()->routeIs($pattern) : request()->url() === $href;
+                            @endphp
+                            <flux:sidebar.item :icon="$icon" :href="$href" :current="$current" wire:navigate>
                                 {{ $label }}
                             </flux:sidebar.item>
                         @endforeach

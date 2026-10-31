@@ -73,12 +73,12 @@
                     </span>
                 </a>
 
-                <nav class="hidden items-center gap-1 text-sm font-semibold xl:flex" aria-label="{{ __('Navigasi utama') }}">
+                <nav class="hidden items-center gap-0.5 text-sm font-semibold whitespace-nowrap xl:flex" aria-label="{{ __('Navigasi utama') }}">
                     <a href="{{ route('site.home') }}" @class(['rounded-lg px-3 py-2 transition-colors', 'bg-primary-container text-on-primary' => request()->routeIs('site.home'), 'text-on-surface-variant hover:text-on-surface' => ! request()->routeIs('site.home')])>{{ __('Beranda') }}</a>
                     @foreach ($headerMenu as $item)
                         @if ($item->children->isNotEmpty())
                             <div class="group relative">
-                                <button type="button" class="flex items-center gap-1 rounded-lg px-3 py-2 text-on-surface-variant transition-colors hover:text-on-surface" aria-haspopup="true">
+                                <button type="button" class="flex items-center gap-1 rounded-lg px-2.5 py-2 text-on-surface-variant transition-colors hover:text-on-surface" aria-haspopup="true">
                                     {{ $item->label }} <x-site.icon name="expand_more" class="text-[16px]!" />
                                 </button>
                                 <div class="invisible absolute start-0 top-full z-50 w-60 pt-2 opacity-0 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
@@ -90,7 +90,7 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ $item->href() }}" @if ($item->open_in_new_tab) target="_blank" rel="noopener" @endif class="rounded-lg px-3 py-2 text-on-surface-variant transition-colors hover:text-on-surface">{{ $item->label }}</a>
+                            <a href="{{ $item->href() }}" @if ($item->open_in_new_tab) target="_blank" rel="noopener" @endif class="rounded-lg px-2.5 py-2 text-on-surface-variant transition-colors hover:text-on-surface">{{ $item->label }}</a>
                         @endif
                     @endforeach
                 </nav>

@@ -51,7 +51,7 @@
                 <span class="truncate text-lg font-bold tracking-tight text-primary">{{ $site->name }}</span>
             </a>
 
-            <nav class="hidden items-center gap-6 text-sm font-semibold xl:flex" aria-label="{{ __('Navigasi utama') }}">
+            <nav class="hidden items-center gap-5 text-sm font-semibold whitespace-nowrap xl:flex" aria-label="{{ __('Navigasi utama') }}">
                 <a href="{{ route('site.home') }}" @class(['transition-colors', 'text-primary' => request()->routeIs('site.home'), 'text-on-surface-variant hover:text-primary' => ! request()->routeIs('site.home')])>{{ __('Beranda') }}</a>
                 @foreach ($headerMenu as $item)
                     @if ($item->children->isNotEmpty())

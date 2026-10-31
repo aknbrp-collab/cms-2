@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Middleware\EnsureAdminAccess;
 use App\Http\Middleware\SetAdminSite;
+use App\Models;
 use App\Models\AdmissionPeriod;
 use App\Models\AdmissionRegistration;
 use App\Models\Category;
@@ -25,6 +26,7 @@ use App\Policies\GalleryPolicy;
 use App\Policies\MediaAssetPolicy;
 use App\Policies\PagePolicy;
 use App\Policies\PostPolicy;
+use App\Policies\PublicationPolicy;
 use App\Support\Audit;
 use App\Support\ContentTypes;
 use App\Support\CurrentSite;
@@ -80,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Event::class, EventPolicy::class);
         Gate::policy(Gallery::class, GalleryPolicy::class);
         Gate::policy(MediaAsset::class, MediaAssetPolicy::class);
+        Gate::policy(Models\Publication::class, PublicationPolicy::class);
 
         RateLimiter::for('admission-registration', fn (Request $request) => [
             Limit::perMinute(3)->by($request->ip()),
@@ -126,6 +129,15 @@ class AppServiceProvider extends ServiceProvider
             'leader' => Leader::class,
             'admission_period' => AdmissionPeriod::class,
             'admission_registration' => AdmissionRegistration::class,
+            'facility' => Models\Facility::class,
+            'extracurricular' => Models\Extracurricular::class,
+            'achievement' => Models\Achievement::class,
+            'lecturer' => Models\Lecturer::class,
+            'program' => Models\Program::class,
+            'course' => Models\Course::class,
+            'journal' => Models\Journal::class,
+            'organization' => Models\Organization::class,
+            'publication' => Models\Publication::class,
         ]);
     }
 

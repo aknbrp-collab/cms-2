@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Site\DirectoryController;
 use App\Http\Controllers\Site\ModuleController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\SitemapController;
@@ -53,6 +54,19 @@ Route::middleware(ResolveSite::class)->name('site.')->group(function () {
     Route::get('penerimaan/selesai/{number}', [ModuleController::class, 'registered'])
         ->middleware('signed')
         ->name('admissions.done');
+
+    Route::get('fasilitas', [DirectoryController::class, 'facilities'])->name('facilities');
+    Route::get('ekstrakurikuler', [DirectoryController::class, 'extracurriculars'])->name('extracurriculars');
+    Route::get('prestasi', [DirectoryController::class, 'achievements'])->name('achievements');
+    Route::get('dosen', [DirectoryController::class, 'lecturers'])->name('lecturers.index');
+    Route::get('dosen/{slug}', [DirectoryController::class, 'lecturer'])->name('lecturers.show');
+    Route::get('program', [DirectoryController::class, 'programs'])->name('programs.index');
+    Route::get('program/{slug}', [DirectoryController::class, 'program'])->name('programs.show');
+    Route::get('publikasi', [DirectoryController::class, 'publications'])->name('publications.index');
+    Route::get('publikasi/{slug}', [DirectoryController::class, 'publication'])->name('publications.show');
+    Route::get('jurnal', [DirectoryController::class, 'journals'])->name('journals.index');
+    Route::get('jurnal/{slug}', [DirectoryController::class, 'journal'])->name('journals.show');
+    Route::get('organisasi', [DirectoryController::class, 'organizations'])->name('organizations');
 
     Route::get('sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
     Route::get('robots.txt', [SitemapController::class, 'robots'])->name('robots');

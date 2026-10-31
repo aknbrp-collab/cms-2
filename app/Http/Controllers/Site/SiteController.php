@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Site;
 use App\Enums\GalleryType;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
+use App\Models\Achievement;
 use App\Models\AdmissionPeriod;
 use App\Models\Category;
 use App\Models\Event;
@@ -12,6 +13,8 @@ use App\Models\GalleryItem;
 use App\Models\Leader;
 use App\Models\Page;
 use App\Models\Post;
+use App\Models\Program;
+use App\Models\Publication;
 use App\Models\Site;
 use App\Support\Seo;
 use App\Support\SiteTheme;
@@ -65,6 +68,15 @@ class SiteController extends Controller
             'admission' => $site->hasModule('admissions')
                 ? AdmissionPeriod::query()->open()->orderBy('closes_on')->first()
                 : null,
+            'achievements' => $site->hasModule('achievements')
+                ? Achievement::query()->published()->with('image.media')->orderByDesc('achieved_on')->limit(4)->get()
+                : collect(),
+            'programs' => $site->hasModule('programs')
+                ? Program::query()->published()->orderBy('sort_order')->limit(3)->get()
+                : collect(),
+            'publications' => $site->hasModule('publications')
+                ? Publication::query()->published()->with('journal')->latest('published_at')->limit(3)->get()
+                : collect(),
         ]);
     }
 

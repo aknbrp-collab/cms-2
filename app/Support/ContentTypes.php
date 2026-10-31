@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\Gallery;
 use App\Models\Page;
 use App\Models\Post;
+use App\Models\Publication;
 
 /**
  * Content types that go through the editorial workflow.
@@ -20,5 +21,6 @@ class ContentTypes
         Page::class,
         Event::class,
         Gallery::class,
+        Publication::class,
     ];
 }

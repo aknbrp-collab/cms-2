@@ -1,5 +1,6 @@
 <?php
 
+use App\Cms\Resources;
 use App\Http\Controllers\Admin\ExportRegistrationsController;
 use App\Http\Controllers\Admin\SwitchSiteController;
 use App\Http\Middleware\EnsureAdminAccess;
@@ -38,6 +39,15 @@ Route::middleware(['auth', 'verified', EnsureAdminAccess::class, SetAdminSite::c
     Route::get('admissions/registrations/export', ExportRegistrationsController::class)
         ->middleware('can:admissions.view')
         ->name('admin.admissions.export');
+
+    Route::livewire('resources/{resource}', 'pages::admin.resource')
+        ->whereIn('resource', array_keys(Resources::all()))
+        ->name('admin.resources');
+    Route::livewire('programs/{program}/curriculum', 'pages::admin.programs.curriculum')->name('admin.programs.curriculum');
+
+    Route::livewire('publications', 'pages::admin.publications.index')->name('admin.publications.index');
+    Route::livewire('publications/create', 'pages::admin.publications.edit')->name('admin.publications.create');
+    Route::livewire('publications/{publication}/edit', 'pages::admin.publications.edit')->name('admin.publications.edit');
 
     Route::livewire('categories', 'pages::admin.categories')
         ->middleware('can:categories.view')

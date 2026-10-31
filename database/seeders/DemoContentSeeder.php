@@ -2,26 +2,39 @@
 
 namespace Database\Seeders;
 
+use App\Enums\AchievementLevel;
 use App\Enums\BlockType;
 use App\Enums\ContentStatus;
 use App\Enums\GalleryType;
 use App\Enums\MenuItemType;
 use App\Enums\MenuLocation;
+use App\Enums\OrganizationType;
 use App\Enums\PageTemplate;
 use App\Enums\PostType;
+use App\Enums\ProgramLevel;
+use App\Enums\PublicationType;
 use App\Enums\SiteKey;
+use App\Models\Achievement;
 use App\Models\AdmissionPeriod;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\Extracurricular;
+use App\Models\Facility;
 use App\Models\Faq;
 use App\Models\Gallery;
+use App\Models\Journal;
 use App\Models\Leader;
+use App\Models\Lecturer;
 use App\Models\Menu;
+use App\Models\Organization;
 use App\Models\Page;
 use App\Models\Post;
+use App\Models\Program;
+use App\Models\Publication;
 use App\Models\Site;
 use App\Models\User;
 use App\Support\CurrentSite;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -94,13 +107,15 @@ class DemoContentSeeder extends Seeder
             'kontak' => ['Hubungi Kami', null, PageTemplate::Contact],
         ]);
 
+        $this->pondokModules($site);
+
         $this->modules($site, $author, 'PSB', [
             ['Pengasuh Pondok Pesantren', 'KH. Ahmad Mudzakir', 'Sanad Tahfidz & Kitab Kuning'],
             ['Kepala Madrasah', 'Ust. H. Muhammad Ridwan, M.Pd.I', 'Manajemen Pendidikan Islam'],
         ], ['Reguler', 'Tahfidz Al-Qur\'an', 'Bahasa Arab & Inggris']);
 
         $this->menu($site, MenuLocation::Header, [
-            ['Profil', null, [['Sejarah', $pages['sejarah']], ['Visi & Misi', $pages['visi-misi']], ['Pimpinan', '/pimpinan']]],
+            ['Profil', null, [['Sejarah', $pages['sejarah']], ['Visi & Misi', $pages['visi-misi']], ['Pimpinan', '/pimpinan'], ['Sarana Prasarana', '/fasilitas'], ['Ekstrakurikuler', '/ekstrakurikuler'], ['Prestasi', '/prestasi']]],
             ['Berita', null, [['Berita', '/berita'], ['Pengumuman', '/pengumuman'], ['Agenda', '/agenda']]],
             ['Pendaftaran', null, [['Info PSB', '/penerimaan'], ['Pendaftaran Online', '/penerimaan/daftar'], ['FAQ', '/faq']]],
             ['Galeri', null, [['Foto', '/galeri?jenis=photo'], ['Video', '/galeri?jenis=video']]],
@@ -156,6 +171,8 @@ class DemoContentSeeder extends Seeder
             'kontak' => ['Kontak', null, PageTemplate::Contact],
         ]);
 
+        $this->mahadModules($site, $author);
+
         $this->modules($site, $author, 'PMB', [
             ['Rais Masyayikh', 'Syaikh Dr. KH. Luqmanul Hakim, MA.', 'Sanad Ushul Fiqh Al-Azhar Kairo'],
             ['Mudir Ma\'had Aly', 'KH. M. Syukron Ma\'mun, Lc., M.Hum.', 'Tahqiq Turats Fiqh Syafi\'i'],
@@ -164,8 +181,10 @@ class DemoContentSeeder extends Seeder
 
         $this->menu($site, MenuLocation::Header, [
             ['Profil', null, [['Tentang Kami', $pages['tentang-kami']], ['Visi & Misi', $pages['visi-dan-misi']], ['Sejarah & Sanad', $pages['sejarah-dan-sanad']], ['Pimpinan', '/pimpinan']]],
-            ['Publikasi & Riset', null, [['Bahtsul Masail', $categories['Bahtsul Masail']], ['Kajian Ilmiah', $categories['Kajian Ilmiah']]]],
-            ['Berita & Agenda', null, [['Berita Akademik', '/berita'], ['Agenda & Halaqah', '/agenda'], ['Galeri', '/galeri']]],
+            ['Akademik', null, [['Program Takhassus', '/program'], ['Direktori Dosen', '/dosen'], ['Agenda & Halaqah', '/agenda']]],
+            ['Publikasi & Riset', null, [['Repositori', '/publikasi'], ['Bahtsul Masail', '/publikasi?jenis=bahtsul_masail'], ['Jurnal Ilmiah', '/jurnal']]],
+            ['Mahasantri', null, [['Organisasi (DEMA & UKM)', '/organisasi'], ['Galeri', '/galeri']]],
+            ['Berita', '/berita'],
             ['PMB', null, [['Informasi PMB', '/penerimaan'], ['FAQ', '/faq']]],
             ['Kontak', $pages['kontak']],
         ]);
@@ -179,6 +198,108 @@ class DemoContentSeeder extends Seeder
             ['Berita Akademik', '/berita'],
             ['Pengumuman', '/pengumuman'],
         ]);
+    }
+
+    /**
+     * Facilities, extracurriculars and achievements of the Pondok.
+     */
+    protected function pondokModules(Site $site): void
+    {
+        $this->reference(Facility::class, $site, [
+            ['name' => 'Masjid Jami\'', 'description' => 'Pusat ibadah dan kajian kitab santri putra dan putri.'],
+            ['name' => 'Asrama Santri', 'description' => 'Asrama putra dan putri dengan pembina di setiap kamar.'],
+            ['name' => 'Perpustakaan', 'description' => 'Koleksi kitab kuning, buku umum, dan ruang baca yang nyaman.'],
+            ['name' => 'Laboratorium Komputer', 'description' => 'Fasilitas pembelajaran teknologi informasi.'],
+        ]);
+
+        $this->reference(Extracurricular::class, $site, [
+            ['name' => 'Pencak Silat', 'category' => 'Olahraga', 'schedule' => 'Jumat, 15.30 WIB', 'coach' => 'Ust. Hamid', 'description' => 'Bela diri tradisional untuk membentuk fisik dan mental santri.'],
+            ['name' => 'Hadrah & Sholawat', 'category' => 'Seni', 'schedule' => 'Kamis malam', 'description' => 'Grup rebana yang sering tampil di acara pesantren.'],
+            ['name' => 'Muhadharah', 'category' => 'Bahasa', 'schedule' => 'Ahad pagi', 'description' => 'Latihan pidato tiga bahasa: Indonesia, Arab, Inggris.'],
+            ['name' => 'Pramuka', 'category' => 'Kepanduan', 'schedule' => 'Sabtu, 14.00 WIB', 'description' => 'Pembinaan kepemimpinan dan kemandirian.'],
+        ]);
+
+        $this->reference(Achievement::class, $site, [
+            ['title' => 'Juara Umum Pencak Silat', 'student_name' => 'Tim Pencak Silat', 'level' => AchievementLevel::Province, 'event_name' => 'Sunan Kalijaga Cup V', 'achieved_on' => now()->subWeeks(2)],
+            ['title' => 'Juara 1 MTQ Putri', 'student_name' => 'Siti Aisyah', 'level' => AchievementLevel::District, 'event_name' => 'MTQ Kabupaten Kendal', 'achieved_on' => now()->subMonth()],
+            ['title' => 'Medali Perak Olimpiade Sains', 'student_name' => 'Muhammad Faiz', 'level' => AchievementLevel::National, 'event_name' => 'OSN Pesantren', 'achieved_on' => now()->subMonths(2)],
+            ['title' => 'Juara 2 Debat Bahasa Arab', 'student_name' => 'Tim Debat', 'level' => AchievementLevel::Province, 'event_name' => 'Festival Bahasa Arab Jateng', 'achieved_on' => now()->subMonths(3)],
+        ]);
+    }
+
+    /**
+     * Programs with curriculum, lecturers, a journal, publications and organizations.
+     */
+    protected function mahadModules(Site $site, ?User $author): void
+    {
+        $programs = [
+            ['Fiqh wa Ushuluh', ProgramLevel::Ula, 'S.Ag.', 'Unggul', 'Penguasaan metodologi istinbath hukum, qawa\'id fiqhiyyah, dan perbandingan madzhab.', "Jam'ul Jawami'\nAl-Muhadzdzab\nNihayatul Muhtaj"],
+            ['Hadits wa \'Ulumuhu', ProgramLevel::Ula, 'S.Ag.', 'A', 'Kajian kritik sanad dan matan, takhrij, ilmu rijal, serta kutubus sittah.', "Fathul Bari\nTadribur Rawi\nAl-Muwaththa'"],
+            ['Fiqh Mu\'amalah', ProgramLevel::Tsaniyah, 'M.Ag.', 'Unggul', 'Fiqh ekonomi dan transaksi kontemporer berbasis turats.', "Al-Asybah wan Nadha'ir\nI'anatut Thalibin"],
+        ];
+
+        foreach ($programs as $order => [$name, $level, $degree, $accreditation, $summary, $books]) {
+            $program = Program::query()->create([
+                'site_id' => $site->id, 'name' => $name, 'slug' => Str::slug($name), 'level' => $level, 'degree' => $degree,
+                'accreditation' => $accreditation, 'summary' => $summary, 'core_books' => $books, 'sort_order' => $order,
+                'description' => '<p>'.e($summary).' Perkuliahan memadukan sistem halaqah dan kurikulum pendidikan tinggi.</p>',
+            ]);
+            $program->forceFill(['is_published' => true])->save();
+
+            foreach ([[1, 'Ushul Fiqh I', 'Al-Waraqat'], [1, 'Qawa\'id Fiqhiyyah', 'Al-Faraid Al-Bahiyyah'], [2, 'Ushul Fiqh II', "Jam'ul Jawami'"], [2, 'Fiqh Ibadah', 'Fathul Mu\'in']] as $index => [$semester, $course, $kitab]) {
+                $program->courses()->create(['semester' => $semester, 'code' => 'MK'.($order + 1).'0'.($index + 1), 'name' => $course, 'credits' => 2, 'books' => $kitab, 'sort_order' => $index]);
+            }
+        }
+
+        $this->reference(Lecturer::class, $site, [
+            ['name' => 'Syaikh Dr. KH. Luqmanul Hakim, MA.', 'slug' => 'luqmanul-hakim', 'position' => 'Rais Masyayikh', 'expertise' => 'Ushul Fiqh Komparatif', 'education' => "S3 Universitas Al-Azhar Kairo\nS2 Universitas Al-Azhar Kairo"],
+            ['name' => 'KH. M. Syukron Ma\'mun, Lc., M.Hum.', 'slug' => 'syukron-mamun', 'position' => 'Mudir', 'expertise' => 'Tahqiq Turats Fiqh Syafi\'i', 'education' => "S2 UIN Sunan Kalijaga\nS1 Universitas Al-Azhar Kairo"],
+            ['name' => 'Dr. H. Mahbub Ridwan, M.Ag.', 'slug' => 'mahbub-ridwan', 'position' => 'Dosen Tetap', 'expertise' => 'Hadits wa \'Ulumuhu', 'education' => "S3 UIN Walisongo\nS2 UIN Walisongo"],
+            ['name' => 'Ust. Ahmad Syarifuddin, M.H.', 'slug' => 'ahmad-syarifuddin', 'position' => 'Dosen Tetap', 'expertise' => 'Fiqh Mu\'amalah', 'education' => 'S2 UIN Walisongo'],
+        ]);
+
+        $journal = Journal::query()->create([
+            'site_id' => $site->id, 'name' => 'Al-Ahkam: Jurnal Studi Fiqh Kontemporer', 'slug' => 'al-ahkam', 'issn' => '2580-992X',
+            'accreditation' => 'Sinta 2', 'description' => 'Jurnal kajian fiqh kontemporer dan turats Nusantara.',
+        ]);
+        $journal->forceFill(['is_published' => true])->save();
+
+        $publications = [
+            [PublicationType::BahtsulMasail, 'Hukum Akad Kontrak Pintar (Smart Contract) dalam Tinjauan Ijarah dan Wakalah', 'Lembaga Bahtsul Masail Ma\'had Aly', null],
+            [PublicationType::JournalArticle, 'Metodologi Qiyas Kausalitas dalam Jam\'ul Jawami\'', 'Mahbub Ridwan', $journal],
+            [PublicationType::Research, 'Fiqh Lingkungan dalam Perspektif Maqashid Syariah', 'Ahmad Syarifuddin', null],
+            [PublicationType::Thesis, 'Tahqiq Naskah Fiqh Syafi\'i dari Pesisir Utara Jawa', 'Abdul Karim', null],
+        ];
+
+        foreach ($publications as $index => [$type, $title, $authors, $inJournal]) {
+            $this->publish(Publication::query()->make([
+                'site_id' => $site->id, 'author_id' => $author?->id, 'type' => $type, 'title' => $title, 'slug' => Str::slug($title),
+                'authors' => $authors, 'year' => (int) now()->format('Y') - ($index % 2), 'journal_id' => $inJournal?->id,
+                'volume' => $inJournal ? '12' : null, 'issue' => $inJournal ? '1' : null, 'keywords' => 'fiqh, turats, maqashid',
+                'abstract' => "Kajian ini membahas {$title} dengan pendekatan turats dan konteks kontemporer.",
+            ]), now()->subDays($index + 1));
+        }
+
+        $this->reference(Organization::class, $site, [
+            ['name' => 'Dewan Mahasantri (DEMA)', 'slug' => 'dema', 'type' => OrganizationType::Dema, 'chairperson' => 'Muhammad Rizqi', 'period' => '2026/2027', 'description' => 'Organisasi perwakilan mahasantri Ma\'had Aly.'],
+            ['name' => 'Lembaga Bahtsul Masail Mahasantri', 'slug' => 'lbm', 'type' => OrganizationType::Ukm, 'description' => 'Forum musyawarah ilmiah membahas persoalan keagamaan aktual.'],
+            ['name' => 'Jam\'iyyah Qurra\' wa Huffadz', 'slug' => 'jqh', 'type' => OrganizationType::Ukm, 'description' => 'Pembinaan tilawah dan tahfidz Al-Qur\'an.'],
+        ]);
+    }
+
+    /**
+     * Create published reference items of a model.
+     *
+     * @param  class-string<Model>  $modelClass
+     * @param  list<array<string, mixed>>  $items
+     */
+    protected function reference(string $modelClass, Site $site, array $items): void
+    {
+        foreach ($items as $order => $attributes) {
+            $modelClass::query()->create(['site_id' => $site->id, 'sort_order' => $order, ...$attributes])
+                ->forceFill(['is_published' => true])
+                ->save();
+        }
     }
 
     /**
@@ -394,12 +515,12 @@ class DemoContentSeeder extends Seeder
     }
 
     /**
-     * @template TModel of Post|Page|Event
+     * @template TModel of Post|Page|Event|Publication
      *
      * @param  TModel  $content
      * @return TModel
      */
-    protected function publish(Post|Page|Event $content, \DateTimeInterface $at): Post|Page|Event
+    protected function publish(Post|Page|Event|Publication $content, \DateTimeInterface $at): Post|Page|Event|Publication
     {
         $content->forceFill(['status' => ContentStatus::Published, 'published_at' => $at])->save();
 

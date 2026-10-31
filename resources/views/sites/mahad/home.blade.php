@@ -60,7 +60,23 @@
         </section>
     @endif
 
-    <section class="py-16 md:py-20">
+    @if ($programs->isNotEmpty())
+        <section class="py-16 md:py-20" id="takhassus">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+                <div class="mb-10 text-center">
+                    <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Program Takhassus') }}</p>
+                    <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Disiplin Keilmuan Pesantren Tinggi') }}</h2>
+                </div>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($programs as $program)
+                        <x-site.program-card :program="$program" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    <section @class(['py-16 md:py-20', 'bg-surface-low' => $programs->isNotEmpty()])>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
             <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
@@ -115,6 +131,25 @@
             </div>
         </section>
     @endforeach
+
+    @if ($publications->isNotEmpty())
+        <section class="py-16 md:py-20">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+                <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Publikasi & Riset Ilmiah') }}</p>
+                        <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Bahtsul Masail, Jurnal & Repositori') }}</h2>
+                    </div>
+                    <a href="{{ route('site.publications.index') }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Kunjungi repositori') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                </div>
+                <div class="grid gap-5 lg:grid-cols-3">
+                    @foreach ($publications as $publication)
+                        <x-site.publication-item :publication="$publication" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 
     @if ($leaders->isNotEmpty())
         <section class="bg-surface-low py-16 md:py-20">

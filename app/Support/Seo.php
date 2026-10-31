@@ -7,6 +7,7 @@ use App\Models\Gallery;
 use App\Models\MediaAsset;
 use App\Models\Page;
 use App\Models\Post;
+use App\Models\Publication;
 use App\Models\Site;
 use Illuminate\Support\Str;
 
@@ -40,13 +41,14 @@ readonly class Seo
     /**
      * Meta tags of a content item, using its SEO overrides when present.
      */
-    public static function forContent(Site $site, Post|Page|Event|Gallery $content): self
+    public static function forContent(Site $site, Post|Page|Event|Gallery|Publication $content): self
     {
         $seo = $content->seo;
         $excerpt = match (true) {
             $content instanceof Post => (string) $content->excerpt,
             $content instanceof Event => (string) $content->summary,
             $content instanceof Gallery => (string) $content->description,
+            $content instanceof Publication => (string) $content->abstract,
             default => '',
         };
         $fallbackImage = match (true) {
@@ -64,7 +66,7 @@ readonly class Seo
             image: $image instanceof MediaAsset ? $image->url('large') : $site->brandingUrl('og_default'),
             canonical: $seo?->canonical_url ?: url()->current(),
             noindex: (bool) $seo?->noindex,
-            type: $content instanceof Post ? 'article' : 'website',
+            type: $content instanceof Post || $content instanceof Publication ? 'article' : 'website',
         );
     }
 

@@ -148,7 +148,20 @@ Phase 0 task breakdown, in order:
 - Homepages: Pondok gets a TV section, an agenda sidebar and a PSB card driven by the open period. Ma'had gets Pimpinan & Masyayikh, Agenda & Halaqah, and PMB steps.
 - Registration confirmation is on-screen and via a WhatsApp link only; email/WhatsApp notifications can be added later.
 
-**Phase 2c — Site-specific modules:** Pondok (facilities, achievements, extracurriculars); Ma'had (lecturers, Takhassus programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); homepage sections for each.
+**Phase 2c — Site-specific modules** ✅ done 2026-10-31.
+- **Generic resource screen** for simple reference content: `pages::admin.resource` at `/resources/{key}` is driven by `App\Cms\AdminResource` definitions in `app/Cms/Resources` (fields, ordering, thumbnails, row actions). Adding a module = model + migration + one definition class.
+  - Pondok: facilities, extracurriculars, achievements.
+  - Ma'had: lecturers, Takhassus programs, journals, organizations.
+- **Curriculum editor** per program (courses by semester with SKS and kitab).
+- **Publications** (articles, journal articles, Bahtsul Masail, theses, books) go through the editorial workflow, so the Managing Editor approves them. They support journal/volume/issue, a DOI, a PDF and an external link. `external_source`/`external_id` are ready for SIAKAD (Phase 3).
+- **Public routes:**
+  - Pondok: `/fasilitas`, `/ekstrakurikuler`, `/prestasi`.
+  - Ma'had: `/dosen` (search), `/dosen/{slug}`, `/program`, `/program/{slug}`, `/publikasi` (filter by type, year and keyword), `/publikasi/{slug}`, `/jurnal`, `/jurnal/{slug}`, `/organisasi`.
+  - Each returns 404 on a site without the module.
+- **Homepages:** Pondok gets an achievements section. Ma'had gets Program Takhassus and Publikasi & Riset sections.
+- **Known simplification:** "related publications" on a lecturer page match by surname in the authors text. A proper author link can come with the SIAKAD sync.
+
+**Phase 2 complete.** Next: Phase 3 (SIAKAD and Tanya Hukum).
 
 Original Phase 2 scope: events calendar, galleries (incl. YouTube), FAQ, PMB, leadership, facilities, achievements, extracurriculars; Ma'had modules (lecturers, programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); the two public themes converted from `ide.html` / `pdf.html`, domain resolution, Hijri date and prayer-times widget (Ma'had), Pondok PSB online registration form, sitemap, and analytics injection.
 
