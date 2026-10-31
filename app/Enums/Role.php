@@ -52,6 +52,7 @@ enum Role: string
                 ...Permissions::system('menus'),
                 ...Permissions::system('categories'),
                 ...Permissions::system('siakad_articles'),
+                ...Permissions::system('integration_logs', ['view']),
                 ...Permissions::system('audit_logs'),
             ],
             self::PondokAdmin => [

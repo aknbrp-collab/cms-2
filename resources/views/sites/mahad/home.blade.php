@@ -151,6 +151,33 @@
         </section>
     @endif
 
+    @if ($site->hasModule('legal_questions'))
+        <section class="bg-surface-low py-16 md:py-20">
+            <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:px-10">
+                <div class="lg:col-span-4">
+                    <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Konsultasi Hukum Islam') }}</p>
+                    <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Tanya Hukum') }}</h2>
+                    <p class="mt-4 text-on-surface-variant">{{ __('Ajukan pertanyaan seputar fiqh. Jawaban dikaji oleh dewan asatidz Ma\'had Aly.') }}</p>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <a href="{{ route('site.legal-questions.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-container">{{ __('Ajukan Pertanyaan') }}</a>
+                        <a href="{{ route('site.legal-questions.index') }}" class="inline-flex items-center gap-1 px-2 py-2.5 font-semibold text-primary hover:underline">{{ __('Arsip jawaban') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                    </div>
+                </div>
+                <div class="space-y-4 lg:col-span-8">
+                    @forelse ($legalQuestions as $question)
+                        <a href="{{ route('site.legal-questions.show', $question->slug) }}" class="block rounded-xl border border-primary/10 bg-surface-card p-5 shadow-sm transition hover:shadow-md">
+                            <span class="rounded-full bg-mint px-2.5 py-0.5 text-xs font-bold text-primary">{{ $question->category->label() }}</span>
+                            <h3 class="mt-2 font-semibold text-on-surface">{{ $question->title }}</h3>
+                            <p class="mt-1 line-clamp-2 text-sm text-on-surface-variant">{{ $question->public_question }}</p>
+                        </a>
+                    @empty
+                        <p class="rounded-xl bg-surface-card p-8 text-center text-on-surface-variant shadow-sm">{{ __('Jadilah yang pertama bertanya.') }}</p>
+                    @endforelse
+                </div>
+            </div>
+        </section>
+    @endif
+
     @if ($leaders->isNotEmpty())
         <section class="bg-surface-low py-16 md:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">

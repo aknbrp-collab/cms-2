@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\Gallery;
 use App\Models\Journal;
 use App\Models\Lecturer;
+use App\Models\LegalQuestion;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Program;
@@ -60,7 +61,7 @@ class SitemapController extends Controller
             'extracurriculars' => 'site.extracurriculars', 'achievements' => 'site.achievements',
             'lecturers' => 'site.lecturers.index', 'programs' => 'site.programs.index',
             'publications' => 'site.publications.index', 'journals' => 'site.journals.index',
-            'organizations' => 'site.organizations',
+            'organizations' => 'site.organizations', 'legal_questions' => 'site.legal-questions.index',
         ];
 
         foreach ($indexes as $module => $route) {
@@ -82,6 +83,11 @@ class SitemapController extends Controller
         if ($site->hasModule('publications')) {
             $urls = $urls->concat($this->indexable(Publication::query()->published())->get(['slug', 'updated_at'])
                 ->map(fn (Publication $publication) => ['loc' => route('site.publications.show', $publication->slug), 'lastmod' => $publication->updated_at]));
+        }
+
+        if ($site->hasModule('legal_questions')) {
+            $urls = $urls->concat(LegalQuestion::query()->published()->get(['slug', 'updated_at'])
+                ->map(fn (LegalQuestion $question) => ['loc' => route('site.legal-questions.show', $question->slug), 'lastmod' => $question->updated_at]));
         }
 
         $details = [

@@ -4,6 +4,7 @@ use App\Http\Controllers\Site\DirectoryController;
 use App\Http\Controllers\Site\ModuleController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\SitemapController;
+use App\Http\Controllers\Site\TanyaHukumController;
 use App\Http\Middleware\ResolveSite;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +68,16 @@ Route::middleware(ResolveSite::class)->name('site.')->group(function () {
     Route::get('jurnal', [DirectoryController::class, 'journals'])->name('journals.index');
     Route::get('jurnal/{slug}', [DirectoryController::class, 'journal'])->name('journals.show');
     Route::get('organisasi', [DirectoryController::class, 'organizations'])->name('organizations');
+
+    Route::get('tanya-hukum', [TanyaHukumController::class, 'index'])->name('legal-questions.index');
+    Route::get('tanya-hukum/tanya', [TanyaHukumController::class, 'create'])->name('legal-questions.create');
+    Route::post('tanya-hukum/tanya', [TanyaHukumController::class, 'store'])
+        ->middleware('throttle:legal-question')
+        ->name('legal-questions.store');
+    Route::get('tanya-hukum/status', [TanyaHukumController::class, 'status'])
+        ->middleware('throttle:30,1')
+        ->name('legal-questions.status');
+    Route::get('tanya-hukum/{slug}', [TanyaHukumController::class, 'show'])->name('legal-questions.show');
 
     Route::get('sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
     Route::get('robots.txt', [SitemapController::class, 'robots'])->name('robots');

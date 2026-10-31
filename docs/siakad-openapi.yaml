@@ -1,0 +1,175 @@
+openapi: 3.1.0
+info:
+  title: SIAKAD ⇄ CMS Integration
+  version: 1.0.0
+  description: |
+    Contract between SIAKAD and the CMS. Prose version and signing rules: siakad-api-spec.md.
+    Every request in both directions carries X-Siakad-Timestamp and X-Siakad-Signature
+    (hex HMAC-SHA256 of "{timestamp}.{raw body}" with the shared webhook secret).
+servers:
+  - url: https://admin.pondok.example/api/webhooks/siakad
+    description: CMS webhooks (SIAKAD → CMS)
+  - url: https://siakad.example.ac.id/api/cms
+    description: SIAKAD API (CMS → SIAKAD)
+security:
+  - siakadSignature: []
+paths:
+  /articles:
+    post:
+      summary: Create or update an article (idempotent on id)
+      servers: [{ url: https://admin.pondok.example/api/webhooks/siakad }]
+      parameters: [{ $ref: '#/components/parameters/Timestamp' }, { $ref: '#/components/parameters/Signature' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Article' }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/ArticleReceived' } } } }
+        '200': { description: Updated, content: { application/json: { schema: { $ref: '#/components/schemas/ArticleReceived' } } } }
+        '401': { $ref: '#/components/responses/InvalidSignature' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { description: Rate limited }
+  /articles/{id}:
+    delete:
+      summary: Withdraw an article from the website
+      servers: [{ url: https://admin.pondok.example/api/webhooks/siakad }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, pattern: '^[A-Za-z0-9._:-]+$' } }
+        - { $ref: '#/components/parameters/Timestamp' }
+        - { $ref: '#/components/parameters/Signature' }
+      responses:
+        '200':
+          description: Withdrawn
+          content:
+            application/json:
+              schema: { type: object, properties: { status: { const: withdrawn }, cms_id: { type: string } } }
+        '401': { $ref: '#/components/responses/InvalidSignature' }
+        '404': { description: Unknown article }
+  /answers:
+    post:
+      summary: Answer to a forwarded Tanya Hukum question
+      servers: [{ url: https://admin.pondok.example/api/webhooks/siakad }]
+      parameters: [{ $ref: '#/components/parameters/Timestamp' }, { $ref: '#/components/parameters/Signature' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Answer' }
+      responses:
+        '200':
+          description: Received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { const: received }
+                  cms_id: { type: string }
+                  question_status: { type: string, enum: [answered, published] }
+        '401': { $ref: '#/components/responses/InvalidSignature' }
+        '404': { description: Unknown question }
+        '409': { description: Question was not forwarded to SIAKAD }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /legal-questions:
+    post:
+      summary: (Hosted by SIAKAD) receive a question forwarded by the CMS
+      servers: [{ url: https://siakad.example.ac.id/api/cms }]
+      security: [{ bearerApiKey: [], siakadSignature: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/Timestamp' }
+        - { $ref: '#/components/parameters/Signature' }
+        - { name: Idempotency-Key, in: header, required: true, schema: { type: string }, description: Equals cms_question_id; repeat calls must return the existing question. }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ForwardedQuestion' }
+      responses:
+        '201':
+          description: Accepted
+          content:
+            application/json:
+              schema: { type: object, required: [id], properties: { id: { type: string } } }
+        '200':
+          description: Already received (idempotent repeat)
+          content:
+            application/json:
+              schema: { type: object, required: [id], properties: { id: { type: string } } }
+components:
+  securitySchemes:
+    siakadSignature:
+      type: apiKey
+      in: header
+      name: X-Siakad-Signature
+      description: Hex HMAC-SHA256 of "{X-Siakad-Timestamp}.{raw body}"; timestamp must be within 300 s.
+    bearerApiKey:
+      type: http
+      scheme: bearer
+  parameters:
+    Timestamp: { name: X-Siakad-Timestamp, in: header, required: true, schema: { type: string, pattern: '^[0-9]+$' } }
+    Signature: { name: X-Siakad-Signature, in: header, required: true, schema: { type: string, pattern: '^[0-9a-f]{64}$' } }
+  responses:
+    InvalidSignature:
+      description: Missing, invalid or expired signature
+      content: { application/json: { schema: { type: object, properties: { message: { type: string } } } } }
+    ValidationError:
+      description: Invalid payload
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string }
+              errors: { type: object, additionalProperties: { type: array, items: { type: string } } }
+  schemas:
+    Article:
+      type: object
+      required: [id, title, authors, year]
+      properties:
+        id: { type: string, maxLength: 191 }
+        type: { type: string, enum: [research, journal_article, bahtsul_masail, thesis, book], default: research }
+        title: { type: string, maxLength: 255 }
+        authors:
+          oneOf:
+            - { type: array, items: { type: string, maxLength: 255 } }
+            - { type: string, maxLength: 255 }
+        year: { type: integer, minimum: 1900 }
+        abstract: { type: string, maxLength: 20000 }
+        body_html: { type: string }
+        keywords: { type: array, items: { type: string, maxLength: 100 } }
+        doi: { type: string, maxLength: 255 }
+        file_url: { type: string, format: uri }
+        source_url: { type: string, format: uri }
+    ArticleReceived:
+      type: object
+      properties:
+        status: { const: received }
+        cms_id: { type: string }
+        review_status: { type: string, enum: [draft, under_review, approved, rejected, withdrawn] }
+    Answer:
+      type: object
+      required: [answer_html, answered_by]
+      properties:
+        question_id: { type: string, description: cms_question_id (preferred) }
+        siakad_question_id: { type: string }
+        answer_html: { type: string }
+        answered_by: { type: string, maxLength: 255 }
+        references: { type: string, maxLength: 5000 }
+    ForwardedQuestion:
+      type: object
+      required: [cms_question_id, tracking_code, category, question, asker, callback_url]
+      properties:
+        cms_question_id: { type: string }
+        tracking_code: { type: string }
+        category: { type: string, enum: [ibadah, muamalah, munakahat, mawaris, jinayah, akhlak, lainnya] }
+        question: { type: string }
+        asker:
+          type: object
+          properties:
+            name: { type: [string, 'null'] }
+            city: { type: [string, 'null'] }
+            anonymous: { type: boolean }
+        submitted_at: { type: string, format: date-time }
+        moderator_note: { type: [string, 'null'] }
+        callback_url: { type: string, format: uri }

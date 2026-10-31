@@ -22,8 +22,8 @@
         <div class="border-b border-primary-container/40 bg-primary text-xs text-on-primary">
             <div class="mx-auto flex h-10 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
                 <div class="flex min-w-0 items-center gap-3">
-                    <span class="hidden font-arabic text-sm text-mint/90 md:inline" lang="ar" dir="rtl">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</span>
-                    <span class="hidden text-on-primary-container md:inline">•</span>
+                    <span class="hidden font-arabic text-sm whitespace-nowrap text-mint/90 lg:inline" lang="ar" dir="rtl">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</span>
+                    <span class="hidden text-on-primary-container lg:inline">•</span>
                     <span class="flex items-center gap-1 truncate">
                         <x-site.icon name="calendar_today" class="text-[14px]! text-gold-light" />
                         @if ($prayer)

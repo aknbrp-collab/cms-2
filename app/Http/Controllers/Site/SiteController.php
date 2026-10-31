@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Event;
 use App\Models\GalleryItem;
 use App\Models\Leader;
+use App\Models\LegalQuestion;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Program;
@@ -73,6 +74,9 @@ class SiteController extends Controller
                 : collect(),
             'programs' => $site->hasModule('programs')
                 ? Program::query()->published()->orderBy('sort_order')->limit(3)->get()
+                : collect(),
+            'legalQuestions' => $site->hasModule('legal_questions')
+                ? LegalQuestion::query()->published()->latest('published_at')->limit(3)->get()
                 : collect(),
             'publications' => $site->hasModule('publications')
                 ? Publication::query()->published()->with('journal')->latest('published_at')->limit(3)->get()

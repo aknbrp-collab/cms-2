@@ -49,6 +49,15 @@ Route::middleware(['auth', 'verified', EnsureAdminAccess::class, SetAdminSite::c
     Route::livewire('publications/create', 'pages::admin.publications.edit')->name('admin.publications.create');
     Route::livewire('publications/{publication}/edit', 'pages::admin.publications.edit')->name('admin.publications.edit');
 
+    // SIAKAD integration
+    Route::livewire('siakad/articles', 'pages::admin.siakad-articles.index')->name('admin.siakad-articles.index');
+    Route::livewire('siakad/articles/{article}', 'pages::admin.siakad-articles.show')->name('admin.siakad-articles.show');
+    Route::livewire('tanya-hukum', 'pages::admin.legal-questions.index')->name('admin.legal-questions.index');
+    Route::livewire('tanya-hukum/{question}', 'pages::admin.legal-questions.show')->name('admin.legal-questions.show');
+    Route::livewire('integration-logs', 'pages::admin.integration-logs')
+        ->middleware('can:integration_logs.view')
+        ->name('admin.integration-logs');
+
     Route::livewire('categories', 'pages::admin.categories')
         ->middleware('can:categories.view')
         ->name('admin.categories');

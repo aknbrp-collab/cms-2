@@ -27,6 +27,9 @@ use App\Policies\MediaAssetPolicy;
 use App\Policies\PagePolicy;
 use App\Policies\PostPolicy;
 use App\Policies\PublicationPolicy;
+use App\Siakad\FakeSiakadClient;
+use App\Siakad\HttpSiakadClient;
+use App\Siakad\SiakadClient;
 use App\Support\Audit;
 use App\Support\ContentTypes;
 use App\Support\CurrentSite;
@@ -56,6 +59,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->scoped(CurrentSite::class);
         $this->app->scoped(SiteTheme::class);
+        $this->app->bind(SiakadClient::class, fn () => config('siakad.driver') === 'http'
+            ? new HttpSiakadClient
+            : new FakeSiakadClient);
     }
 
     /**
@@ -83,6 +89,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Gallery::class, GalleryPolicy::class);
         Gate::policy(MediaAsset::class, MediaAssetPolicy::class);
         Gate::policy(Models\Publication::class, PublicationPolicy::class);
+
+        RateLimiter::for('siakad', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
+
+        RateLimiter::for('legal-question', fn (Request $request) => [
+            Limit::perMinute(2)->by($request->ip()),
+            Limit::perDay(10)->by($request->ip()),
+        ]);
 
         RateLimiter::for('admission-registration', fn (Request $request) => [
             Limit::perMinute(3)->by($request->ip()),
@@ -138,6 +151,9 @@ class AppServiceProvider extends ServiceProvider
             'journal' => Models\Journal::class,
             'organization' => Models\Organization::class,
             'publication' => Models\Publication::class,
+            'integration_log' => Models\IntegrationLog::class,
+            'siakad_article' => Models\SiakadArticle::class,
+            'legal_question' => Models\LegalQuestion::class,
         ]);
     }
 

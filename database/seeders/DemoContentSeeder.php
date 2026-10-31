@@ -6,6 +6,8 @@ use App\Enums\AchievementLevel;
 use App\Enums\BlockType;
 use App\Enums\ContentStatus;
 use App\Enums\GalleryType;
+use App\Enums\LegalCategory;
+use App\Enums\LegalQuestionStatus;
 use App\Enums\MenuItemType;
 use App\Enums\MenuLocation;
 use App\Enums\OrganizationType;
@@ -25,12 +27,14 @@ use App\Models\Gallery;
 use App\Models\Journal;
 use App\Models\Leader;
 use App\Models\Lecturer;
+use App\Models\LegalQuestion;
 use App\Models\Menu;
 use App\Models\Organization;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Program;
 use App\Models\Publication;
+use App\Models\SiakadArticle;
 use App\Models\Site;
 use App\Models\User;
 use App\Support\CurrentSite;
@@ -172,6 +176,7 @@ class DemoContentSeeder extends Seeder
         ]);
 
         $this->mahadModules($site, $author);
+        $this->tanyaHukum($site);
 
         $this->modules($site, $author, 'PMB', [
             ['Rais Masyayikh', 'Syaikh Dr. KH. Luqmanul Hakim, MA.', 'Sanad Ushul Fiqh Al-Azhar Kairo'],
@@ -182,7 +187,7 @@ class DemoContentSeeder extends Seeder
         $this->menu($site, MenuLocation::Header, [
             ['Profil', null, [['Tentang Kami', $pages['tentang-kami']], ['Visi & Misi', $pages['visi-dan-misi']], ['Sejarah & Sanad', $pages['sejarah-dan-sanad']], ['Pimpinan', '/pimpinan']]],
             ['Akademik', null, [['Program Takhassus', '/program'], ['Direktori Dosen', '/dosen'], ['Agenda & Halaqah', '/agenda']]],
-            ['Publikasi & Riset', null, [['Repositori', '/publikasi'], ['Bahtsul Masail', '/publikasi?jenis=bahtsul_masail'], ['Jurnal Ilmiah', '/jurnal']]],
+            ['Publikasi & Riset', null, [['Repositori', '/publikasi'], ['Bahtsul Masail', '/publikasi?jenis=bahtsul_masail'], ['Jurnal Ilmiah', '/jurnal'], ['Tanya Hukum', '/tanya-hukum']]],
             ['Mahasantri', null, [['Organisasi (DEMA & UKM)', '/organisasi'], ['Galeri', '/galeri']]],
             ['Berita', '/berita'],
             ['PMB', null, [['Informasi PMB', '/penerimaan'], ['FAQ', '/faq']]],
@@ -284,6 +289,41 @@ class DemoContentSeeder extends Seeder
             ['name' => 'Dewan Mahasantri (DEMA)', 'slug' => 'dema', 'type' => OrganizationType::Dema, 'chairperson' => 'Muhammad Rizqi', 'period' => '2026/2027', 'description' => 'Organisasi perwakilan mahasantri Ma\'had Aly.'],
             ['name' => 'Lembaga Bahtsul Masail Mahasantri', 'slug' => 'lbm', 'type' => OrganizationType::Ukm, 'description' => 'Forum musyawarah ilmiah membahas persoalan keagamaan aktual.'],
             ['name' => 'Jam\'iyyah Qurra\' wa Huffadz', 'slug' => 'jqh', 'type' => OrganizationType::Ukm, 'description' => 'Pembinaan tilawah dan tahfidz Al-Qur\'an.'],
+        ]);
+    }
+
+    /**
+     * Published Tanya Hukum answers, one new question and one incoming SIAKAD article.
+     */
+    protected function tanyaHukum(Site $site): void
+    {
+        $answered = [
+            [LegalCategory::Ibadah, 'Hukum Menjamak Shalat bagi Musafir', 'Bolehkah menjamak shalat Dzuhur dan Ashar ketika dalam perjalanan kurang dari dua hari?'],
+            [LegalCategory::Muamalah, 'Jual Beli dengan Sistem Pre-Order', 'Bagaimana hukum jual beli pre-order yang barangnya belum ada saat akad?'],
+        ];
+
+        foreach ($answered as [$category, $title, $question]) {
+            LegalQuestion::query()->create([
+                'site_id' => $site->id, 'category' => $category, 'asker_name' => 'Hamba Allah', 'is_anonymous' => true, 'question' => $question,
+            ])->forceFill([
+                'status' => LegalQuestionStatus::Published, 'title' => $title, 'slug' => Str::slug($title), 'public_question' => $question,
+                'external_id' => 'SIAKAD-Q-'.Str::upper(Str::random(6)), 'forwarded_at' => now()->subDays(10),
+                'answer' => '<p>Para ulama madzhab Syafi\'i membolehkannya dengan syarat-syarat tertentu. Wallahu a\'lam.</p>',
+                'answered_by' => 'Dewan Asatidz Ma\'had Aly', 'answer_references' => "Fathul Mu'in\nI'anatut Thalibin",
+                'answered_at' => now()->subDays(5), 'published_at' => now()->subDays(4),
+            ])->save();
+        }
+
+        LegalQuestion::query()->create([
+            'site_id' => $site->id, 'category' => LegalCategory::Munakahat, 'asker_name' => 'Fulan', 'asker_city' => 'Kendal',
+            'question' => 'Apakah wali hakim boleh menikahkan jika wali nasab berada di luar negeri dan sulit dihubungi?',
+        ]);
+
+        SiakadArticle::query()->create([
+            'site_id' => $site->id, 'external_id' => 'ART-DEMO-001', 'type' => PublicationType::Research,
+            'title' => 'Zakat Profesi dalam Perspektif Empat Madzhab', 'authors' => 'Ust. Ahmad Syarifuddin, M.H.',
+            'abstract' => 'Artikel kiriman SIAKAD yang menunggu persetujuan untuk diterbitkan di website.',
+            'year' => (int) now()->format('Y'), 'payload' => ['id' => 'ART-DEMO-001', 'demo' => true], 'received_at' => now(),
         ]);
     }
 

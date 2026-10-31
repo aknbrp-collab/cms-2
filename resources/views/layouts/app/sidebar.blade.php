@@ -49,6 +49,26 @@
                     </flux:sidebar.group>
                 @endcanany
 
+                @canany(['siakad_articles.view', 'legal_questions.view', 'integration_logs.view'])
+                    <flux:sidebar.group :heading="__('SIAKAD')" class="grid">
+                        @can('legal_questions.view')
+                            <flux:sidebar.item icon="scale" :href="route('admin.legal-questions.index')" :current="request()->routeIs('admin.legal-questions.*')" wire:navigate>
+                                {{ __('Tanya Hukum') }}
+                            </flux:sidebar.item>
+                        @endcan
+                        @can('siakad_articles.view')
+                            <flux:sidebar.item icon="arrow-down-tray" :href="route('admin.siakad-articles.index')" :current="request()->routeIs('admin.siakad-articles.*')" wire:navigate>
+                                {{ __('Incoming articles') }}
+                            </flux:sidebar.item>
+                        @endcan
+                        @can('integration_logs.view')
+                            <flux:sidebar.item icon="arrows-right-left" :href="route('admin.integration-logs')" :current="request()->routeIs('admin.integration-logs')" wire:navigate>
+                                {{ __('Integration log') }}
+                            </flux:sidebar.item>
+                        @endcan
+                    </flux:sidebar.group>
+                @endcanany
+
                 @php
                     $moduleLinks = [
                         ['events', 'admin.events.index', 'admin.events.*', 'calendar-days', __('Agenda')],

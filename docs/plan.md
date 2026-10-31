@@ -163,6 +163,20 @@ Phase 0 task breakdown, in order:
 
 **Phase 2 complete.** Next: Phase 3 (SIAKAD and Tanya Hukum).
 
+**Phase 3 — SIAKAD and Tanya Hukum (CMS side)** ✅ done 2026-10-31.
+- **Contract:** [siakad-api-spec.md](siakad-api-spec.md) + [siakad-openapi.yaml](siakad-openapi.yaml). Every call in both directions is signed with HMAC-SHA256 over `"{timestamp}.{body}"`, with a 300-second replay window. The CMS also sends a Bearer API key to SIAKAD. Settings `SIAKAD_*` are in `.env.example`.
+- **Webhooks** (admin domain, `/api/webhooks/siakad/…`): create/update an article (idempotent on SIAKAD id), withdraw an article, and receive an answer. Refused calls (bad signature, invalid payload) are logged too.
+- **Articles:** Draft → Under Review → Approved (becomes a published Publication) or Rejected. Updates after approval go back to review; withdrawal archives the publication. Ma'had admins review; the Managing Editor approves.
+- **Tanya Hukum:**
+  - Public form at `/tanya-hukum/tanya` (anonymous option, honeypot, minimum fill time, throttle) and a tracking code with status at `/tanya-hukum/status`.
+  - Moderator rejects or forwards. `ForwardLegalQuestion` is a queued job with 5 tries and backoff; it returns the question to the moderator if all attempts fail.
+  - The answer arrives by webhook, then the moderator edits the public wording and publishes to `/tanya-hukum`.
+  - The asker's email is never sent to SIAKAD or shown publicly, and personal data is kept out of the audit log.
+- **Integration log screen** with request/response detail and retry. `php artisan siakad:simulate article|answer|withdraw` sends signed webhooks locally; `SIAKAD_DRIVER=fake` (default) simulates SIAKAD accepting forwarded questions.
+- **Simplification:** question state history lives in the audit log and integration log instead of a separate `legal_question_events` table.
+
+Next: Phase 4 (social media).
+
 Original Phase 2 scope: events calendar, galleries (incl. YouTube), FAQ, PMB, leadership, facilities, achievements, extracurriculars; Ma'had modules (lecturers, programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); the two public themes converted from `ide.html` / `pdf.html`, domain resolution, Hijri date and prayer-times widget (Ma'had), Pondok PSB online registration form, sitemap, and analytics injection.
 
 **Phase 3 — SIAKAD and Tanya Hukum (CMS side only):** the CMS **defines the contract**, and SIAKAD is built against it later.

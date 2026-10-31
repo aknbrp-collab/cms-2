@@ -7,6 +7,7 @@ use App\Concerns\BelongsToSite;
 use App\Enums\RegistrationStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,11 +54,16 @@ class AdmissionRegistration extends Model
         'status' => 'new',
     ];
 
-    protected static function booted(): void
+    /**
+     * Assign the number on insert (also when model events are muted, e.g. in seeders).
+     *
+     * @param  Builder<static>  $query
+     */
+    protected function performInsert(Builder $query): bool
     {
-        static::creating(function (self $registration) {
-            $registration->registration_number ??= static::nextNumber();
-        });
+        $this->registration_number ??= static::nextNumber();
+
+        return parent::performInsert($query);
     }
 
     /**

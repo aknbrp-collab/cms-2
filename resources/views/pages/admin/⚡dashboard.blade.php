@@ -118,7 +118,9 @@ new #[Title('Dashboard')] class extends Component {
                         $data = $notification->data;
                         $contentClass = Illuminate\Database\Eloquent\Relations\Relation::getMorphedModel($data['content_type'] ?? '');
                     @endphp
-                    @if ($contentClass && is_subclass_of($contentClass, App\Contracts\Reviewable::class))
+                    @if (is_string($data['url'] ?? null))
+                        <a href="{{ $data['url'] }}" wire:navigate class="hover:underline">{{ $data['message'] ?? '' }}</a>
+                    @elseif ($contentClass && is_subclass_of($contentClass, App\Contracts\Reviewable::class))
                         <a href="{{ route($contentClass::adminEditRoute(), $data['content_id'] ?? '') }}" wire:navigate class="hover:underline">{{ $data['message'] ?? '' }}</a>
                     @else
                         <span>{{ $data['message'] ?? '' }}</span>
