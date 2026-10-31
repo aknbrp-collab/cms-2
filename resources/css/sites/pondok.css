@@ -1,0 +1,27 @@
+@import 'tailwindcss';
+
+/* Pondok Pesantren theme: bright green and yellow gold, light news-portal look. */
+@theme {
+    --color-primary: #005d42;
+    --color-primary-container: #047857;
+    --color-on-primary: #ffffff;
+    --color-on-primary-container: #9ffdd3;
+    --color-deep: #0f5132;
+    --color-secondary: #eab308;
+    --color-on-secondary: #0d1c2e;
+    --color-gold-light: #fef3c7;
+    --color-mint: #d1fae5;
+    --color-surface: #f8f9ff;
+    --color-surface-card: #ffffff;
+    --color-surface-low: #eff4ff;
+    --color-surface-container: #e6eeff;
+    --color-on-surface: #0d1c2e;
+    --color-on-surface-variant: #3e4943;
+    --color-muted: #64748b;
+    --color-border-subtle: #e2e8f0;
+    --color-footer: #eff4ff;
+    --color-on-footer: #0d1c2e;
+    --color-footer-bar: #0f5132;
+}
+
+@import './base.css';

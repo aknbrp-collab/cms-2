@@ -1,0 +1,137 @@
+@php
+    use App\Enums\MenuLocation;
+
+    $quickLinks = app(App\Support\SiteTheme::class)->menu(MenuLocation::TopBar)->take(4);
+    $quickIcons = ['menu_book', 'school', 'description', 'public'];
+    $calligraphy = $site->brandingUrl('calligraphy');
+    $hasCta = $site->setting('header.cta_url') && $site->setting('header.cta_label');
+@endphp
+
+<x-site.layout :site="$site" :seo="$seo">
+    <section class="relative overflow-hidden bg-primary pt-12 pb-16 text-on-primary md:pt-16">
+        <div class="pointer-events-none absolute inset-0 opacity-[0.07]" style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 22px 22px;"></div>
+        <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:px-10">
+            <div class="lg:col-span-7">
+                @if ($site->setting('identity.tagline'))
+                    <span class="inline-flex items-center gap-2 rounded-full border border-gold-light/30 bg-primary-container/60 px-3 py-1 text-xs font-semibold text-gold-light">
+                        <x-site.icon name="verified" class="text-[14px]!" /> {{ $site->setting('identity.tagline') }}
+                    </span>
+                @endif
+                <h1 class="mt-5 text-4xl leading-tight font-bold tracking-tight md:text-5xl">{{ $site->name }}</h1>
+                @if ($site->setting('identity.description'))
+                    <p class="mt-5 max-w-2xl text-lg leading-relaxed text-on-primary/80">{{ $site->setting('identity.description') }}</p>
+                @endif
+                <div class="mt-8 flex flex-wrap gap-3">
+                    @if ($hasCta)
+                        <a href="{{ $site->setting('header.cta_url') }}" class="inline-flex items-center gap-2 rounded-lg bg-secondary px-5 py-3 font-semibold text-on-secondary shadow-sm transition hover:brightness-110">
+                            {{ $site->setting('header.cta_label') }} <x-site.icon name="arrow_forward" class="text-[18px]!" />
+                        </a>
+                    @endif
+                    <a href="{{ route('site.posts.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-on-primary/30 px-5 py-3 font-semibold transition hover:bg-on-primary/10">
+                        {{ __('Berita Akademik') }}
+                    </a>
+                </div>
+            </div>
+            <div class="hidden justify-center lg:col-span-5 lg:flex">
+                <div class="flex aspect-square w-full max-w-sm flex-col items-center justify-center gap-4 rounded-3xl border border-gold-light/20 bg-primary-container/50 p-10 text-center shadow-2xl">
+                    @if ($calligraphy)
+                        <img src="{{ $calligraphy }}" alt="{{ $site->name }}" class="max-h-48 w-auto object-contain">
+                    @else
+                        <p class="font-arabic text-4xl leading-relaxed text-gold-light" lang="ar" dir="rtl">تَفَقُّهٌ فِي الدِّينِ</p>
+                    @endif
+                    <p class="text-sm tracking-widest text-on-primary/70 uppercase">{{ $site->name }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @if ($quickLinks->isNotEmpty())
+        <section class="bg-surface-low py-10">
+            <div class="mx-auto grid max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-10">
+                @foreach ($quickLinks as $link)
+                    <a href="{{ $link->href() }}" @if ($link->open_in_new_tab) target="_blank" rel="noopener" @endif class="group flex items-center gap-4 rounded-xl border border-primary/10 bg-surface-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                        <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-mint text-primary-container transition group-hover:bg-primary-container group-hover:text-on-primary">
+                            <x-site.icon :name="$quickIcons[$loop->index] ?? 'east'" />
+                        </span>
+                        <span class="font-semibold text-on-surface">{{ $link->label }}</span>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    <section class="py-16 md:py-20">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+            <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Kabar Kampus') }}</p>
+                    <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Berita Akademik') }}</h2>
+                </div>
+                <a href="{{ route('site.posts.index') }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Semua berita') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+            </div>
+
+            @if ($latest->isEmpty())
+                <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Belum ada berita yang diterbitkan.') }}</p>
+            @else
+                <div class="grid gap-6 lg:grid-cols-12">
+                    <div class="grid gap-6 sm:grid-cols-2 lg:col-span-8">
+                        @foreach ($latest->take(4) as $post)
+                            <x-site.post-card :post="$post" />
+                        @endforeach
+                    </div>
+                    <aside class="lg:col-span-4">
+                        <div class="rounded-xl border border-primary/10 bg-surface-card p-6 shadow-sm">
+                            <h3 class="mb-4 flex items-center gap-2 font-bold text-primary"><x-site.icon name="campaign" /> {{ __('Pengumuman') }}</h3>
+                            @forelse ($announcements as $announcement)
+                                <a href="{{ route('site.posts.show', $announcement->slug) }}" class="group flex gap-4 border-b border-border-subtle py-3 last:border-0">
+                                    <span class="flex w-12 shrink-0 flex-col items-center rounded-lg bg-surface-low py-1.5 text-primary">
+                                        <span class="text-lg leading-none font-bold">{{ $announcement->published_at?->format('d') }}</span>
+                                        <span class="text-[11px] uppercase">{{ $announcement->published_at?->translatedFormat('M') }}</span>
+                                    </span>
+                                    <span class="text-sm font-semibold text-on-surface group-hover:text-primary">{{ $announcement->title }}</span>
+                                </a>
+                            @empty
+                                <p class="text-sm text-muted">{{ __('Belum ada pengumuman.') }}</p>
+                            @endforelse
+                        </div>
+                    </aside>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    @foreach ($homeCategories as $category)
+        <section @class(['py-16', 'bg-surface-low' => $loop->odd])>
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+                <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+                    <h2 class="text-2xl font-bold text-primary">{{ $category->name }}</h2>
+                    <a href="{{ route('site.categories.show', $category->slug) }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Selengkapnya') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                </div>
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    @foreach ($category->posts as $post)
+                        <x-site.post-card :post="$post" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endforeach
+
+    @if ($hasCta)
+        <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+            <div class="relative overflow-hidden rounded-3xl bg-primary-container px-8 py-12 text-on-primary md:px-14">
+                <div class="absolute -end-16 -bottom-16 size-64 rounded-full bg-secondary/20"></div>
+                <div class="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold">{{ $site->setting('header.announcement') ?: $site->setting('header.cta_label') }}</h2>
+                        @if ($site->setting('contact.whatsapp'))
+                            <p class="mt-2 text-on-primary/80">{{ __('Helpdesk WhatsApp: :number', ['number' => $site->setting('contact.whatsapp')]) }}</p>
+                        @endif
+                    </div>
+                    <a href="{{ $site->setting('header.cta_url') }}" class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-secondary px-6 py-3 font-semibold text-on-secondary hover:brightness-110">
+                        {{ $site->setting('header.cta_label') }} <x-site.icon name="arrow_forward" class="text-[18px]!" />
+                    </a>
+                </div>
+            </div>
+        </section>
+    @endif
+</x-site.layout>

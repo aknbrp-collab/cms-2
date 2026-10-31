@@ -1,0 +1,77 @@
+/*
+ * Shared base for the public website themes. Each site file imports this
+ * after defining its @theme tokens; shared templates only use token names
+ * (primary, surface, on-surface …) so they pick up the site's palette.
+ */
+
+@source '../../views/sites';
+@source '../../views/components/site';
+@source '../../views/errors';
+@source '../../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/tailwind.blade.php';
+
+@theme {
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-arabic: 'Amiri', 'Traditional Arabic', serif;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-surface font-sans text-on-surface antialiased;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+/* Rich text from the CMS editor. */
+.prose-site {
+    @apply text-base leading-relaxed text-on-surface-variant;
+}
+
+.prose-site > * + * {
+    @apply mt-4;
+}
+
+.prose-site h1,
+.prose-site h2 {
+    @apply text-2xl font-bold text-on-surface;
+}
+
+.prose-site h3 {
+    @apply text-xl font-semibold text-on-surface;
+}
+
+.prose-site a {
+    @apply font-medium text-primary underline underline-offset-2;
+}
+
+.prose-site ul {
+    @apply list-disc ps-6;
+}
+
+.prose-site ol {
+    @apply list-decimal ps-6;
+}
+
+.prose-site blockquote {
+    @apply border-s-4 border-secondary bg-surface-low px-4 py-3 italic;
+}
+
+.prose-site img {
+    @apply rounded-xl;
+}
+
+.prose-site pre {
+    @apply overflow-x-auto rounded-lg bg-surface-container p-4 text-sm;
+}

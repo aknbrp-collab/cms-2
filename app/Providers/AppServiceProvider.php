@@ -18,6 +18,7 @@ use App\Policies\PagePolicy;
 use App\Policies\PostPolicy;
 use App\Support\Audit;
 use App\Support\CurrentSite;
+use App\Support\SiteTheme;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
@@ -39,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->scoped(CurrentSite::class);
+        $this->app->scoped(SiteTheme::class);
     }
 
     /**

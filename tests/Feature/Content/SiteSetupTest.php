@@ -32,7 +32,7 @@ test('a superadmin saves site settings and branding', function () {
 
     expect($site->setting('contact.phone'))->toBe('0294-452-473')
         ->and($site->setting('theme.primary'))->toBe('#005D42')
-        ->and($site->setting('theme.secondary'))->toBe('#B45309')
+        ->and($site->setting('theme.secondary'))->toBe('#EAB308')
         ->and($site->setting('social.instagram'))->toBe('https://instagram.com/darulamanah')
         ->and($site->brandingUrl('logo'))->not->toBe('');
 });

@@ -52,9 +52,10 @@ class Site extends Model implements HasMedia
         'social.instagram' => '',
         'social.youtube' => '',
         'social.tiktok' => '',
-        'theme.primary' => '#064E3B',
-        'theme.primary_container' => '#047857',
-        'theme.secondary' => '#B45309',
+        // Theme colours fall back to config('cms.sites.{key}.theme'), see setting().
+        'theme.primary' => null,
+        'theme.primary_container' => null,
+        'theme.secondary' => null,
         'header.announcement' => '',
         'header.cta_label' => '',
         'header.cta_url' => '',
@@ -110,7 +111,7 @@ class Site extends Model implements HasMedia
      */
     public function setting(string $key): mixed
     {
-        return Arr::get($this->settings ?? [], $key, self::SETTING_DEFAULTS[$key] ?? null);
+        return Arr::get($this->settings ?? [], $key) ?? $this->defaultSetting($key);
     }
 
     /**
@@ -120,10 +121,22 @@ class Site extends Model implements HasMedia
      */
     public function allSettings(): array
     {
-        return array_merge(self::SETTING_DEFAULTS, array_intersect_key(
-            Arr::dot($this->settings ?? []),
-            self::SETTING_DEFAULTS,
-        ));
+        $values = [];
+
+        foreach (array_keys(self::SETTING_DEFAULTS) as $key) {
+            $values[$key] = $this->setting($key);
+        }
+
+        return $values;
+    }
+
+    protected function defaultSetting(string $key): mixed
+    {
+        if (str_starts_with($key, 'theme.')) {
+            return config("cms.sites.{$this->key->value}.theme.".substr($key, 6));
+        }
+
+        return self::SETTING_DEFAULTS[$key] ?? null;
     }
 
     /**

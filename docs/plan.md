@@ -128,7 +128,19 @@ Phase 0 task breakdown, in order:
 - Scheduled publishing needs the scheduler running (`php artisan schedule:work` locally, cron + `schedule:run` on the VPS).
 - Upload limit is 12 MB per file (Livewire default). Larger videos should go to YouTube.
 
-**Phase 2 — Site modules + public frontends:** events calendar, galleries (incl. YouTube), FAQ, PMB, leadership, facilities, achievements, extracurriculars; Ma'had modules (lecturers, programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); the two public themes converted from `ide.html` / `pdf.html`, domain resolution, Hijri date and prayer-times widget (Ma'had), Pondok PSB online registration form, sitemap, and analytics injection.
+**Phase 2a — Public themes** ✅ done 2026-10-31.
+- One app serves both domains. Shared inner templates live in `resources/views/sites/shared`, theme overrides in `sites/{pondok,mahad}`, resolved by `App\Support\SiteTheme`. Each theme has its own Tailwind v4 token file (`resources/css/sites/*.css`), and the brand colours from site settings override the tokens at runtime.
+- Routes: `/`, `/berita`, `/berita/{slug}`, `/pengumuman`, `/kategori/{slug}`, `/{page-slug}`, `/sitemap.xml`, `/robots.txt`, plus a themed 404.
+- Ma'had top bar: Hijri date (Umm al-Qura, pesantren month names) and next-prayer countdown (`App\Support\PrayerTimes`, Kemenag angles plus 2-minute ihtiyat). Verify the times against the official Kemenag schedule for the real coordinates.
+- Homepages are data-driven. Sections for programs, lecturers, agenda, gallery/TV and PMB steps are added with their modules in 2b and 2c.
+- `DemoContentSeeder` fills both sites locally (runs from `DatabaseSeeder` outside production).
+- App timezone is now `Asia/Jakarta` (`APP_TIMEZONE`).
+
+**Phase 2b — Shared modules (next):** events/agenda calendar, galleries (photo + YouTube "TV"), FAQ, admissions (PSB/PMB info + Pondok online registration form), leadership.
+
+**Phase 2c — Site-specific modules:** Pondok (facilities, achievements, extracurriculars); Ma'had (lecturers, Takhassus programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); homepage sections for each.
+
+Original Phase 2 scope: events calendar, galleries (incl. YouTube), FAQ, PMB, leadership, facilities, achievements, extracurriculars; Ma'had modules (lecturers, programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); the two public themes converted from `ide.html` / `pdf.html`, domain resolution, Hijri date and prayer-times widget (Ma'had), Pondok PSB online registration form, sitemap, and analytics injection.
 
 **Phase 3 — SIAKAD and Tanya Hukum (CMS side only):** the CMS **defines the contract**, and SIAKAD is built against it later.
 - Inbound webhooks (articles, answers) with HMAC auth; outbound `SiakadClient` behind an interface, with a `fake` driver for dev and tests.

@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             User::factory()
                 ->create(['name' => 'Superadmin', 'email' => 'superadmin@pondok.test'])
                 ->assignRole(Role::Superadmin->value);
+
+            $this->call(DemoContentSeeder::class);
         }
     }
 }

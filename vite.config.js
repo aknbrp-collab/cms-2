@@ -10,6 +10,9 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/js/passkeys.js',
+                'resources/css/sites/pondok.css',
+                'resources/css/sites/mahad.css',
+                'resources/js/site.js',
             ],
             refresh: true,
             fonts: [
