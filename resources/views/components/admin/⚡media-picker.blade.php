@@ -11,7 +11,8 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 
 /**
- * Pick an image from the media library (or upload one) and bind its id.
+ * Pick a file from the media library (or upload one) and bind its id.
+ * `kind` is "image" (default) or "document" (PDF, Office files).
  */
 new class extends Component {
     use WithFileUploads;
@@ -20,6 +21,8 @@ new class extends Component {
     public ?string $value = null;
 
     public string $label = '';
+
+    public string $kind = 'image';
 
     public string $search = '';
 
@@ -40,7 +43,9 @@ new class extends Component {
     {
         return MediaAsset::query()
             ->with('media')
-            ->whereHas('media', fn ($query) => $query->whereIn('mime_type', MediaAsset::IMAGE_TYPES))
+            ->whereHas('media', fn ($query) => $this->kind === 'document'
+                ? $query->whereNotIn('mime_type', MediaAsset::IMAGE_TYPES)->whereNotLike('mime_type', 'video/%')
+                : $query->whereIn('mime_type', MediaAsset::IMAGE_TYPES))
             ->when($this->search !== '', fn ($query) => $query->whereLike('title', "%{$this->search}%"))
             ->latest()
             ->limit(48)
@@ -61,7 +66,9 @@ new class extends Component {
     public function updatedUpload(MediaUploader $uploader): void
     {
         $this->authorize('media.create');
-        $this->validate(['upload' => ['image', 'max:12288']]);
+        $this->validate(['upload' => $this->kind === 'document'
+            ? ['file', 'max:12288', 'extensions:pdf,doc,docx,xls,xlsx,ppt,pptx']
+            : ['image', 'max:12288']]);
 
         $asset = $uploader->store($this->upload, Auth::user());
         $this->reset('upload');
@@ -76,7 +83,13 @@ new class extends Component {
 
     <div class="flex items-center gap-3">
         @if ($this->selected)
-            <img src="{{ $this->selected->url('thumb') }}" alt="{{ $this->selected->alt }}" class="size-20 rounded-lg border border-zinc-200 object-cover dark:border-zinc-700">
+            @if ($this->selected->isImage())
+                <img src="{{ $this->selected->url('thumb') }}" alt="{{ $this->selected->alt }}" class="size-20 rounded-lg border border-zinc-200 object-cover dark:border-zinc-700">
+            @else
+                <div class="flex size-20 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
+                    <flux:icon.document class="size-8 text-zinc-400" />
+                </div>
+            @endif
             <div class="flex flex-col gap-1">
                 <flux:text size="sm" class="max-w-48 truncate">{{ $this->selected->title }}</flux:text>
                 <div class="flex gap-1">
@@ -88,7 +101,7 @@ new class extends Component {
             </div>
         @else
             <flux:modal.trigger :name="'media-picker-'.$this->getId()">
-                <flux:button size="sm" icon="photo">{{ __('Choose image') }}</flux:button>
+                <flux:button size="sm" :icon="$kind === 'document' ? 'document' : 'photo'">{{ $kind === 'document' ? __('Choose file') : __('Choose image') }}</flux:button>
             </flux:modal.trigger>
         @endif
     </div>
@@ -98,9 +111,9 @@ new class extends Component {
             <flux:heading size="lg">{{ __('Media library') }}</flux:heading>
 
             <div class="flex flex-wrap items-end gap-3">
-                <flux:input wire:model.live.debounce.300ms="search" :placeholder="__('Search images')" icon="magnifying-glass" class="max-w-xs" />
+                <flux:input wire:model.live.debounce.300ms="search" :placeholder="__('Search')" icon="magnifying-glass" class="max-w-xs" />
                 @can('media.create')
-                    <flux:input type="file" wire:model="upload" accept="image/*" :label="__('Upload new')" class="max-w-xs" />
+                    <flux:input type="file" wire:model="upload" :accept="$kind === 'document' ? '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx' : 'image/*'" :label="__('Upload new')" class="max-w-xs" />
                 @endcan
             </div>
             <div wire:loading wire:target="upload"><flux:text size="sm">{{ __('Uploading…') }}</flux:text></div>
@@ -118,11 +131,15 @@ new class extends Component {
                             'border-zinc-200 dark:border-zinc-700' => $asset->id !== $value,
                         ])
                     >
-                        <img src="{{ $asset->url('thumb') }}" alt="{{ $asset->alt }}" class="aspect-[4/3] w-full object-cover" loading="lazy">
+                        @if ($asset->isImage())
+                            <img src="{{ $asset->url('thumb') }}" alt="{{ $asset->alt }}" class="aspect-[4/3] w-full object-cover" loading="lazy">
+                        @else
+                            <div class="flex aspect-[4/3] w-full items-center justify-center bg-zinc-50 dark:bg-zinc-800"><flux:icon.document class="size-8 text-zinc-400" /></div>
+                        @endif
                         <span class="block truncate px-1.5 py-1 text-xs">{{ $asset->title }}</span>
                     </button>
                 @empty
-                    <flux:text class="col-span-full">{{ __('No images yet.') }}</flux:text>
+                    <flux:text class="col-span-full">{{ __('No files yet.') }}</flux:text>
                 @endforelse
             </div>
         </div>

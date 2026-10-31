@@ -2,8 +2,7 @@
 
 use App\Enums\ContentStatus;
 use App\Models\AuditLog;
-use App\Models\Page;
-use App\Models\Post;
+use App\Support\ContentTypes;
 use App\Models\Site;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -38,8 +37,8 @@ new #[Title('Dashboard')] class extends Component {
     #[Computed]
     public function awaitingReview(): int
     {
-        return Post::query()->withStatus(ContentStatus::UnderReview)->count()
-            + Page::query()->withStatus(ContentStatus::UnderReview)->count();
+        return collect(ContentTypes::REVIEWABLE)
+            ->sum(fn (string $modelClass) => $modelClass::query()->withStatus(ContentStatus::UnderReview)->count());
     }
 
     public function markAllRead(): void
@@ -117,9 +116,13 @@ new #[Title('Dashboard')] class extends Component {
                 <div class="border-b border-zinc-100 py-2 text-sm last:border-0 dark:border-zinc-700" wire:key="note-{{ $notification->id }}">
                     @php
                         $data = $notification->data;
-                        $route = ($data['content_type'] ?? null) === 'page' ? 'admin.pages.edit' : 'admin.posts.edit';
+                        $contentClass = Illuminate\Database\Eloquent\Relations\Relation::getMorphedModel($data['content_type'] ?? '');
                     @endphp
-                    <a href="{{ route($route, $data['content_id'] ?? '') }}" wire:navigate class="hover:underline">{{ $data['message'] ?? '' }}</a>
+                    @if ($contentClass && is_subclass_of($contentClass, App\Contracts\Reviewable::class))
+                        <a href="{{ route($contentClass::adminEditRoute(), $data['content_id'] ?? '') }}" wire:navigate class="hover:underline">{{ $data['message'] ?? '' }}</a>
+                    @else
+                        <span>{{ $data['message'] ?? '' }}</span>
+                    @endif
                     @if (! empty($data['note']))
                         <div class="text-zinc-500">“{{ $data['note'] }}”</div>
                     @endif

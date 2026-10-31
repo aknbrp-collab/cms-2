@@ -1,8 +1,8 @@
 <?php
 
 use App\Enums\ContentStatus;
-use App\Models\Page;
-use App\Models\Post;
+use App\Contracts\Reviewable;
+use App\Support\ContentTypes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -14,14 +14,14 @@ new #[Title('Review queue')] class extends Component {
     /**
      * Content waiting for review that the current user may approve.
      *
-     * @return Collection<int, Post|Page>
+     * @return Collection<int, Reviewable&Model>
      */
     #[Computed]
     public function items(): Collection
     {
         $user = Auth::user();
 
-        return collect([Post::class, Page::class])
+        return collect(ContentTypes::REVIEWABLE)
             ->flatMap(fn (string $modelClass) => $modelClass::query()
                 ->with(['site', 'author'])
                 ->withStatus(ContentStatus::UnderReview)
@@ -51,7 +51,7 @@ new #[Title('Review queue')] class extends Component {
             @forelse ($this->items as $item)
                 <flux:table.row :key="$item->getMorphClass().'-'.$item->id">
                     <flux:table.cell>
-                        <a href="{{ $item instanceof App\Models\Post ? route('admin.posts.edit', $item) : route('admin.pages.edit', $item) }}" wire:navigate class="font-medium hover:underline">{{ $item->title }}</a>
+                        <a href="{{ route($item::adminEditRoute(), $item) }}" wire:navigate class="font-medium hover:underline">{{ $item->title }}</a>
                     </flux:table.cell>
                     <flux:table.cell>{{ $item::contentLabel() }}</flux:table.cell>
                     <flux:table.cell>{{ $item->site->name }}</flux:table.cell>

@@ -16,4 +16,9 @@ interface Reviewable
      * Human readable name of this kind of content.
      */
     public static function contentLabel(): string;
+
+    /**
+     * Name of the admin route that edits one item (takes the model as parameter).
+     */
+    public static function adminEditRoute(): string;
 }

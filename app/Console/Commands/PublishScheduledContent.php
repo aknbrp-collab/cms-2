@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Page;
-use App\Models\Post;
 use App\Services\ContentWorkflow;
+use App\Support\ContentTypes;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
@@ -17,7 +16,7 @@ class PublishScheduledContent extends Command
     {
         $count = 0;
 
-        foreach ([Post::class, Page::class] as $modelClass) {
+        foreach (ContentTypes::REVIEWABLE as $modelClass) {
             $count += $workflow->releaseScheduled($modelClass);
         }
 

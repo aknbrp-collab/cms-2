@@ -49,6 +49,27 @@
                     </flux:sidebar.group>
                 @endcanany
 
+                @php
+                    $moduleLinks = [
+                        ['events', 'admin.events.index', 'admin.events.*', 'calendar-days', __('Agenda')],
+                        ['galleries', 'admin.galleries.index', 'admin.galleries.*', 'film', __('Galleries')],
+                        ['admissions', 'admin.admissions.index', 'admin.admissions.*', 'academic-cap', __('Admissions')],
+                        ['leaders', 'admin.leaders', 'admin.leaders', 'user-group', __('Leadership')],
+                        ['faqs', 'admin.faqs', 'admin.faqs', 'question-mark-circle', __('FAQ')],
+                    ];
+                    $currentSite = current_site();
+                    $moduleLinks = array_filter($moduleLinks, fn ($link) => auth()->user()->can($link[0].'.view') && (! $currentSite || $currentSite->hasModule($link[0])));
+                @endphp
+                @if ($moduleLinks !== [])
+                    <flux:sidebar.group :heading="__('Modules')" class="grid">
+                        @foreach ($moduleLinks as [$module, $route, $pattern, $icon, $label])
+                            <flux:sidebar.item :icon="$icon" :href="route($route)" :current="request()->routeIs($pattern)" wire:navigate>
+                                {{ $label }}
+                            </flux:sidebar.item>
+                        @endforeach
+                    </flux:sidebar.group>
+                @endif
+
                 @canany(['menus.view', 'sites.update'])
                     <flux:sidebar.group :heading="__('Website')" class="grid">
                         @can('menus.view')

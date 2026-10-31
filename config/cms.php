@@ -42,7 +42,7 @@ return [
             'domain' => env('SITE_MAHAD_DOMAIN', 'mahad.test'),
             'theme' => ['primary' => '#003527', 'primary_container' => '#064E3B', 'secondary' => '#B45309'],
             'modules' => [
-                'pages', 'posts', 'events', 'galleries', 'admissions', 'leaders',
+                'pages', 'posts', 'events', 'galleries', 'faqs', 'admissions', 'leaders',
                 'lecturers', 'programs', 'curricula', 'publications', 'journals',
                 'organizations', 'legal_questions',
             ],

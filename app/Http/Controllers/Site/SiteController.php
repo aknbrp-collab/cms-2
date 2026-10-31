@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers\Site;
 
+use App\Enums\GalleryType;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
+use App\Models\AdmissionPeriod;
 use App\Models\Category;
+use App\Models\Event;
+use App\Models\GalleryItem;
+use App\Models\Leader;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Site;
@@ -42,6 +47,24 @@ class SiteController extends Controller
                     $this->postsQuery()->where('category_id', $category->id)->limit(4)->get(),
                 ))
                 ->filter(fn (Category $category) => $category->posts->isNotEmpty()),
+            'events' => $site->hasModule('events')
+                ? Event::query()->published()->upcoming()->orderBy('starts_at')->limit(3)->get()
+                : collect(),
+            'videos' => $site->hasModule('galleries')
+                ? GalleryItem::query()
+                    ->whereNotNull('video_url')
+                    ->whereHas('gallery', fn (Builder $query) => $query->published()->where('type', GalleryType::Video->value))
+                    ->with('gallery')
+                    ->latest()
+                    ->limit(3)
+                    ->get()
+                : collect(),
+            'leaders' => $site->hasModule('leaders')
+                ? Leader::query()->published()->with('photo.media')->orderBy('sort_order')->limit(3)->get()
+                : collect(),
+            'admission' => $site->hasModule('admissions')
+                ? AdmissionPeriod::query()->open()->orderBy('closes_on')->first()
+                : null,
         ]);
     }
 

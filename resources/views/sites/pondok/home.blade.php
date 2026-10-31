@@ -67,13 +67,48 @@
                     </section>
                 @endforeach
 
+                @if ($videos->isNotEmpty())
+                    <section class="flex flex-col gap-6">
+                        @include('sites.pondok.section-heading', ['title' => $videos->first()->gallery->title, 'url' => route('site.galleries.index', ['jenis' => 'video'])])
+                        <div class="overflow-hidden rounded-xl bg-deep shadow-lg">
+                            <iframe src="{{ $videos->first()->embedUrl() }}" class="aspect-video w-full" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="{{ $videos->first()->caption ?: $videos->first()->gallery->title }}"></iframe>
+                        </div>
+                        @if ($videos->count() > 1)
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                @foreach ($videos->skip(1) as $video)
+                                    <a href="{{ route('site.galleries.show', $video->gallery->slug) }}" class="group flex items-center gap-3 rounded-xl bg-surface-card p-3 shadow-sm hover:shadow-md">
+                                        <span class="relative block w-32 shrink-0 overflow-hidden rounded-lg">
+                                            <img src="{{ $video->videoThumbnail() }}" alt="" loading="lazy" class="aspect-video w-full object-cover">
+                                            <span class="absolute inset-0 flex items-center justify-center"><x-site.icon name="play_circle" filled class="text-3xl! text-white drop-shadow" /></span>
+                                        </span>
+                                        <span class="text-sm font-semibold text-on-surface group-hover:text-primary">{{ $video->caption ?: $video->gallery->title }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
+                    </section>
+                @endif
+
                 @if (! $featured)
                     <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Belum ada berita yang diterbitkan.') }}</p>
                 @endif
             </div>
 
             <aside class="flex flex-col gap-6 lg:sticky lg:top-28 lg:col-span-4">
-                @if ($site->setting('header.cta_url') && $site->setting('header.cta_label'))
+                @if ($admission)
+                    <div class="relative overflow-hidden rounded-xl bg-primary p-6 text-on-primary shadow-md">
+                        <div class="absolute -end-8 -top-8 size-32 rounded-full bg-secondary/25"></div>
+                        <x-site.icon name="school" class="relative text-4xl! text-secondary" />
+                        <p class="relative mt-3 text-sm font-semibold text-gold-light">{{ __('Penerimaan :year', ['year' => $admission->academic_year]) }}</p>
+                        <p class="relative mt-1 text-lg font-bold">{{ $admission->title }}</p>
+                        <p class="relative mt-1 text-sm text-on-primary/80">{{ __('Dibuka hingga :date', ['date' => $admission->closes_on->translatedFormat('d F Y')]) }}</p>
+                        <div class="relative mt-4 flex flex-wrap gap-2">
+                            <a href="{{ $admission->acceptsRegistrations() ? route('site.admissions.register') : route('site.admissions.show') }}" class="inline-flex items-center gap-2 rounded-lg bg-secondary px-4 py-2 text-sm font-bold text-on-secondary hover:brightness-110">
+                                {{ $admission->acceptsRegistrations() ? __('Daftar Online') : __('Info Pendaftaran') }} <x-site.icon name="arrow_forward" class="text-[16px]!" />
+                            </a>
+                        </div>
+                    </div>
+                @elseif ($site->setting('header.cta_url') && $site->setting('header.cta_label'))
                     <div class="relative overflow-hidden rounded-xl bg-primary p-6 text-on-primary shadow-md">
                         <div class="absolute -end-8 -top-8 size-32 rounded-full bg-secondary/25"></div>
                         <x-site.icon name="school" class="relative text-4xl! text-secondary" />
@@ -81,6 +116,26 @@
                         <a href="{{ $site->setting('header.cta_url') }}" class="relative mt-4 inline-flex items-center gap-2 rounded-lg bg-secondary px-4 py-2 text-sm font-bold text-on-secondary hover:brightness-110">
                             {{ $site->setting('header.cta_label') }} <x-site.icon name="arrow_forward" class="text-[16px]!" />
                         </a>
+                    </div>
+                @endif
+
+                @if ($events->isNotEmpty())
+                    <div class="rounded-xl bg-surface-card p-6 shadow-sm">
+                        <h2 class="mb-4 flex items-center gap-2 font-bold text-on-surface"><x-site.icon name="calendar_today" class="text-primary" /> {{ __('Agenda') }}</h2>
+                        <ul class="space-y-3">
+                            @foreach ($events as $event)
+                                <li>
+                                    <a href="{{ route('site.events.show', $event->slug) }}" class="group flex gap-3">
+                                        <span class="flex w-12 shrink-0 flex-col items-center rounded-lg bg-surface-low py-1.5 text-primary">
+                                            <span class="text-lg leading-none font-bold">{{ $event->starts_at->format('d') }}</span>
+                                            <span class="text-[11px] uppercase">{{ $event->starts_at->translatedFormat('M') }}</span>
+                                        </span>
+                                        <span class="text-sm font-semibold text-on-surface group-hover:text-primary">{{ $event->title }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                        <a href="{{ route('site.events.index') }}" class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">{{ __('Semua agenda') }} <x-site.icon name="east" class="text-[16px]!" /></a>
                     </div>
                 @endif
 

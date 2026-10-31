@@ -116,7 +116,88 @@
         </section>
     @endforeach
 
-    @if ($hasCta)
+    @if ($leaders->isNotEmpty())
+        <section class="bg-surface-low py-16 md:py-20">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+                <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Dewan Pengasuh & Pendidik') }}</p>
+                        <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Pimpinan & Masyayikh') }}</h2>
+                    </div>
+                    <a href="{{ route('site.leaders') }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Lihat semua') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                </div>
+                <div class="grid gap-6 md:grid-cols-3">
+                    @foreach ($leaders as $leader)
+                        <article class="rounded-2xl border border-primary/10 bg-surface-card p-6 text-center shadow-sm">
+                            <x-site.image :asset="$leader->photo" conversion="thumb" :alt="$leader->name" icon="person" class="mx-auto size-28 rounded-full ring-4 ring-mint" />
+                            <p class="mt-4 text-xs font-bold tracking-wider text-secondary uppercase">{{ $leader->position }}</p>
+                            <h3 class="mt-1 text-lg font-bold text-on-surface">{{ $leader->name }}</h3>
+                            @if ($leader->expertise)
+                                <p class="mt-2 text-sm text-on-surface-variant">{{ $leader->expertise }}</p>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    @if ($events->isNotEmpty())
+        <section class="py-16 md:py-20">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+                <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Kegiatan Kampus') }}</p>
+                        <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Agenda & Halaqah Ilmiah') }}</h2>
+                    </div>
+                    <a href="{{ route('site.events.index') }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Kalender lengkap') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                </div>
+                <div class="grid gap-5 lg:grid-cols-3">
+                    @foreach ($events as $event)
+                        <x-site.event-card :event="$event" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    @if ($admission)
+        <section class="bg-surface-low py-16 md:py-20">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+                <div class="grid gap-10 lg:grid-cols-12">
+                    <div class="lg:col-span-5">
+                        <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Penerimaan Mahasantri Baru') }}</p>
+                        <h2 class="mt-1 text-3xl font-bold text-primary">{{ $admission->title }} {{ $admission->academic_year }}</h2>
+                        @if ($admission->summary)
+                            <p class="mt-4 text-on-surface-variant">{{ $admission->summary }}</p>
+                        @endif
+                        <p class="mt-4 inline-flex items-center gap-2 rounded-lg bg-surface-card px-4 py-2 text-sm font-semibold text-primary shadow-sm">
+                            <x-site.icon name="calendar_today" class="text-[18px]!" />
+                            {{ $admission->opens_on->translatedFormat('d F') }} – {{ $admission->closes_on->translatedFormat('d F Y') }}
+                        </p>
+                        <div class="mt-6">
+                            <a href="{{ $admission->acceptsRegistrations() ? route('site.admissions.register') : route('site.admissions.show') }}" class="inline-flex items-center gap-2 rounded-lg bg-secondary px-6 py-3 font-semibold text-on-secondary hover:brightness-110">
+                                {{ $admission->acceptsRegistrations() ? __('Daftar Sekarang') : __('Informasi Pendaftaran') }} <x-site.icon name="arrow_forward" class="text-[18px]!" />
+                            </a>
+                        </div>
+                    </div>
+                    @if ($admission->steps)
+                        <ol class="grid gap-4 sm:grid-cols-2 lg:col-span-7">
+                            @foreach (array_slice($admission->steps, 0, 4) as $step)
+                                <li class="rounded-xl border border-primary/10 bg-surface-card p-5 shadow-sm">
+                                    <span class="text-3xl font-bold text-primary/20">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                                    <h3 class="mt-2 font-semibold text-on-surface">{{ $step['title'] }}</h3>
+                                    @if ($step['description'] ?? '')
+                                        <p class="mt-1 text-sm text-on-surface-variant">{{ $step['description'] }}</p>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ol>
+                    @endif
+                </div>
+            </div>
+        </section>
+    @elseif ($hasCta)
         <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
             <div class="relative overflow-hidden rounded-3xl bg-primary-container px-8 py-12 text-on-primary md:px-14">
                 <div class="absolute -end-16 -bottom-16 size-64 rounded-full bg-secondary/20"></div>

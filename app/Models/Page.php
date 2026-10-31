@@ -61,6 +61,11 @@ class Page extends Model implements Reviewable
         return 'pages';
     }
 
+    public static function adminEditRoute(): string
+    {
+        return 'admin.pages.edit';
+    }
+
     public static function contentLabel(): string
     {
         return __('Page');

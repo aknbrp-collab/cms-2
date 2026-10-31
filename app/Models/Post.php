@@ -67,6 +67,11 @@ class Post extends Model implements Reviewable
         return 'posts';
     }
 
+    public static function adminEditRoute(): string
+    {
+        return 'admin.posts.edit';
+    }
+
     public static function contentLabel(): string
     {
         return __('Post');

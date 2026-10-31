@@ -4,12 +4,18 @@ namespace Database\Seeders;
 
 use App\Enums\BlockType;
 use App\Enums\ContentStatus;
+use App\Enums\GalleryType;
 use App\Enums\MenuItemType;
 use App\Enums\MenuLocation;
 use App\Enums\PageTemplate;
 use App\Enums\PostType;
 use App\Enums\SiteKey;
+use App\Models\AdmissionPeriod;
 use App\Models\Category;
+use App\Models\Event;
+use App\Models\Faq;
+use App\Models\Gallery;
+use App\Models\Leader;
 use App\Models\Menu;
 use App\Models\Page;
 use App\Models\Post;
@@ -58,7 +64,7 @@ class DemoContentSeeder extends Seeder
             'social.facebook' => 'https://facebook.com/darulamanah',
             'header.announcement' => 'Penerimaan Santri Baru (PSB) Tahun Ajaran 2026/2027 telah dibuka',
             'header.cta_label' => 'Daftar PSB',
-            'header.cta_url' => '/pendaftaran',
+            'header.cta_url' => '/penerimaan',
         ])->save();
 
         $categories = $this->categories($site, ['Keislaman' => true, 'Prestasi Santri' => true, 'Kegiatan Pesantren' => false]);
@@ -88,17 +94,22 @@ class DemoContentSeeder extends Seeder
             'kontak' => ['Hubungi Kami', null, PageTemplate::Contact],
         ]);
 
+        $this->modules($site, $author, 'PSB', [
+            ['Pengasuh Pondok Pesantren', 'KH. Ahmad Mudzakir', 'Sanad Tahfidz & Kitab Kuning'],
+            ['Kepala Madrasah', 'Ust. H. Muhammad Ridwan, M.Pd.I', 'Manajemen Pendidikan Islam'],
+        ], ['Reguler', 'Tahfidz Al-Qur\'an', 'Bahasa Arab & Inggris']);
+
         $this->menu($site, MenuLocation::Header, [
-            ['Profil', null, [['Sejarah', $pages['sejarah']], ['Visi & Misi', $pages['visi-misi']], ['Profil Pimpinan', $pages['profil-pimpinan']]]],
-            ['Berita', '/berita'],
-            ['Pengumuman', '/pengumuman'],
-            ['Pendaftaran', $pages['pendaftaran']],
+            ['Profil', null, [['Sejarah', $pages['sejarah']], ['Visi & Misi', $pages['visi-misi']], ['Pimpinan', '/pimpinan']]],
+            ['Berita', null, [['Berita', '/berita'], ['Pengumuman', '/pengumuman'], ['Agenda', '/agenda']]],
+            ['Pendaftaran', null, [['Info PSB', '/penerimaan'], ['Pendaftaran Online', '/penerimaan/daftar'], ['FAQ', '/faq']]],
+            ['Galeri', null, [['Foto', '/galeri?jenis=photo'], ['Video', '/galeri?jenis=video']]],
             ['Kontak', $pages['kontak']],
         ]);
         $this->menu($site, MenuLocation::Footer, [
             ['Pengumuman', '/pengumuman'],
             ['Profil Pimpinan', $pages['profil-pimpinan']],
-            ['Pendaftaran PSB', $pages['pendaftaran']],
+            ['Pendaftaran PSB', '/penerimaan'],
             ['Prestasi Santri', $categories['Prestasi Santri']],
         ]);
     }
@@ -115,7 +126,7 @@ class DemoContentSeeder extends Seeder
             'contact.address' => 'Jl. Pesantren Luhur No. 1, Kompleks Kampus Putra-Putri',
             'header.announcement' => 'Penerimaan Mahasantri Baru 2026/2027',
             'header.cta_label' => 'PMB 2026/2027',
-            'header.cta_url' => '/pmb',
+            'header.cta_url' => '/penerimaan',
             'prayer.enabled' => true,
             'prayer.latitude' => -7.0,
             'prayer.longitude' => 110.0,
@@ -145,10 +156,17 @@ class DemoContentSeeder extends Seeder
             'kontak' => ['Kontak', null, PageTemplate::Contact],
         ]);
 
+        $this->modules($site, $author, 'PMB', [
+            ['Rais Masyayikh', 'Syaikh Dr. KH. Luqmanul Hakim, MA.', 'Sanad Ushul Fiqh Al-Azhar Kairo'],
+            ['Mudir Ma\'had Aly', 'KH. M. Syukron Ma\'mun, Lc., M.Hum.', 'Tahqiq Turats Fiqh Syafi\'i'],
+            ['Wakil Mudir Bidang Akademik', 'Dr. H. Mahbub Ridwan, M.Ag.', 'Hadits wa \'Ulumuhu'],
+        ], ['Marhalah Ula (S1) Fiqh wa Ushuluh', 'Marhalah Ula (S1) Hadits wa \'Ulumuhu', 'Marhalah Tsaniyah (S2) Fiqh Mu\'amalah']);
+
         $this->menu($site, MenuLocation::Header, [
-            ['Profil', null, [['Tentang Kami', $pages['tentang-kami']], ['Visi & Misi', $pages['visi-dan-misi']], ['Sejarah & Sanad', $pages['sejarah-dan-sanad']]]],
+            ['Profil', null, [['Tentang Kami', $pages['tentang-kami']], ['Visi & Misi', $pages['visi-dan-misi']], ['Sejarah & Sanad', $pages['sejarah-dan-sanad']], ['Pimpinan', '/pimpinan']]],
             ['Publikasi & Riset', null, [['Bahtsul Masail', $categories['Bahtsul Masail']], ['Kajian Ilmiah', $categories['Kajian Ilmiah']]]],
-            ['Berita & Agenda', '/berita'],
+            ['Berita & Agenda', null, [['Berita Akademik', '/berita'], ['Agenda & Halaqah', '/agenda'], ['Galeri', '/galeri']]],
+            ['PMB', null, [['Informasi PMB', '/penerimaan'], ['FAQ', '/faq']]],
             ['Kontak', $pages['kontak']],
         ]);
         $this->menu($site, MenuLocation::TopBar, [
@@ -157,10 +175,99 @@ class DemoContentSeeder extends Seeder
             ['Jurnal OJS', '#'],
         ]);
         $this->menu($site, MenuLocation::Footer, [
-            ['Penerimaan Mahasantri Baru', $pages['pmb']],
+            ['Penerimaan Mahasantri Baru', '/penerimaan'],
             ['Berita Akademik', '/berita'],
             ['Pengumuman', '/pengumuman'],
         ]);
+    }
+
+    /**
+     * Agenda, FAQ, leaders, an empty video gallery and an open admission period.
+     *
+     * @param  list<array{0: string, 1: string, 2: string}>  $leaders  position, name, expertise
+     * @param  list<string>  $programs
+     */
+    protected function modules(Site $site, ?User $author, string $admissionName, array $leaders, array $programs): void
+    {
+        $events = [
+            ['Kajian Kitab Bulanan', 'Kajian Rutin', 5, 'Masjid Jami\'', 'Terbuka untuk umum'],
+            ['Ujian Lisan Akhir Semester', 'Imtihan', 12, 'Aula Utama', 'Wajib santri'],
+            ['Peringatan Maulid Nabi', 'Peringatan Hari Besar', 20, 'Lapangan Utama', 'Terbuka untuk umum'],
+        ];
+
+        foreach ($events as [$title, $label, $days, $location, $audience]) {
+            $startsAt = now()->addDays($days)->setTime(8, 0);
+
+            $this->publish(Event::query()->make([
+                'site_id' => $site->id,
+                'author_id' => $author?->id,
+                'title' => $title,
+                'slug' => Str::slug($title),
+                'label' => $label,
+                'summary' => "Agenda {$title} bersama para asatidz dan santri.",
+                'body' => $this->body($title),
+                'location' => $location,
+                'audience' => $audience,
+                'starts_at' => $startsAt,
+                'ends_at' => $startsAt->copy()->addHours(4),
+            ]), now()->subDay());
+        }
+
+        // Video items are left to the editors so the demo never embeds unknown videos.
+        Gallery::query()->create([
+            'site_id' => $site->id,
+            'author_id' => $author?->id,
+            'type' => GalleryType::Video,
+            'title' => Str::of($site->name)->afterLast(' ')->append(' TV')->toString(),
+            'slug' => 'tv',
+            'description' => 'Kumpulan video kegiatan. Tambahkan tautan YouTube lalu terbitkan.',
+        ]);
+
+        foreach ($leaders as $order => [$position, $name, $expertise]) {
+            Leader::query()->create([
+                'site_id' => $site->id,
+                'name' => $name,
+                'position' => $position,
+                'expertise' => $expertise,
+                'bio' => '<p>'.e($name).' mengabdikan diri dalam pendidikan dan pembinaan santri selama lebih dari dua puluh tahun.</p>',
+                'sort_order' => $order,
+            ])->forceFill(['is_published' => true])->save();
+        }
+
+        $faqs = [
+            ['Kapan pendaftaran dibuka?', "Pendaftaran {$admissionName} dibuka sesuai jadwal gelombang yang tertera di halaman penerimaan."],
+            ['Apakah tersedia beasiswa?', 'Tersedia beasiswa prestasi dan beasiswa bagi santri dari keluarga kurang mampu.'],
+            ['Bagaimana cara mendaftar online?', 'Isi formulir pendaftaran online, simpan nomor pendaftaran, lalu konfirmasi ke panitia melalui WhatsApp.'],
+        ];
+
+        foreach ($faqs as $order => [$question, $answer]) {
+            Faq::query()->create([
+                'site_id' => $site->id,
+                'group' => 'Pendaftaran',
+                'question' => $question,
+                'answer' => '<p>'.e($answer).'</p>',
+                'sort_order' => $order,
+            ])->forceFill(['is_published' => true])->save();
+        }
+
+        AdmissionPeriod::query()->create([
+            'site_id' => $site->id,
+            'title' => 'Gelombang II',
+            'academic_year' => '2026/2027',
+            'opens_on' => today()->subWeeks(2),
+            'closes_on' => today()->addMonths(2),
+            'summary' => "Penerimaan {$admissionName} gelombang kedua telah dibuka. Kuota terbatas.",
+            'requirements' => '<ul><li>Fotokopi ijazah terakhir</li><li>Fotokopi kartu keluarga</li><li>Pas foto 3x4 (4 lembar)</li><li>Surat keterangan sehat</li></ul>',
+            'fees' => '<p>Biaya pendaftaran Rp 250.000. Tersedia beasiswa penuh bagi santri berprestasi.</p>',
+            'steps' => [
+                ['title' => 'Pendaftaran Online', 'description' => 'Isi formulir dan simpan nomor pendaftaran.'],
+                ['title' => 'Verifikasi Berkas', 'description' => 'Serahkan berkas persyaratan ke sekretariat.'],
+                ['title' => 'Tes Masuk', 'description' => 'Tes baca Al-Qur\'an, kitab, dan wawancara.'],
+                ['title' => 'Pengumuman', 'description' => 'Hasil seleksi diumumkan melalui website dan WhatsApp.'],
+            ],
+            'programs' => $programs,
+            'accepts_online_registration' => true,
+        ])->forceFill(['is_published' => true])->save();
     }
 
     /**
@@ -287,12 +394,12 @@ class DemoContentSeeder extends Seeder
     }
 
     /**
-     * @template TModel of Post|Page
+     * @template TModel of Post|Page|Event
      *
      * @param  TModel  $content
      * @return TModel
      */
-    protected function publish(Post|Page $content, \DateTimeInterface $at): Post|Page
+    protected function publish(Post|Page|Event $content, \DateTimeInterface $at): Post|Page|Event
     {
         $content->forceFill(['status' => ContentStatus::Published, 'published_at' => $at])->save();
 

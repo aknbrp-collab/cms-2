@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ExportRegistrationsController;
 use App\Http\Controllers\Admin\SwitchSiteController;
 use App\Http\Middleware\EnsureAdminAccess;
 use App\Http\Middleware\SetAdminSite;
@@ -18,6 +19,25 @@ Route::middleware(['auth', 'verified', EnsureAdminAccess::class, SetAdminSite::c
     Route::livewire('pages', 'pages::admin.pages.index')->name('admin.pages.index');
     Route::livewire('pages/create', 'pages::admin.pages.edit')->name('admin.pages.create');
     Route::livewire('pages/{page}/edit', 'pages::admin.pages.edit')->name('admin.pages.edit');
+
+    Route::livewire('events', 'pages::admin.events.index')->name('admin.events.index');
+    Route::livewire('events/create', 'pages::admin.events.edit')->name('admin.events.create');
+    Route::livewire('events/{event}/edit', 'pages::admin.events.edit')->name('admin.events.edit');
+
+    Route::livewire('galleries', 'pages::admin.galleries.index')->name('admin.galleries.index');
+    Route::livewire('galleries/create', 'pages::admin.galleries.edit')->name('admin.galleries.create');
+    Route::livewire('galleries/{gallery}/edit', 'pages::admin.galleries.edit')->name('admin.galleries.edit');
+
+    Route::livewire('faqs', 'pages::admin.faqs')->name('admin.faqs');
+    Route::livewire('leaders', 'pages::admin.leaders')->name('admin.leaders');
+
+    Route::livewire('admissions', 'pages::admin.admissions.index')->name('admin.admissions.index');
+    Route::livewire('admissions/create', 'pages::admin.admissions.edit')->name('admin.admissions.create');
+    Route::livewire('admissions/{period}/edit', 'pages::admin.admissions.edit')->name('admin.admissions.edit');
+    Route::livewire('admissions/registrations', 'pages::admin.admissions.registrations')->name('admin.admissions.registrations');
+    Route::get('admissions/registrations/export', ExportRegistrationsController::class)
+        ->middleware('can:admissions.view')
+        ->name('admin.admissions.export');
 
     Route::livewire('categories', 'pages::admin.categories')
         ->middleware('can:categories.view')

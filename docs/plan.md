@@ -136,7 +136,17 @@ Phase 0 task breakdown, in order:
 - `DemoContentSeeder` fills both sites locally (runs from `DatabaseSeeder` outside production).
 - App timezone is now `Asia/Jakarta` (`APP_TIMEZONE`).
 
-**Phase 2b — Shared modules (next):** events/agenda calendar, galleries (photo + YouTube "TV"), FAQ, admissions (PSB/PMB info + Pondok online registration form), leadership.
+**Phase 2b — Shared modules** ✅ done 2026-10-31.
+- **Agenda (events) and galleries** use the full editorial workflow, like posts and pages (`App\Support\ContentTypes::REVIEWABLE` drives the review queue, scheduling and dashboard). Galleries are photo albums (bulk upload or pick from the library) or YouTube collections. The newest videos become the Pondok homepage "TV" section.
+- **FAQ, leadership and admission periods** are reference content with an on/off publish switch (`App\Livewire\ReferenceList`). Site admins edit unpublished items; `{module}.publish` is needed to publish or to change published items.
+- **Admissions:** periods have steps, requirements, fees, programs, a brochure (PDF via the media picker) and an "accept online registration" switch.
+  - Public pages: `/penerimaan`, `/penerimaan/daftar` and a signed confirmation page showing the registration number.
+  - Spam protection: throttling, a honeypot field and a minimum fill time.
+  - Admin: a registrations inbox (status and notes), scoped to the user's sites, with CSV export guarded against formula injection.
+  - Personal data is kept out of the audit log.
+- Public routes: `/agenda`, `/agenda/{slug}`, `/galeri`, `/galeri/{slug}`, `/faq`, `/pimpinan`, `/penerimaan…`. Each returns 404 on a site without that module (`config/cms.php`); FAQ is now enabled for Ma'had too.
+- Homepages: Pondok gets a TV section, an agenda sidebar and a PSB card driven by the open period. Ma'had gets Pimpinan & Masyayikh, Agenda & Halaqah, and PMB steps.
+- Registration confirmation is on-screen and via a WhatsApp link only; email/WhatsApp notifications can be added later.
 
 **Phase 2c — Site-specific modules:** Pondok (facilities, achievements, extracurriculars); Ma'had (lecturers, Takhassus programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); homepage sections for each.
 

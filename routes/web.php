@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Site\ModuleController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\SitemapController;
 use App\Http\Middleware\ResolveSite;
@@ -37,6 +38,21 @@ Route::middleware(ResolveSite::class)->name('site.')->group(function () {
     Route::get('berita/{slug}', [SiteController::class, 'post'])->name('posts.show');
     Route::get('pengumuman', [SiteController::class, 'announcements'])->name('announcements');
     Route::get('kategori/{slug}', [SiteController::class, 'category'])->name('categories.show');
+
+    Route::get('agenda', [ModuleController::class, 'events'])->name('events.index');
+    Route::get('agenda/{slug}', [ModuleController::class, 'event'])->name('events.show');
+    Route::get('galeri', [ModuleController::class, 'galleries'])->name('galleries.index');
+    Route::get('galeri/{slug}', [ModuleController::class, 'gallery'])->name('galleries.show');
+    Route::get('faq', [ModuleController::class, 'faqs'])->name('faqs');
+    Route::get('pimpinan', [ModuleController::class, 'leaders'])->name('leaders');
+    Route::get('penerimaan', [ModuleController::class, 'admissions'])->name('admissions.show');
+    Route::get('penerimaan/daftar', [ModuleController::class, 'registerForm'])->name('admissions.register');
+    Route::post('penerimaan/daftar', [ModuleController::class, 'register'])
+        ->middleware('throttle:admission-registration')
+        ->name('admissions.store');
+    Route::get('penerimaan/selesai/{number}', [ModuleController::class, 'registered'])
+        ->middleware('signed')
+        ->name('admissions.done');
 
     Route::get('sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
     Route::get('robots.txt', [SitemapController::class, 'robots'])->name('robots');

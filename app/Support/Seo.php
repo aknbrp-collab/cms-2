@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Models\Event;
+use App\Models\Gallery;
 use App\Models\MediaAsset;
 use App\Models\Page;
 use App\Models\Post;
@@ -36,13 +38,22 @@ readonly class Seo
     }
 
     /**
-     * Meta tags of a post or page, using its SEO overrides when present.
+     * Meta tags of a content item, using its SEO overrides when present.
      */
-    public static function forContent(Site $site, Post|Page $content): self
+    public static function forContent(Site $site, Post|Page|Event|Gallery $content): self
     {
         $seo = $content->seo;
-        $excerpt = $content instanceof Post ? (string) $content->excerpt : '';
-        $fallbackImage = $content instanceof Post ? $content->featuredImage : null;
+        $excerpt = match (true) {
+            $content instanceof Post => (string) $content->excerpt,
+            $content instanceof Event => (string) $content->summary,
+            $content instanceof Gallery => (string) $content->description,
+            default => '',
+        };
+        $fallbackImage = match (true) {
+            $content instanceof Post, $content instanceof Event => $content->featuredImage,
+            $content instanceof Gallery => $content->cover(),
+            default => null,
+        };
         $image = $seo->ogImage ?? $fallbackImage;
 
         return new self(
