@@ -1,7 +1,10 @@
 <?php
 
 use App\Enums\Role;
+use App\Enums\SiteKey;
+use App\Models\Site;
 use App\Models\User;
+use App\Support\CurrentSite;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\SiteSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -62,6 +65,17 @@ function seedCms(): void
 function cmsUser(Role $role, array $attributes = []): User
 {
     return User::factory()->create($attributes)->assignRole($role->value);
+}
+
+/**
+ * Make the given site the current site, as the admin site switcher would.
+ */
+function onSite(SiteKey $key): Site
+{
+    $site = Site::findByKey($key);
+    app(CurrentSite::class)->set($site);
+
+    return $site;
 }
 
 /**

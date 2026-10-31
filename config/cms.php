@@ -31,7 +31,7 @@ return [
             'name' => 'Pondok Pesantren Darul Amanah',
             'domain' => env('SITE_PONDOK_DOMAIN', 'pondok.test'),
             'modules' => [
-                'pages', 'posts', 'announcements', 'events', 'galleries', 'faqs',
+                'pages', 'posts', 'events', 'galleries', 'faqs',
                 'admissions', 'leaders', 'facilities', 'achievements', 'extracurriculars',
             ],
         ],

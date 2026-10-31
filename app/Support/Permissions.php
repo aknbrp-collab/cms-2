@@ -11,7 +11,7 @@ class Permissions
      * Site content modules and the actions available on each.
      */
     public const CONTENT_MODULES = [
-        'pages', 'posts', 'announcements', 'events', 'galleries', 'faqs', 'admissions', 'leaders',
+        'pages', 'posts', 'events', 'galleries', 'faqs', 'admissions', 'leaders',
         'facilities', 'achievements', 'extracurriculars',
         'lecturers', 'programs', 'curricula', 'publications', 'journals', 'organizations',
     ];
@@ -26,6 +26,7 @@ class Permissions
         'roles' => ['view', 'assign'],
         'sites' => ['view', 'update'],
         'menus' => ['view', 'update'],
+        'categories' => ['view', 'create', 'update', 'delete'],
         'media' => ['view', 'create', 'update', 'delete'],
         'audit_logs' => ['view'],
         'integration_logs' => ['view', 'retry'],

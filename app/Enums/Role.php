@@ -50,18 +50,21 @@ enum Role: string
                 ...Permissions::content(Permissions::CONTENT_MODULES),
                 ...Permissions::system('media'),
                 ...Permissions::system('menus'),
+                ...Permissions::system('categories'),
                 ...Permissions::system('siakad_articles'),
                 ...Permissions::system('audit_logs'),
             ],
             self::PondokAdmin => [
                 ...Permissions::content(config('cms.sites.pondok.modules'), except: ['publish']),
                 ...Permissions::system('media'),
-                ...Permissions::system('menus', ['view']),
+                ...Permissions::system('menus'),
+                ...Permissions::system('categories'),
             ],
             self::MahadAdmin => [
                 ...Permissions::content(config('cms.sites.mahad.modules'), except: ['publish']),
                 ...Permissions::system('media'),
-                ...Permissions::system('menus', ['view']),
+                ...Permissions::system('menus'),
+                ...Permissions::system('categories'),
                 ...Permissions::system('siakad_articles', ['view', 'review']),
             ],
             self::SocialMediaManager => [

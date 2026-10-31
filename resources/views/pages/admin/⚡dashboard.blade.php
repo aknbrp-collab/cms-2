@@ -1,9 +1,13 @@
 <?php
 
+use App\Enums\ContentStatus;
 use App\Models\AuditLog;
+use App\Models\Page;
+use App\Models\Post;
 use App\Models\Site;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -20,6 +24,28 @@ new #[Title('Dashboard')] class extends Component {
     public function userCount(): int
     {
         return User::query()->count();
+    }
+
+    /**
+     * @return Collection<int, DatabaseNotification>
+     */
+    #[Computed]
+    public function notifications(): Collection
+    {
+        return Auth::user()->unreadNotifications()->limit(10)->get();
+    }
+
+    #[Computed]
+    public function awaitingReview(): int
+    {
+        return Post::query()->withStatus(ContentStatus::UnderReview)->count()
+            + Page::query()->withStatus(ContentStatus::UnderReview)->count();
+    }
+
+    public function markAllRead(): void
+    {
+        Auth::user()->unreadNotifications()->update(['read_at' => now()]);
+        unset($this->notifications);
     }
 
     /**
@@ -62,6 +88,16 @@ new #[Title('Dashboard')] class extends Component {
             </flux:card>
         @endcan
 
+        @can('review-content')
+            <flux:card>
+                <flux:text>{{ __('Waiting for review') }}</flux:text>
+                <div class="mt-2 flex items-center justify-between">
+                    <flux:heading size="xl">{{ $this->awaitingReview }}</flux:heading>
+                    <flux:link :href="route('admin.review')" wire:navigate>{{ __('Open queue') }}</flux:link>
+                </div>
+            </flux:card>
+        @endcan
+
         <flux:card>
             <flux:text>{{ __('Sites you manage') }}</flux:text>
             <flux:heading size="lg" class="mt-2">
@@ -69,6 +105,29 @@ new #[Title('Dashboard')] class extends Component {
             </flux:heading>
         </flux:card>
     </div>
+
+    @if ($this->notifications->isNotEmpty())
+        <flux:card>
+            <div class="mb-4 flex items-center justify-between">
+                <flux:heading size="lg">{{ __('Notifications') }}</flux:heading>
+                <flux:button size="sm" variant="ghost" wire:click="markAllRead">{{ __('Mark all as read') }}</flux:button>
+            </div>
+
+            @foreach ($this->notifications as $notification)
+                <div class="border-b border-zinc-100 py-2 text-sm last:border-0 dark:border-zinc-700" wire:key="note-{{ $notification->id }}">
+                    @php
+                        $data = $notification->data;
+                        $route = ($data['content_type'] ?? null) === 'page' ? 'admin.pages.edit' : 'admin.posts.edit';
+                    @endphp
+                    <a href="{{ route($route, $data['content_id'] ?? '') }}" wire:navigate class="hover:underline">{{ $data['message'] ?? '' }}</a>
+                    @if (! empty($data['note']))
+                        <div class="text-zinc-500">“{{ $data['note'] }}”</div>
+                    @endif
+                    <div class="text-xs text-zinc-500">{{ $notification->created_at?->diffForHumans() }}</div>
+                </div>
+            @endforeach
+        </flux:card>
+    @endif
 
     @can('audit_logs.view')
         <flux:card>

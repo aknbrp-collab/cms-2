@@ -2,6 +2,7 @@
 
 use App\Enums\Role;
 use App\Enums\SiteKey;
+use App\Http\Middleware\EnsureAdminAccess;
 use App\Http\Middleware\SetAdminSite;
 use App\Models\Site;
 
@@ -60,4 +61,10 @@ test('invalid site ids are rejected', function () {
     $this->actingAs(cmsUser(Role::ManagingEditor))
         ->post(route('admin.switch-site'), ['site' => 'not-a-uuid'])
         ->assertNotFound();
+});
+
+test('livewire update requests re-apply the admin site', function () {
+    expect(Livewire\Livewire::getPersistentMiddleware())
+        ->toContain(EnsureAdminAccess::class)
+        ->toContain(SetAdminSite::class);
 });

@@ -119,7 +119,14 @@ Phase 0 task breakdown, in order:
 8. Admin routing group on `ADMIN_DOMAIN`, Flux layout, site switcher, role-aware sidebar, Users & Roles screens.
 9. `composer test` green (Pint, Larastan, Pest).
 
-**Phase 1 — CMS core:** site settings and theme, menus, media library, pages (block builder), posts/news/announcements, categories, SEO, approval workflow, scheduled publishing.
+**Phase 1 — CMS core:** ✅ done 2026-10-31. Site settings and theme, menus, media library, pages (block builder), posts/news/announcements, categories, SEO, approval workflow, scheduled publishing.
+- Announcements are a post *type* and use the `posts.*` permissions; categories have their own `categories.*` permissions.
+- Rich text uses Trix and is sanitised server side (`App\Support\RichText`). Embeds accept only YouTube and Google Maps (`App\Support\Embed`).
+- Page blocks: text, image, call to action, embed. More block types come in Phase 2 with the themes.
+- Cross-site "publish to both" was not built. Each post belongs to one site; add a "copy to other site" action later if needed.
+- Workflow notifications go to the database (dashboard). Email can be added per notification later.
+- Scheduled publishing needs the scheduler running (`php artisan schedule:work` locally, cron + `schedule:run` on the VPS).
+- Upload limit is 12 MB per file (Livewire default). Larger videos should go to YouTube.
 
 **Phase 2 — Site modules + public frontends:** events calendar, galleries (incl. YouTube), FAQ, PMB, leadership, facilities, achievements, extracurriculars; Ma'had modules (lecturers, programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); the two public themes converted from `ide.html` / `pdf.html`, domain resolution, Hijri date and prayer-times widget (Ma'had), Pondok PSB online registration form, sitemap, and analytics injection.
 
