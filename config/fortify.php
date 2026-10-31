@@ -88,7 +88,7 @@ return [
 
     'prefix' => '',
 
-    'domain' => null,
+    'domain' => env('ADMIN_DOMAIN'),
 
     /*
     |--------------------------------------------------------------------------
@@ -161,7 +161,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // CMS users are created by a superadmin.
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([

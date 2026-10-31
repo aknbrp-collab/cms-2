@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,11 +16,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            SiteSeeder::class,
+            RolesAndPermissionsSeeder::class,
         ]);
+
+        // Local superadmin. In production, create users with `php artisan cms:create-superadmin`.
+        if (! app()->isProduction()) {
+            User::factory()
+                ->create(['name' => 'Superadmin', 'email' => 'superadmin@pondok.test'])
+                ->assignRole(Role::Superadmin->value);
+        }
     }
 }

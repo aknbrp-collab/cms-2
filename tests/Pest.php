@@ -1,5 +1,9 @@
 <?php
 
+use App\Enums\Role;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\SiteSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +19,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -44,7 +48,26 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Seed both sites and all roles and permissions.
+ */
+function seedCms(): void
 {
-    // ..
+    test()->seed([SiteSeeder::class, RolesAndPermissionsSeeder::class]);
+}
+
+/**
+ * Create a user holding the given CMS role.
+ */
+function cmsUser(Role $role, array $attributes = []): User
+{
+    return User::factory()->create($attributes)->assignRole($role->value);
+}
+
+/**
+ * Absolute URL on the admin domain.
+ */
+function adminUrl(string $path = '/'): string
+{
+    return 'http://'.config('cms.admin_domain').'/'.ltrim($path, '/');
 }

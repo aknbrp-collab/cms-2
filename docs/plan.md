@@ -17,7 +17,7 @@ Source: [req/project.md](req/project.md)
 | Language | **Indonesian only** for now. UI strings still go through `__()` so adding languages later is cheap; no translatable columns |
 | Multi-site isolation | `sites` table + `BelongsToSite` trait (global scope + auto-fill `site_id`). Cross-site content only via an explicit `site_post` pivot ("publish to both") |
 | Keys | `HasUuids` on every model; nullable, indexed `external_id` (+ `external_source`) where third parties are involved |
-| RBAC | `spatie/laravel-permission` with **teams = site** so a role can be scoped to one site; Policies per model; Superadmin via `Gate::before` |
+| RBAC | `spatie/laravel-permission` (no teams). **Each role carries its site scope** in `App\Enums\Role::site()`: Pondok Admin → Pondok, Ma'had Admin and Tanya Hukum Admin → Ma'had, the others → all sites. Policies check `can('{module}.{action}')` plus `$user->canAccessSite($model->site)`; Superadmin via `Gate::before`. Permission names live in `App\Support\Permissions` |
 | Content workflow | Backed enum `ContentStatus`: `draft → under_review → approved → published` (+ `archived`). Only Managing Editor/Superadmin can approve |
 | Media | `spatie/laravel-medialibrary` on an S3-compatible disk (`league/flysystem-aws-s3-v3`), shared library with site tag + conversions |
 | SEO | Polymorphic `seo_meta` (title, description, OG image, canonical, noindex) + sitemap per site |
@@ -101,7 +101,7 @@ Permissions named `{module}.{action}` (e.g. `posts.publish`), seeded from an enu
 
 ## 5. Phased delivery
 
-**Phase 0 — Foundation**
+**Phase 0 — Foundation** ✅ done 2026-10-31. Keys: domain tables use UUIDs; package lookup tables (roles, permissions, media, jobs, cache) keep their bigint ids, and their polymorphic model keys are UUID.
 - Give the project its own git repo (currently the repo root is `D:\`, see notes).
 - Switch to PostgreSQL; S3-compatible `media` disk (local disk in dev, same config shape); app name/URLs; Herd domains.
 - Install spatie/laravel-permission, spatie/laravel-medialibrary, flysystem-s3.
