@@ -39,6 +39,33 @@ test('disallowed file types are rejected', function () {
     expect(MediaAsset::query()->count())->toBe(0);
 });
 
+test('uploaded svgs are stripped of scripts', function () {
+    $this->actingAs(cmsUser(Role::PondokAdmin));
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><script>alert(document.cookie)</script>'
+        .'<rect width="10" height="10" onclick="steal()"/><image href="https://evil.example/x.png"/></svg>';
+
+    Livewire::test('pages::admin.media')
+        ->set('uploads', [UploadedFile::fake()->createWithContent('logo.svg', $svg)])
+        ->assertHasNoErrors();
+
+    $stored = file_get_contents(MediaAsset::query()->sole()->file()->getPath());
+
+    expect($stored)->toContain('<rect')
+        ->not->toContain('<script')
+        ->not->toContain('onclick')
+        ->not->toContain('evil.example');
+});
+
+test('invalid svgs are refused', function () {
+    $this->actingAs(cmsUser(Role::PondokAdmin));
+
+    Livewire::test('pages::admin.media')
+        ->set('uploads', [UploadedFile::fake()->createWithContent('broken.svg', '<svg><script>')])
+        ->assertHasErrors('upload');
+
+    expect(MediaAsset::query()->count())->toBe(0);
+});
+
 test('sites see their own and shared assets only', function () {
     $own = MediaAsset::factory()->create(['site_id' => $this->pondok->id, 'title' => 'Own']);
     $shared = MediaAsset::factory()->create(['title' => 'Shared']);

@@ -72,7 +72,7 @@ new #[Title('Edit event')] class extends ContentEditor {
             }
         } else {
             $this->authorize('create', Event::class);
-            $this->siteId = current_site()?->id;
+            $this->siteId = $this->siteIdForNewContent();
             $this->startsAt = now()->addWeek()->setTime(8, 0)->format('Y-m-d\TH:i');
         }
     }

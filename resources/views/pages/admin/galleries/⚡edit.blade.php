@@ -71,7 +71,7 @@ new #[Title('Edit gallery')] class extends ContentEditor {
             ]);
         } else {
             $this->authorize('create', Gallery::class);
-            $this->siteId = current_site()?->id;
+            $this->siteId = $this->siteIdForNewContent();
             $this->type = request()->query('type') === 'video' ? 'video' : 'photo';
         }
     }

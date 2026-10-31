@@ -20,6 +20,8 @@ class MediaUploader
      */
     public function store(UploadedFile $file, User $uploader, bool $shared = false): MediaAsset
     {
+        SvgSanitizer::clean($file);
+
         $asset = MediaAsset::query()->create([
             'site_id' => $shared ? null : $this->currentSite->id(),
             'title' => Str::of($file->getClientOriginalName())->beforeLast('.')->replace(['-', '_'], ' ')->title()->limit(200)->toString(),

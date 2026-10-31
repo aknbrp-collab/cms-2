@@ -24,6 +24,12 @@ class PublishSocialTarget implements ShouldQueue
     public int $tries = 3;
 
     /**
+     * Video uploads and Instagram container processing can take minutes.
+     * Keep the queue's retry_after above this value.
+     */
+    public int $timeout = 300;
+
+    /**
      * @var list<int>
      */
     public array $backoff = [60, 300];

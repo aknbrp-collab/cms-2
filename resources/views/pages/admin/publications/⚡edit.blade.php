@@ -86,7 +86,7 @@ new #[Title('Edit publication')] class extends ContentEditor {
             }
         } else {
             $this->authorize('create', Publication::class);
-            $this->siteId = current_site()?->id;
+            $this->siteId = $this->siteIdForNewContent();
             $this->year = (int) now()->format('Y');
         }
     }

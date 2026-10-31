@@ -16,6 +16,48 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Alert Email
+    |--------------------------------------------------------------------------
+    |
+    | Receives operational alerts: failed or unhealthy backups and long
+    | Horizon queue waits. Leave empty to disable the emails.
+    |
+    */
+
+    'alert_email' => env('CMS_ALERT_EMAIL'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Proxies and HTTPS
+    |--------------------------------------------------------------------------
+    |
+    | "trusted_proxies": comma separated IPs/CIDRs (or "*") of a load balancer
+    | or CDN in front of nginx, so client IPs and HTTPS are detected. Leave
+    | empty when nginx talks to PHP directly. "hsts_max_age": seconds browsers
+    | must use HTTPS once they have seen it (0 disables the header).
+    |
+    */
+
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
+    'hsts_max_age' => (int) env('HSTS_MAX_AGE', 31536000),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retention
+    |--------------------------------------------------------------------------
+    |
+    | Days to keep operational records before they are pruned nightly.
+    | Audit logs are append-only and never pruned.
+    |
+    */
+
+    'retention' => [
+        'integration_logs' => (int) env('CMS_RETAIN_INTEGRATION_LOGS_DAYS', 180),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Sites
     |--------------------------------------------------------------------------
     |

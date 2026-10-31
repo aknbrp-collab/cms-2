@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
@@ -34,7 +36,7 @@ use Illuminate\Support\Carbon;
 ])]
 class IntegrationLog extends Model
 {
-    use HasUuids;
+    use HasUuids, MassPrunable;
 
     public const INBOUND = 'inbound';
 
@@ -68,6 +70,16 @@ class IntegrationLog extends Model
     public function subject(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Logs older than the retention period are deleted by model:prune.
+     *
+     * @return Builder<static>
+     */
+    public function prunable(): Builder
+    {
+        return static::query()->where('created_at', '<', now()->subDays(config('cms.retention.integration_logs')));
     }
 
     public function isRetryable(): bool

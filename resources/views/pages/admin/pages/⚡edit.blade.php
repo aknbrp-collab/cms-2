@@ -61,7 +61,7 @@ new #[Title('Edit page')] class extends ContentEditor {
             }
         } else {
             $this->authorize('create', Page::class);
-            $this->siteId = current_site()?->id;
+            $this->siteId = $this->siteIdForNewContent();
             $this->addBlock(BlockType::RichText->value);
         }
     }

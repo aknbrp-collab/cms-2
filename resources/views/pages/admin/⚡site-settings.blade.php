@@ -2,6 +2,7 @@
 
 use App\Models\Site;
 use App\Support\Embed;
+use App\Support\SvgSanitizer;
 use Flux\Flux;
 use Illuminate\Http\UploadedFile;
 use Livewire\Attributes\Computed;
@@ -91,6 +92,10 @@ new #[Title('Site settings')] class extends Component {
             'branding.favicon' => ['nullable', 'file', 'mimes:png,ico,svg', 'max:1024'],
             'branding.og_default' => ['nullable', 'image', 'max:4096'],
         ]);
+
+        foreach (array_filter($this->branding) as $collection => $file) {
+            SvgSanitizer::clean($file, "branding.{$collection}");
+        }
 
         $site->name = $this->name;
         $site->fillSettings(collect($this->settings)

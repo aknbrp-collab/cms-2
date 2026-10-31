@@ -144,6 +144,7 @@ new #[Title('Media library')] class extends Component {
                 <div wire:loading wire:target="uploads"><flux:text size="sm">{{ __('Uploading…') }}</flux:text></div>
                 <flux:error name="uploads" />
                 <flux:error name="uploads.*" />
+                <flux:error name="upload" />
             </div>
         @endcan
     </div>

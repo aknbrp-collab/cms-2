@@ -65,7 +65,7 @@ new #[Title('Edit post')] class extends ContentEditor {
             }
         } else {
             $this->authorize('create', Post::class);
-            $this->siteId = current_site()?->id;
+            $this->siteId = $this->siteIdForNewContent();
         }
     }
 

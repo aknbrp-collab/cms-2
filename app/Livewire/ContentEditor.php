@@ -32,6 +32,18 @@ abstract class ContentEditor extends Component
         return true;
     }
 
+    /**
+     * Site that new content is created on: the admin's current site.
+     * "All sites" has none, so the user has to pick one first.
+     */
+    protected function siteIdForNewContent(): string
+    {
+        $site = current_site();
+        abort_if($site === null, 403, __('Choose a site in the sidebar first.'));
+
+        return $site->id;
+    }
+
     public function submitForReview(ContentWorkflow $workflow): void
     {
         $this->runWorkflow(fn ($content) => $workflow->submit($content, Auth::user()), __('Sent for review.'), save: true);

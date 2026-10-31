@@ -40,6 +40,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -186,6 +187,10 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );
+
+        if ($proxies = config('cms.trusted_proxies')) {
+            TrustProxies::at($proxies === '*' ? '*' : array_map(trim(...), explode(',', $proxies)));
+        }
 
         Password::defaults(fn (): ?Password => app()->isProduction()
             ? Password::min(12)

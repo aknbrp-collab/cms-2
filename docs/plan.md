@@ -183,7 +183,21 @@ Phase 0 task breakdown, in order:
 - **Review readiness:** privacy policy (`/kebijakan-privasi`) and terms (`/syarat-ketentuan`) on the admin domain, the Meta data-deletion callback (verified `signed_request`, status page) and deauthorize callback, and minimal scopes. Setup steps and screencast scripts are in [social-review.md](social-review.md).
 - `SOCIAL_DRIVER=fake` (default) simulates connecting and publishing; a caption containing `#gagal` simulates a failure. Set `SOCIAL_DRIVER=live` once the app keys are in `.env`.
 
-Next: Phase 5 (hardening).
+**Phase 5 — Hardening** ✅ done 2026-11-01.
+- **Operations:**
+  - Horizon on Redis: superadmin-only dashboard on the admin domain, alert emails to `CMS_ALERT_EMAIL`.
+  - Nightly encrypted backups (spatie/laravel-backup): gzipped `pg_dump` plus `storage/app`, written locally and to an optional off-site `backups` S3 disk, with retention and a health monitor.
+  - Pruning of integration logs (180 days), failed jobs and password resets. Audit logs are never pruned.
+  - `php artisan cms:check` flags unsafe or incomplete production settings and runs on every deploy.
+- **Security:**
+  - Security headers on every response (HSTS over HTTPS, frame-ancestors CSP).
+  - `TRUSTED_PROXIES` support.
+  - A per-IP login cap on top of the per-account limit.
+  - Uploaded SVGs are sanitized (media library and branding images). The media library's 12 MB limit now matches the upload form.
+  - nginx sandboxes `/storage/`.
+- **Tests:** cross-site access by URL (posts, pages, events, galleries, admission periods), social targets on another site, headers, Horizon access, login throttling, the schedule, pruning, the readiness check, and SVG sanitizing.
+- **Docs:** [deployment.md](deployment.md) covers the server, first-time setup, deploys and rollback, queues, the schedule, backup/restore and security. Server config samples are in `deploy/` (nginx, Supervisor for Horizon, a zero-downtime `deploy.sh`).
+- Composer declares `ext-pcntl`/`ext-posix` as platform extensions so Horizon installs on Windows dev machines; production Linux has them.
 
 Original Phase 2 scope: events calendar, galleries (incl. YouTube), FAQ, PMB, leadership, facilities, achievements, extracurriculars; Ma'had modules (lecturers, programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); the two public themes converted from `ide.html` / `pdf.html`, domain resolution, Hijri date and prayer-times widget (Ma'had), Pondok PSB online registration form, sitemap, and analytics injection.
 
