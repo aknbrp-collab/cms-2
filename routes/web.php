@@ -5,6 +5,7 @@ use App\Http\Controllers\Site\ModuleController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\SitemapController;
 use App\Http\Controllers\Site\TanyaHukumController;
+use App\Http\Controllers\Webhooks\MetaCallbackController;
 use App\Http\Middleware\ResolveSite;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::domain(config('cms.admin_domain'))->group(function () {
     Route::redirect('/', '/dashboard')->name('home');
+
+    // Public pages required by the Meta and TikTok app reviews.
+    Route::view('kebijakan-privasi', 'legal.privacy')->name('legal.privacy');
+    Route::view('syarat-ketentuan', 'legal.terms')->name('legal.terms');
+    Route::get('social/data-deletion/{code}', [MetaCallbackController::class, 'status'])
+        ->where('code', '[A-Z0-9]{12}')
+        ->name('social.data-deletion.status');
 
     require __DIR__.'/admin.php';
     require __DIR__.'/settings.php';

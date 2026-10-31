@@ -49,6 +49,24 @@
                     </flux:sidebar.group>
                 @endcanany
 
+                @canany(['social_posts.view', 'social_accounts.view'])
+                    <flux:sidebar.group :heading="__('Social media')" class="grid">
+                        @can('social_posts.view')
+                            <flux:sidebar.item icon="megaphone" :href="route('admin.social.posts')" :current="request()->routeIs('admin.social.posts', 'admin.social.create', 'admin.social.edit')" wire:navigate>
+                                {{ __('Posts') }}
+                            </flux:sidebar.item>
+                            <flux:sidebar.item icon="calendar" :href="route('admin.social.calendar')" :current="request()->routeIs('admin.social.calendar')" wire:navigate>
+                                {{ __('Calendar') }}
+                            </flux:sidebar.item>
+                        @endcan
+                        @can('social_accounts.view')
+                            <flux:sidebar.item icon="link" :href="route('admin.social.accounts')" :current="request()->routeIs('admin.social.accounts')" wire:navigate>
+                                {{ __('Accounts') }}
+                            </flux:sidebar.item>
+                        @endcan
+                    </flux:sidebar.group>
+                @endcanany
+
                 @canany(['siakad_articles.view', 'legal_questions.view', 'integration_logs.view'])
                     <flux:sidebar.group :heading="__('SIAKAD')" class="grid">
                         @can('legal_questions.view')

@@ -2,6 +2,7 @@
 
 use App\Cms\Resources;
 use App\Http\Controllers\Admin\ExportRegistrationsController;
+use App\Http\Controllers\Admin\SocialConnectController;
 use App\Http\Controllers\Admin\SwitchSiteController;
 use App\Http\Middleware\EnsureAdminAccess;
 use App\Http\Middleware\SetAdminSite;
@@ -48,6 +49,25 @@ Route::middleware(['auth', 'verified', EnsureAdminAccess::class, SetAdminSite::c
     Route::livewire('publications', 'pages::admin.publications.index')->name('admin.publications.index');
     Route::livewire('publications/create', 'pages::admin.publications.edit')->name('admin.publications.create');
     Route::livewire('publications/{publication}/edit', 'pages::admin.publications.edit')->name('admin.publications.edit');
+
+    // Social media
+    Route::livewire('social/accounts', 'pages::admin.social.accounts')
+        ->middleware('can:social_accounts.view')
+        ->name('admin.social.accounts');
+    Route::get('social/connect/{provider}', [SocialConnectController::class, 'redirect'])->name('social.connect');
+    Route::get('social/callback/{app}', [SocialConnectController::class, 'callback'])->name('social.callback');
+    Route::livewire('social/posts', 'pages::admin.social.posts')
+        ->middleware('can:social_posts.view')
+        ->name('admin.social.posts');
+    Route::livewire('social/posts/create', 'pages::admin.social.compose')
+        ->middleware('can:social_posts.create')
+        ->name('admin.social.create');
+    Route::livewire('social/posts/{post}/edit', 'pages::admin.social.compose')
+        ->middleware('can:social_posts.view')
+        ->name('admin.social.edit');
+    Route::livewire('social/calendar', 'pages::admin.social.calendar')
+        ->middleware('can:social_posts.view')
+        ->name('admin.social.calendar');
 
     // SIAKAD integration
     Route::livewire('siakad/articles', 'pages::admin.siakad-articles.index')->name('admin.siakad-articles.index');

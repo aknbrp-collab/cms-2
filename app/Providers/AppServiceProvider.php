@@ -154,6 +154,9 @@ class AppServiceProvider extends ServiceProvider
             'integration_log' => Models\IntegrationLog::class,
             'siakad_article' => Models\SiakadArticle::class,
             'legal_question' => Models\LegalQuestion::class,
+            'social_account' => Models\SocialAccount::class,
+            'social_post' => Models\SocialPost::class,
+            'social_post_target' => Models\SocialPostTarget::class,
         ]);
     }
 

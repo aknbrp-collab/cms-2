@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Webhooks\MetaCallbackController;
 use App\Http\Controllers\Webhooks\SiakadWebhookController;
 use App\Http\Middleware\VerifySiakadSignature;
 use Illuminate\Support\Facades\Route;
@@ -24,4 +25,19 @@ Route::domain(config('cms.admin_domain'))
             ->where('externalId', '[A-Za-z0-9._:-]+')
             ->name('articles.withdraw');
         Route::post('answers', [SiakadWebhookController::class, 'answer'])->name('answers');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Meta app callbacks (data deletion, deauthorize)
+|--------------------------------------------------------------------------
+*/
+
+Route::domain(config('cms.admin_domain'))
+    ->prefix('social/meta')
+    ->middleware('throttle:60,1')
+    ->name('social.meta.')
+    ->group(function () {
+        Route::post('data-deletion', [MetaCallbackController::class, 'dataDeletion'])->name('data-deletion');
+        Route::post('deauthorize', [MetaCallbackController::class, 'deauthorize'])->name('deauthorize');
     });

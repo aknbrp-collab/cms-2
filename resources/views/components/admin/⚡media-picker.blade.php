@@ -12,7 +12,7 @@ use Livewire\WithFileUploads;
 
 /**
  * Pick a file from the media library (or upload one) and bind its id.
- * `kind` is "image" (default) or "document" (PDF, Office files).
+ * `kind` is "image" (default), "visual" (images and videos) or "document" (PDF, Office files).
  */
 new class extends Component {
     use WithFileUploads;
@@ -43,9 +43,11 @@ new class extends Component {
     {
         return MediaAsset::query()
             ->with('media')
-            ->whereHas('media', fn ($query) => $this->kind === 'document'
-                ? $query->whereNotIn('mime_type', MediaAsset::IMAGE_TYPES)->whereNotLike('mime_type', 'video/%')
-                : $query->whereIn('mime_type', MediaAsset::IMAGE_TYPES))
+            ->whereHas('media', fn ($query) => match ($this->kind) {
+                'document' => $query->whereNotIn('mime_type', MediaAsset::IMAGE_TYPES)->whereNotLike('mime_type', 'video/%'),
+                'visual' => $query->where(fn ($query) => $query->whereIn('mime_type', MediaAsset::IMAGE_TYPES)->orWhereLike('mime_type', 'video/%')),
+                default => $query->whereIn('mime_type', MediaAsset::IMAGE_TYPES),
+            })
             ->when($this->search !== '', fn ($query) => $query->whereLike('title', "%{$this->search}%"))
             ->latest()
             ->limit(48)
@@ -66,9 +68,11 @@ new class extends Component {
     public function updatedUpload(MediaUploader $uploader): void
     {
         $this->authorize('media.create');
-        $this->validate(['upload' => $this->kind === 'document'
-            ? ['file', 'max:12288', 'extensions:pdf,doc,docx,xls,xlsx,ppt,pptx']
-            : ['image', 'max:12288']]);
+        $this->validate(['upload' => match ($this->kind) {
+            'document' => ['file', 'max:12288', 'extensions:pdf,doc,docx,xls,xlsx,ppt,pptx'],
+            'visual' => ['file', 'max:12288', 'extensions:jpg,jpeg,png,webp,mp4,mov,webm'],
+            default => ['image', 'max:12288'],
+        }]);
 
         $asset = $uploader->store($this->upload, Auth::user());
         $this->reset('upload');
@@ -113,7 +117,7 @@ new class extends Component {
             <div class="flex flex-wrap items-end gap-3">
                 <flux:input wire:model.live.debounce.300ms="search" :placeholder="__('Search')" icon="magnifying-glass" class="max-w-xs" />
                 @can('media.create')
-                    <flux:input type="file" wire:model="upload" :accept="$kind === 'document' ? '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx' : 'image/*'" :label="__('Upload new')" class="max-w-xs" />
+                    <flux:input type="file" wire:model="upload" :accept="match ($kind) { 'document' => '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx', 'visual' => 'image/*,video/mp4,video/quicktime,video/webm', default => 'image/*' }" :label="__('Upload new')" class="max-w-xs" />
                 @endcan
             </div>
             <div wire:loading wire:target="upload"><flux:text size="sm">{{ __('Uploading…') }}</flux:text></div>

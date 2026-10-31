@@ -175,7 +175,15 @@ Phase 0 task breakdown, in order:
 - **Integration log screen** with request/response detail and retry. `php artisan siakad:simulate article|answer|withdraw` sends signed webhooks locally; `SIAKAD_DRIVER=fake` (default) simulates SIAKAD accepting forwarded questions.
 - **Simplification:** question state history lives in the audit log and integration log instead of a separate `legal_question_events` table.
 
-Next: Phase 4 (social media).
+**Phase 4 — Social media** ✅ done 2026-10-31.
+- **Accounts:** Meta login connects every granted Facebook Page and its linked Instagram Business account; TikTok uses Login Kit v2 with PKCE. Tokens are stored encrypted. TikTok tokens are refreshed hourly (`social:refresh-tokens`), and accounts with invalid tokens show "Reconnect needed".
+- **Composer:** one caption with per-account overrides and hashtags, live character counts, ordered media from the library (max 10), and platform checks before publishing (Instagram/TikTok need media, caption and hashtag limits). TikTok follows the Content Sharing Guidelines: creator nickname, privacy with no default, interaction toggles off by default, commercial disclosure, and consent text.
+- **Publishing:** one `PublishSocialTarget` job per account (3 tries, one at a time per account), so one failing platform doesn't block the others. Post status is derived from the targets (published / partially failed / failed), and failed targets can be retried. TikTok publishing is asynchronous and polled by `CheckSocialPublishStatus`. Scheduled posts go out via `social:dispatch-due` every minute.
+- **Calendar:** month and week views; drag a draft or scheduled post to another day to reschedule it (the time of day is kept, and past days are refused).
+- **Review readiness:** privacy policy (`/kebijakan-privasi`) and terms (`/syarat-ketentuan`) on the admin domain, the Meta data-deletion callback (verified `signed_request`, status page) and deauthorize callback, and minimal scopes. Setup steps and screencast scripts are in [social-review.md](social-review.md).
+- `SOCIAL_DRIVER=fake` (default) simulates connecting and publishing; a caption containing `#gagal` simulates a failure. Set `SOCIAL_DRIVER=live` once the app keys are in `.env`.
+
+Next: Phase 5 (hardening).
 
 Original Phase 2 scope: events calendar, galleries (incl. YouTube), FAQ, PMB, leadership, facilities, achievements, extracurriculars; Ma'had modules (lecturers, programs, curriculum, publications/journals/repository/Bahtsul Masail, organizations); the two public themes converted from `ide.html` / `pdf.html`, domain resolution, Hijri date and prayer-times widget (Ma'had), Pondok PSB online registration form, sitemap, and analytics injection.
 

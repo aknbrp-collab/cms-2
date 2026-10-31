@@ -9,3 +9,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('cms:publish-scheduled')->everyMinute()->withoutOverlapping();
+Schedule::command('social:dispatch-due')->everyMinute()->withoutOverlapping();
+Schedule::command('social:refresh-tokens')->hourly()->withoutOverlapping();
