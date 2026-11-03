@@ -2,18 +2,15 @@
 
 use App\Enums\ContentStatus;
 use App\Enums\PostType;
+use App\Livewire\ContentList;
 use App\Models\Post;
 use Flux\Flux;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
-use Livewire\Component;
-use Livewire\WithPagination;
 
-new #[Title('Posts')] class extends Component {
-    use WithPagination;
-
+new #[Title('Posts')] class extends ContentList {
     #[Url]
     public string $search = '';
 
@@ -42,12 +39,18 @@ new #[Title('Posts')] class extends Component {
     public function posts(): LengthAwarePaginator
     {
         return Post::query()
+            ->tap(fn ($query) => $this->applyVisibilityFilter($query))
             ->with(['site', 'category', 'author'])
             ->when($this->search !== '', fn ($query) => $query->whereLike('title', "%{$this->search}%"))
             ->when(ContentStatus::tryFrom($this->status), fn ($query, ContentStatus $status) => $query->withStatus($status))
             ->when(PostType::tryFrom($this->type), fn ($query, PostType $type) => $query->where('type', $type->value))
             ->latest('updated_at')
             ->paginate(20);
+    }
+
+    protected function visibilityModel(): string
+    {
+        return Post::class;
     }
 
     public function delete(string $id): void
@@ -86,6 +89,7 @@ new #[Title('Posts')] class extends Component {
                 <option value="{{ $case->value }}">{{ $case->label() }}</option>
             @endforeach
         </flux:select>
+        <x-admin.visibility-filter />
     </div>
 
     <flux:table :paginate="$this->posts">
@@ -105,6 +109,7 @@ new #[Title('Posts')] class extends Component {
                 <flux:table.row :key="$post->id">
                     <flux:table.cell class="max-w-md">
                         <a href="{{ route('admin.posts.edit', $post) }}" wire:navigate class="font-medium hover:underline">{{ $post->title }}</a>
+                        <x-admin.hidden-badge :item="$post" class="ms-1" />
                         <div class="text-xs text-zinc-500">{{ $post->author?->name }}</div>
                     </flux:table.cell>
                     @unless (current_site())
@@ -117,6 +122,7 @@ new #[Title('Posts')] class extends Component {
                     </flux:table.cell>
                     <flux:table.cell class="whitespace-nowrap">{{ $post->updated_at?->diffForHumans() }}</flux:table.cell>
                     <flux:table.cell align="end">
+                        <x-admin.visibility-toggle :item="$post" :can="auth()->user()->can('hide', $post)" />
                         @can('delete', $post)
                             <flux:button size="sm" variant="ghost" icon="trash" wire:click="delete('{{ $post->id }}')" wire:confirm="{{ __('Move this post to the trash?') }}" />
                         @endcan

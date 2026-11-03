@@ -33,7 +33,7 @@ abstract class ReferenceList extends Component
         $item->forceFill(['is_published' => $published])->save();
 
         Audit::record($published ? 'reference.published' : 'reference.unpublished', $item);
-        Flux::toast(variant: 'success', text: $published ? __('Published.') : __('Unpublished.'));
+        Flux::toast(variant: 'success', text: $published ? __('Shown on the website again.') : __('Hidden from the website.'));
     }
 
     /**

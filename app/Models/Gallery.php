@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Concerns\Auditable;
 use App\Concerns\BelongsToSite;
 use App\Concerns\HasSeo;
+use App\Concerns\HasVisibility;
 use App\Concerns\HasWorkflow;
 use App\Contracts\Reviewable;
 use App\Enums\ContentStatus;
@@ -23,6 +24,7 @@ use Illuminate\Support\Carbon;
  * Photo album or video collection (e.g. the pesantren "TV" channel).
  *
  * @property string $id
+ * @property bool $is_hidden
  * @property string $site_id
  * @property string|null $author_id
  * @property GalleryType $type
@@ -46,7 +48,7 @@ use Illuminate\Support\Carbon;
 class Gallery extends Model implements Reviewable
 {
     /** @use HasFactory<GalleryFactory> */
-    use Auditable, BelongsToSite, HasFactory, HasSeo, HasUuids, HasWorkflow, SoftDeletes;
+    use Auditable, BelongsToSite, HasFactory, HasSeo, HasUuids, HasVisibility, HasWorkflow, SoftDeletes;
 
     /**
      * @var array<string, mixed>

@@ -1,18 +1,15 @@
 <?php
 
 use App\Enums\ContentStatus;
+use App\Livewire\ContentList;
 use App\Models\Event;
 use Flux\Flux;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
-use Livewire\Component;
-use Livewire\WithPagination;
 
-new #[Title('Agenda')] class extends Component {
-    use WithPagination;
-
+new #[Title('Agenda')] class extends ContentList {
     #[Url]
     public string $search = '';
 
@@ -38,11 +35,17 @@ new #[Title('Agenda')] class extends Component {
     public function events(): LengthAwarePaginator
     {
         return Event::query()
+            ->tap(fn ($query) => $this->applyVisibilityFilter($query))
             ->with('site')
             ->when($this->search !== '', fn ($query) => $query->whereLike('title', "%{$this->search}%"))
             ->when($this->when === 'upcoming', fn ($query) => $query->upcoming()->orderBy('starts_at'))
             ->when($this->when === 'past', fn ($query) => $query->where('starts_at', '<', now()->startOfDay())->orderByDesc('starts_at'))
             ->paginate(20);
+    }
+
+    protected function visibilityModel(): string
+    {
+        return Event::class;
     }
 
     public function delete(string $id): void
@@ -73,6 +76,7 @@ new #[Title('Agenda')] class extends Component {
             <option value="upcoming">{{ __('Upcoming') }}</option>
             <option value="past">{{ __('Past') }}</option>
         </flux:select>
+        <x-admin.visibility-filter />
     </div>
 
     <flux:table :paginate="$this->events">
@@ -92,6 +96,7 @@ new #[Title('Agenda')] class extends Component {
                     <flux:table.cell class="whitespace-nowrap">{{ $event->starts_at->translatedFormat($event->all_day ? 'd M Y' : 'd M Y H:i') }}</flux:table.cell>
                     <flux:table.cell>
                         <a href="{{ route('admin.events.edit', $event) }}" wire:navigate class="font-medium hover:underline">{{ $event->title }}</a>
+                        <x-admin.hidden-badge :item="$event" class="ms-1" />
                         @if ($event->label)
                             <div class="text-xs text-zinc-500">{{ $event->label }}</div>
                         @endif
@@ -102,6 +107,7 @@ new #[Title('Agenda')] class extends Component {
                     <flux:table.cell>{{ $event->location }}</flux:table.cell>
                     <flux:table.cell><flux:badge size="sm" :color="$event->status->color()">{{ $event->isScheduled() ? __('Scheduled') : $event->status->label() }}</flux:badge></flux:table.cell>
                     <flux:table.cell align="end">
+                        <x-admin.visibility-toggle :item="$event" :can="auth()->user()->can('hide', $event)" />
                         @can('delete', $event)
                             <flux:button size="sm" variant="ghost" icon="trash" wire:click="delete('{{ $event->id }}')" wire:confirm="{{ __('Move this event to the trash?') }}" />
                         @endcan

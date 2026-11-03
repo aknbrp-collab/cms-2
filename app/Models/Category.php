@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\Auditable;
 use App\Concerns\BelongsToSite;
+use App\Concerns\HasVisibility;
 use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -16,6 +17,7 @@ use Illuminate\Support\Carbon;
  * Post category. Categories flagged "show on home" become homepage sections.
  *
  * @property string $id
+ * @property bool $is_hidden
  * @property string $site_id
  * @property string $name
  * @property string $slug
@@ -29,7 +31,7 @@ use Illuminate\Support\Carbon;
 class Category extends Model
 {
     /** @use HasFactory<CategoryFactory> */
-    use Auditable, BelongsToSite, HasFactory, HasUuids;
+    use Auditable, BelongsToSite, HasFactory, HasUuids, HasVisibility;
 
     /**
      * Get the attributes that should be cast.

@@ -12,7 +12,7 @@
         'h-44 rounded-lg md:w-56' => $layout === 'row',
     ])>
         <x-site.image :asset="$post->featuredImage" conversion="thumb" :alt="$post->title" class="h-full w-full transition duration-300 group-hover:scale-105" />
-        @if ($post->category)
+        @if ($post->category && ! $post->category->isHidden())
             <span class="absolute start-2.5 top-2.5 rounded-full bg-primary/90 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-on-primary">{{ $post->category->name }}</span>
         @endif
     </a>

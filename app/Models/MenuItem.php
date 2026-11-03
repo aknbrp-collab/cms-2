@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\Auditable;
+use App\Concerns\HasVisibility;
 use App\Enums\MenuItemType;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -14,6 +15,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
+ * @property bool $is_hidden
  * @property string $menu_id
  * @property string|null $parent_id
  * @property string $label
@@ -29,7 +31,7 @@ use Illuminate\Support\Carbon;
 #[Fillable(['menu_id', 'parent_id', 'label', 'type', 'url', 'linkable_type', 'linkable_id', 'open_in_new_tab', 'sort_order'])]
 class MenuItem extends Model
 {
-    use Auditable, HasUuids;
+    use Auditable, HasUuids, HasVisibility;
 
     /**
      * Get the attributes that should be cast.
@@ -75,6 +77,20 @@ class MenuItem extends Model
     public function linkable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Whether the page or category the item links to is shown on the public site.
+     */
+    public function targetIsPublic(): bool
+    {
+        $linkable = $this->linkable;
+
+        return match ($this->type) {
+            MenuItemType::Url => true,
+            MenuItemType::Page => $linkable instanceof Page && $linkable->isPublished() && ! $linkable->isHidden(),
+            MenuItemType::Category => $linkable instanceof Category && ! $linkable->isHidden(),
+        };
     }
 
     /**

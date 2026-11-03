@@ -139,7 +139,7 @@ new #[Title('FAQ')] class extends ReferenceList {
             @unless (current_site())
                 <flux:table.column>{{ __('Site') }}</flux:table.column>
             @endunless
-            <flux:table.column>{{ __('Published') }}</flux:table.column>
+            <flux:table.column>{{ __('Shown on website') }}</flux:table.column>
             <flux:table.column />
         </flux:table.columns>
         <flux:table.rows>

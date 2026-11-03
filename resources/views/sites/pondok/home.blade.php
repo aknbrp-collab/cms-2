@@ -25,7 +25,7 @@
                         <a href="{{ route('site.posts.show', $featured->slug) }}" class="relative block aspect-[16/9] overflow-hidden bg-surface-container md:aspect-[16/8]">
                             <x-site.image :asset="$featured->featuredImage" :alt="$featured->title" class="h-full w-full transition duration-500 group-hover:scale-105" />
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-                            @if ($featured->category)
+                            @if ($featured->category && ! $featured->category->isHidden())
                                 <span class="absolute start-4 top-4 rounded-full bg-primary-container px-3 py-1 text-xs font-bold text-on-primary shadow-md">{{ $featured->category->name }}</span>
                             @endif
                             <div class="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5 text-white md:p-6">

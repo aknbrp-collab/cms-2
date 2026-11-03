@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * Abilities combine the module permission ("posts.update") with the
  * user's site scope. Users without the publish permission may only edit
- * or delete content that is still a draft.
+ * or delete content that is still a draft, but may hide or show any of it.
  */
 abstract class ContentPolicy
 {
@@ -56,6 +56,15 @@ abstract class ContentPolicy
     {
         return $this->allows($user, $content, 'delete')
             && ($this->isDraft($content) || $this->allows($user, $content, 'publish'));
+    }
+
+    /**
+     * Hide from or show on the public site. Unlike update, this is allowed on
+     * published content too: it never makes unreviewed content public.
+     */
+    public function hide(User $user, Reviewable&Model $content): bool
+    {
+        return $this->allows($user, $content, 'update');
     }
 
     public function submit(User $user, Reviewable&Model $content): bool

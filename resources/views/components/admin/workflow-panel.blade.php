@@ -8,6 +8,7 @@
     $canPublish = $content
         ? auth()->user()->can('publish', $content)
         : false;
+    $canHide = $content && auth()->user()->can('hide', $content);
 @endphp
 
 {{-- Status and workflow actions for the editor sidebar. Methods come from App\Livewire\ContentEditor. --}}
@@ -51,7 +52,7 @@
         @endif
 
         @if ($canPublish && in_array($status, [ContentStatus::Published, ContentStatus::Approved], true))
-            <flux:button icon="eye-slash" wire:click="unpublish" wire:confirm="{{ __('Take this offline and move it back to draft?') }}">{{ __('Unpublish') }}</flux:button>
+            <flux:button icon="arrow-down-tray" wire:click="unpublish" wire:confirm="{{ __('Take this offline and move it back to draft?') }}">{{ __('Unpublish') }}</flux:button>
         @endif
 
         @if ($canPublish && in_array($status, [ContentStatus::Draft, ContentStatus::Approved, ContentStatus::Published], true))
@@ -68,6 +69,17 @@
     </div>
 
     <flux:error name="status" />
+
+    @if ($content)
+        <flux:separator variant="subtle" />
+        <div class="flex items-start justify-between gap-3">
+            <div>
+                <flux:heading size="sm">{{ __('Show on the website') }}</flux:heading>
+                <flux:text size="sm">{{ $content->is_hidden ? __('Hidden: visitors cannot see it, whatever its status.') : __('Turn off to hide it without changing its status.') }}</flux:text>
+            </div>
+            <flux:switch :checked="! $content->is_hidden" wire:click="toggleHidden" :disabled="! $canHide" />
+        </div>
+    @endif
 
     <flux:modal name="workflow-approve" class="md:w-96">
         <div class="space-y-4">

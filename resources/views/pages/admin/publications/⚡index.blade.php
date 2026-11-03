@@ -2,18 +2,15 @@
 
 use App\Enums\ContentStatus;
 use App\Enums\PublicationType;
+use App\Livewire\ContentList;
 use App\Models\Publication;
 use Flux\Flux;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
-use Livewire\Component;
-use Livewire\WithPagination;
 
-new #[Title('Publications')] class extends Component {
-    use WithPagination;
-
+new #[Title('Publications')] class extends ContentList {
     #[Url]
     public string $search = '';
 
@@ -42,6 +39,7 @@ new #[Title('Publications')] class extends Component {
     public function publications(): LengthAwarePaginator
     {
         return Publication::query()
+            ->tap(fn ($query) => $this->applyVisibilityFilter($query))
             ->with(['site', 'journal'])
             ->when($this->search !== '', fn ($query) => $query->where(fn ($query) => $query
                 ->whereLike('title', "%{$this->search}%")
@@ -50,6 +48,11 @@ new #[Title('Publications')] class extends Component {
             ->when(ContentStatus::tryFrom($this->status), fn ($query, ContentStatus $status) => $query->withStatus($status))
             ->latest('updated_at')
             ->paginate(20);
+    }
+
+    protected function visibilityModel(): string
+    {
+        return Publication::class;
     }
 
     public function delete(string $id): void
@@ -88,6 +91,7 @@ new #[Title('Publications')] class extends Component {
                 <option value="{{ $case->value }}">{{ $case->label() }}</option>
             @endforeach
         </flux:select>
+        <x-admin.visibility-filter />
     </div>
 
     <flux:table :paginate="$this->publications">
@@ -106,6 +110,7 @@ new #[Title('Publications')] class extends Component {
                 <flux:table.row :key="$publication->id">
                     <flux:table.cell class="max-w-md">
                         <a href="{{ route('admin.publications.edit', $publication) }}" wire:navigate class="font-medium hover:underline">{{ $publication->title }}</a>
+                        <x-admin.hidden-badge :item="$publication" class="ms-1" />
                         <div class="truncate text-xs text-zinc-500">{{ $publication->authors }}</div>
                     </flux:table.cell>
                     <flux:table.cell>{{ $publication->type->label() }}</flux:table.cell>
@@ -115,6 +120,7 @@ new #[Title('Publications')] class extends Component {
                     @endunless
                     <flux:table.cell><flux:badge size="sm" :color="$publication->status->color()">{{ $publication->status->label() }}</flux:badge></flux:table.cell>
                     <flux:table.cell align="end">
+                        <x-admin.visibility-toggle :item="$publication" :can="auth()->user()->can('hide', $publication)" />
                         @can('delete', $publication)
                             <flux:button size="sm" variant="ghost" icon="trash" wire:click="delete('{{ $publication->id }}')" wire:confirm="{{ __('Move this publication to the trash?') }}" />
                         @endcan

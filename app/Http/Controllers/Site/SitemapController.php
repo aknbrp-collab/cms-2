@@ -31,7 +31,7 @@ class SitemapController extends Controller
                 ->map(fn (Page $page) => ['loc' => url($page->slug), 'lastmod' => $page->updated_at]))
             ->concat($this->indexable(Post::query()->published())->latest('published_at')->limit(5000)->get(['slug', 'updated_at'])
                 ->map(fn (Post $post) => ['loc' => route('site.posts.show', $post->slug), 'lastmod' => $post->updated_at]))
-            ->concat(Category::query()->get(['slug', 'updated_at'])
+            ->concat(Category::query()->visible()->get(['slug', 'updated_at'])
                 ->map(fn (Category $category) => ['loc' => route('site.categories.show', $category->slug), 'lastmod' => $category->updated_at]))
             ->concat($this->moduleUrls($site));
 

@@ -44,7 +44,8 @@ class SiteTheme
     }
 
     /**
-     * Top-level items of a menu with their children, in order.
+     * Top-level items of a menu with their children, in order. Hidden items
+     * (with their sub-links) and links to hidden or unpublished targets are left out.
      *
      * @return Collection<int, MenuItem>
      */
@@ -52,7 +53,17 @@ class SiteTheme
     {
         $menu = Menu::query()->forSite($this->site())->where('location', $location->value)->first();
 
-        return $menu?->rootItems()->with(['linkable', 'children.linkable'])->get() ?? new Collection;
+        if ($menu === null) {
+            return new Collection;
+        }
+
+        return $menu->rootItems()
+            ->visible()
+            ->with(['linkable', 'children' => fn ($query) => $query->visible(), 'children.linkable'])
+            ->get()
+            ->filter(fn (MenuItem $item) => $item->targetIsPublic())
+            ->each(fn (MenuItem $item) => $item->setRelation('children', $item->children->filter(fn (MenuItem $child) => $child->targetIsPublic())->values()))
+            ->values();
     }
 
     /**

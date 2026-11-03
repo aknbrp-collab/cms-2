@@ -158,9 +158,9 @@ new #[Title('Leadership')] class extends ReferenceList {
                 </div>
                 <div class="mt-auto flex items-center justify-between">
                     @can('leaders.publish')
-                        <flux:switch :checked="$leader->is_published" wire:click="togglePublished('{{ $leader->id }}')" :label="__('Published')" />
+                        <flux:switch :checked="$leader->is_published" wire:click="togglePublished('{{ $leader->id }}')" :label="__('Shown on website')" />
                     @else
-                        <flux:badge size="sm" :color="$leader->is_published ? 'emerald' : 'zinc'">{{ $leader->is_published ? __('Published') : __('Hidden') }}</flux:badge>
+                        <flux:badge size="sm" :color="$leader->is_published ? 'emerald' : 'zinc'">{{ $leader->is_published ? __('Shown') : __('Hidden') }}</flux:badge>
                     @endcan
                     <div>
                         @can('leaders.update')

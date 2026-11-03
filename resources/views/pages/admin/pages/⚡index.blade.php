@@ -1,18 +1,15 @@
 <?php
 
 use App\Enums\ContentStatus;
+use App\Livewire\ContentList;
 use App\Models\Page;
 use Flux\Flux;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
-use Livewire\Component;
-use Livewire\WithPagination;
 
-new #[Title('Pages')] class extends Component {
-    use WithPagination;
-
+new #[Title('Pages')] class extends ContentList {
     #[Url]
     public string $search = '';
 
@@ -38,6 +35,7 @@ new #[Title('Pages')] class extends Component {
     public function pages(): LengthAwarePaginator
     {
         return Page::query()
+            ->tap(fn ($query) => $this->applyVisibilityFilter($query))
             ->with(['site', 'parent'])
             ->when($this->search !== '', fn ($query) => $query->whereLike('title', "%{$this->search}%"))
             ->when(ContentStatus::tryFrom($this->status), fn ($query, ContentStatus $status) => $query->withStatus($status))
@@ -45,6 +43,11 @@ new #[Title('Pages')] class extends Component {
             ->orderBy('sort_order')
             ->orderBy('title')
             ->paginate(30);
+    }
+
+    protected function visibilityModel(): string
+    {
+        return Page::class;
     }
 
     public function delete(string $id): void
@@ -77,6 +80,7 @@ new #[Title('Pages')] class extends Component {
                 <option value="{{ $case->value }}">{{ $case->label() }}</option>
             @endforeach
         </flux:select>
+        <x-admin.visibility-filter />
     </div>
 
     <flux:table :paginate="$this->pages">
@@ -98,6 +102,7 @@ new #[Title('Pages')] class extends Component {
                             <span class="text-zinc-400">{{ $page->parent->title }} /</span>
                         @endif
                         <a href="{{ route('admin.pages.edit', $page) }}" wire:navigate class="font-medium hover:underline">{{ $page->title }}</a>
+                        <x-admin.hidden-badge :item="$page" class="ms-1" />
                     </flux:table.cell>
                     @unless (current_site())
                         <flux:table.cell>{{ $page->site->name }}</flux:table.cell>
@@ -108,6 +113,7 @@ new #[Title('Pages')] class extends Component {
                     </flux:table.cell>
                     <flux:table.cell class="whitespace-nowrap">{{ $page->updated_at?->diffForHumans() }}</flux:table.cell>
                     <flux:table.cell align="end">
+                        <x-admin.visibility-toggle :item="$page" :can="auth()->user()->can('hide', $page)" />
                         @can('delete', $page)
                             <flux:button size="sm" variant="ghost" icon="trash" wire:click="delete('{{ $page->id }}')" wire:confirm="{{ __('Move this page to the trash?') }}" />
                         @endcan

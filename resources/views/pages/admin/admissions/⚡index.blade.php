@@ -77,7 +77,7 @@ new #[Title('Admissions')] class extends ReferenceList {
             <flux:table.column>{{ __('Dates') }}</flux:table.column>
             <flux:table.column>{{ __('Online form') }}</flux:table.column>
             <flux:table.column>{{ __('Registrations') }}</flux:table.column>
-            <flux:table.column>{{ __('Published') }}</flux:table.column>
+            <flux:table.column>{{ __('Shown on website') }}</flux:table.column>
             <flux:table.column />
         </flux:table.columns>
         <flux:table.rows>

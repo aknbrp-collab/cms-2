@@ -48,14 +48,16 @@ trait HasWorkflow
     }
 
     /**
-     * Content visible on the public website.
+     * Content visible on the public website: published, released and not hidden
+     * (workflow models also use HasVisibility).
      *
      * @param  Builder<static>  $query
      */
     public function scopePublished(Builder $query): void
     {
         $query->where($query->qualifyColumn('status'), ContentStatus::Published->value)
-            ->where($query->qualifyColumn('published_at'), '<=', now());
+            ->where($query->qualifyColumn('published_at'), '<=', now())
+            ->where($query->qualifyColumn('is_hidden'), false);
     }
 
     /**

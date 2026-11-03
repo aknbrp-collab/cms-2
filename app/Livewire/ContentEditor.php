@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Contracts\Reviewable;
 use App\Services\ContentWorkflow;
+use App\Support\Visibility;
 use Carbon\CarbonImmutable;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Model;
@@ -42,6 +43,19 @@ abstract class ContentEditor extends Component
         abort_if($site === null, 403, __('Choose a site in the sidebar first.'));
 
         return $site->id;
+    }
+
+    /**
+     * Hide the saved content from the public site, or show it again.
+     */
+    public function toggleHidden(): void
+    {
+        $content = $this->workflowSubject() ?? abort(404);
+        $this->authorize('hide', $content);
+
+        $hidden = Visibility::toggle($content);
+
+        Flux::toast(variant: 'success', text: $hidden ? __('Hidden from the website.') : __('Shown on the website again.'));
     }
 
     public function submitForReview(ContentWorkflow $workflow): void

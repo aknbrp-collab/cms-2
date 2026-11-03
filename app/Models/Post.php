@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Concerns\Auditable;
 use App\Concerns\BelongsToSite;
 use App\Concerns\HasSeo;
+use App\Concerns\HasVisibility;
 use App\Concerns\HasWorkflow;
 use App\Contracts\Reviewable;
 use App\Enums\ContentStatus;
@@ -22,6 +23,7 @@ use Illuminate\Support\Carbon;
  * News item, announcement or article.
  *
  * @property string $id
+ * @property bool $is_hidden
  * @property string $site_id
  * @property PostType $type
  * @property string|null $category_id
@@ -52,7 +54,7 @@ use Illuminate\Support\Carbon;
 class Post extends Model implements Reviewable
 {
     /** @use HasFactory<PostFactory> */
-    use Auditable, BelongsToSite, HasFactory, HasSeo, HasUuids, HasWorkflow, SoftDeletes;
+    use Auditable, BelongsToSite, HasFactory, HasSeo, HasUuids, HasVisibility, HasWorkflow, SoftDeletes;
 
     /**
      * @var array<string, mixed>

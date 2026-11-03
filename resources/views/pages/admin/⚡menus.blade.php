@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Page;
+use App\Support\Visibility;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
@@ -188,6 +189,15 @@ new #[Title('Menus')] class extends Component {
         }
 
         $this->refreshItems();
+    }
+
+    public function toggleHidden(string $id): void
+    {
+        $this->authorize('menus.update');
+        $hidden = Visibility::toggle($this->findItem($id));
+        $this->refreshItems();
+
+        Flux::toast(variant: 'success', text: $hidden ? __('Link hidden, with its sub-links.') : __('Shown on the website again.'));
     }
 
     public function delete(string $id): void

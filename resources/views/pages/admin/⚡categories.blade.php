@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Category;
+use App\Support\Visibility;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
@@ -84,6 +85,15 @@ new #[Title('Categories')] class extends Component {
         $this->resetForm();
     }
 
+    public function toggleHidden(string $id): void
+    {
+        $this->authorize('categories.update');
+        $hidden = Visibility::toggle(Category::query()->findOrFail($id));
+        unset($this->categories);
+
+        Flux::toast(variant: 'success', text: $hidden ? __('Category hidden. Its page and menu links are gone; its posts stay visible.') : __('Shown on the website again.'));
+    }
+
     public function delete(string $id): void
     {
         $this->authorize('categories.delete');
@@ -126,7 +136,7 @@ new #[Title('Categories')] class extends Component {
             <flux:table.rows>
                 @forelse ($this->categories as $category)
                     <flux:table.row :key="$category->id">
-                        <flux:table.cell class="font-medium">{{ $category->name }}</flux:table.cell>
+                        <flux:table.cell class="font-medium">{{ $category->name }} <x-admin.hidden-badge :item="$category" class="ms-1" /></flux:table.cell>
                         <flux:table.cell class="font-mono text-xs">{{ $category->slug }}</flux:table.cell>
                         <flux:table.cell>{{ $category->posts_count }}</flux:table.cell>
                         <flux:table.cell>
@@ -135,6 +145,7 @@ new #[Title('Categories')] class extends Component {
                             @endif
                         </flux:table.cell>
                         <flux:table.cell align="end">
+                            <x-admin.visibility-toggle :item="$category" :can="auth()->user()->can('categories.update')" />
                             @can('categories.update')
                                 <flux:button size="sm" variant="ghost" icon="pencil-square" wire:click="edit('{{ $category->id }}')" />
                             @endcan

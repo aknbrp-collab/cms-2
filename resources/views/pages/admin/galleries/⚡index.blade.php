@@ -1,18 +1,15 @@
 <?php
 
 use App\Enums\GalleryType;
+use App\Livewire\ContentList;
 use App\Models\Gallery;
 use Flux\Flux;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
-use Livewire\Component;
-use Livewire\WithPagination;
 
-new #[Title('Galleries')] class extends Component {
-    use WithPagination;
-
+new #[Title('Galleries')] class extends ContentList {
     #[Url]
     public string $search = '';
 
@@ -38,12 +35,18 @@ new #[Title('Galleries')] class extends Component {
     public function galleries(): LengthAwarePaginator
     {
         return Gallery::query()
+            ->tap(fn ($query) => $this->applyVisibilityFilter($query))
             ->with(['site', 'coverImage.media', 'items.mediaAsset.media'])
             ->withCount('items')
             ->when($this->search !== '', fn ($query) => $query->whereLike('title', "%{$this->search}%"))
             ->when(GalleryType::tryFrom($this->type), fn ($query, GalleryType $type) => $query->where('type', $type->value))
             ->latest('updated_at')
             ->paginate(24);
+    }
+
+    protected function visibilityModel(): string
+    {
+        return Gallery::class;
     }
 
     public function delete(string $id): void
@@ -76,6 +79,7 @@ new #[Title('Galleries')] class extends Component {
                 <option value="{{ $case->value }}">{{ $case->label() }}</option>
             @endforeach
         </flux:select>
+        <x-admin.visibility-filter />
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -97,13 +101,16 @@ new #[Title('Galleries')] class extends Component {
                 <div class="space-y-2 p-4">
                     <div class="flex items-start justify-between gap-2">
                         <a href="{{ route('admin.galleries.edit', $gallery) }}" wire:navigate class="font-medium hover:underline">{{ $gallery->title }}</a>
-                        <flux:badge size="sm" :color="$gallery->status->color()">{{ $gallery->status->label() }}</flux:badge>
+                        <div class="flex shrink-0 gap-1"><x-admin.hidden-badge :item="$gallery" /><flux:badge size="sm" :color="$gallery->status->color()">{{ $gallery->status->label() }}</flux:badge></div>
                     </div>
                     <div class="flex items-center justify-between text-xs text-zinc-500">
                         <span>{{ $gallery->type->label() }} · {{ trans_choice(':count item|:count items', $gallery->items_count) }}@unless (current_site()) · {{ $gallery->site->name }}@endunless</span>
+                        <div class="flex items-center">
+                        <x-admin.visibility-toggle :item="$gallery" :can="auth()->user()->can('hide', $gallery)" />
                         @can('delete', $gallery)
                             <flux:button size="xs" variant="ghost" icon="trash" wire:click="delete('{{ $gallery->id }}')" wire:confirm="{{ __('Move this gallery to the trash?') }}" />
                         @endcan
+                        </div>
                     </div>
                 </div>
             </flux:card>

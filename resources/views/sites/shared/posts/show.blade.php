@@ -10,7 +10,7 @@
                     @else
                         <a href="{{ route('site.posts.index') }}" class="hover:text-on-primary">{{ __('Berita') }}</a>
                     @endif
-                    @if ($post->category)
+                    @if ($post->category && ! $post->category->isHidden())
                         <x-site.icon name="chevron_right" class="text-[16px]!" />
                         <a href="{{ route('site.categories.show', $post->category->slug) }}" class="hover:text-on-primary">{{ $post->category->name }}</a>
                     @endif

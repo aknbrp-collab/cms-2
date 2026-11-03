@@ -43,6 +43,7 @@ class SiteController extends Controller
             'latest' => $latest,
             'announcements' => $this->postsQuery()->where('type', PostType::Announcement->value)->limit(5)->get(),
             'homeCategories' => Category::query()
+                ->visible()
                 ->where('show_on_home', true)
                 ->orderBy('home_order')
                 ->get()
@@ -110,7 +111,7 @@ class SiteController extends Controller
     public function category(string $slug): View
     {
         $site = $this->site();
-        $category = Category::query()->where('slug', $slug)->firstOrFail();
+        $category = Category::query()->visible()->where('slug', $slug)->firstOrFail();
 
         return $this->theme->view('posts.index', [
             'seo' => Seo::forSite($site, $category->name),
