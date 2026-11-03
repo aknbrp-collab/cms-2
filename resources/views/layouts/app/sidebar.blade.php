@@ -116,8 +116,13 @@
                     </flux:sidebar.group>
                 @endif
 
-                @canany(['menus.view', 'sites.update'])
+                @canany(['menus.view', 'sites.update', 'hero_slides.view'])
                     <flux:sidebar.group :heading="__('Website')" class="grid">
+                        @if (auth()->user()->can('hero_slides.view') && (! current_site() || current_site()->hasModule('hero_slides')))
+                            <flux:sidebar.item icon="photo" :href="route('admin.hero-slides')" :current="request()->routeIs('admin.hero-slides')" wire:navigate>
+                                {{ __('Homepage slider') }}
+                            </flux:sidebar.item>
+                        @endif
                         @can('menus.view')
                             <flux:sidebar.item icon="bars-3" :href="route('admin.menus')" :current="request()->routeIs('admin.menus')" wire:navigate>
                                 {{ __('Menus') }}

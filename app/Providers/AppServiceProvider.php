@@ -156,6 +156,7 @@ class AppServiceProvider extends ServiceProvider
             'admission_registration' => AdmissionRegistration::class,
             'admission_requirement' => Models\AdmissionRequirement::class,
             'admission_document' => Models\AdmissionDocument::class,
+            'hero_slide' => Models\HeroSlide::class,
             'facility' => Models\Facility::class,
             'extracurricular' => Models\Extracurricular::class,
             'achievement' => Models\Achievement::class,

@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified', EnsureAdminAccess::class, SetAdminSite::c
 
     Route::livewire('faqs', 'pages::admin.faqs')->name('admin.faqs');
     Route::livewire('leaders', 'pages::admin.leaders')->name('admin.leaders');
+    Route::livewire('hero-slides', 'pages::admin.hero-slides')->name('admin.hero-slides');
 
     Route::livewire('admissions', 'pages::admin.admissions.index')->name('admin.admissions.index');
     Route::livewire('admissions/create', 'pages::admin.admissions.edit')->name('admin.admissions.create');

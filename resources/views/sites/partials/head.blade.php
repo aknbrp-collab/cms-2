@@ -2,10 +2,10 @@
 @php
     // Only the Material Symbols the themes use (sorted, as Google Fonts requires).
     $icons = collect([
-        'arrow_back', 'arrow_forward', 'calendar_today', 'call', 'campaign', 'chat', 'chevron_right', 'close',
+        'arrow_back', 'arrow_forward', 'calendar_today', 'call', 'campaign', 'chat', 'chevron_left', 'chevron_right', 'close',
         'description', 'east', 'expand_more', 'location_on', 'mail', 'menu', 'menu_book', 'mosque',
         'music_note', 'person', 'photo_camera', 'play_circle', 'public', 'schedule', 'school', 'search',
-        'star', 'upload', 'verified',
+        'pause', 'play_arrow', 'star', 'upload', 'verified',
     ])->sort()->join(',');
     $favicon = $site->brandingUrl('favicon');
 @endphp

@@ -14,6 +14,7 @@ class Permissions
         'pages', 'posts', 'events', 'galleries', 'faqs', 'admissions', 'leaders',
         'facilities', 'achievements', 'extracurriculars',
         'lecturers', 'programs', 'curricula', 'publications', 'journals', 'organizations',
+        'hero_slides',
     ];
 
     public const CONTENT_ACTIONS = ['view', 'create', 'update', 'delete', 'submit', 'publish'];

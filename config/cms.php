@@ -88,7 +88,7 @@ return [
             'modules' => [
                 'pages', 'posts', 'events', 'galleries', 'faqs', 'admissions', 'leaders',
                 'lecturers', 'programs', 'curricula', 'publications', 'journals',
-                'organizations', 'legal_questions',
+                'organizations', 'legal_questions', 'hero_slides',
             ],
         ],
     ],

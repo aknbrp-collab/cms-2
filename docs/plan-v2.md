@@ -93,7 +93,15 @@ Source: [req/v2.md](req/v2.md). This builds on the finished v1 (Phases 0–5, se
 - private storage (no public URL) and admin download permissions per site
 - verification, notifications and the export columns
 
-## Phase 8 — Ma'had hero slider
+## Phase 8 — Ma'had hero slider ✅ done 2026-11-04
+
+**Notes from building it:**
+- Slides use the existing `large` image conversion (WEBP, max 1600 px) instead of a new `hero` conversion. A new conversion would be generated for every image upload site-wide, and existing images wouldn't have it.
+- The admin screen is "Homepage slider" in the Website group, shown only when the selected site uses the module. Slides with a deleted image are skipped on the website and flagged in the admin.
+- Accessibility: a pause/play button (required for content that moves automatically), labelled dots, keyboard arrows, swipe, pause on hover/focus or a hidden tab, and no autoplay with reduced motion. The site name stays the page's `<h1>` (visually hidden while slides show their own title).
+- In the built-in browser pane, images from the admin host don't load on the public hosts (the pane blocks the request; curl serves them). This affects all local media on the public sites, not just slides. Real browsers and S3 media in production are unaffected.
+
+**Plan:**
 
 **Data:** `hero_slides` (site_id, image from the media library, optional title, text, button label + URL, sort order, optional `starts_at` / `ends_at`, `is_hidden`). It is a Ma'had module (enabled in `config/cms.php` modules), with permission `hero_slides.*` for the Ma'had admin, editors and superadmins.
 

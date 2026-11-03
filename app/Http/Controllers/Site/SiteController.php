@@ -10,6 +10,7 @@ use App\Models\AdmissionPeriod;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\GalleryItem;
+use App\Models\HeroSlide;
 use App\Models\Leader;
 use App\Models\LegalQuestion;
 use App\Models\Page;
@@ -78,6 +79,9 @@ class SiteController extends Controller
                 : collect(),
             'legalQuestions' => $site->hasModule('legal_questions')
                 ? LegalQuestion::query()->published()->latest('published_at')->limit(3)->get()
+                : collect(),
+            'slides' => $site->hasModule('hero_slides')
+                ? HeroSlide::query()->active()->with('image.media')->get()->filter(fn (HeroSlide $slide) => $slide->image !== null)->values()
                 : collect(),
             'publications' => $site->hasModule('publications')
                 ? Publication::query()->published()->with('journal')->latest('published_at')->limit(3)->get()

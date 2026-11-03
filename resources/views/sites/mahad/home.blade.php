@@ -8,8 +8,60 @@
 @endphp
 
 <x-site.layout :site="$site" :seo="$seo">
-    <section class="relative overflow-hidden bg-primary pt-12 pb-16 text-on-primary md:pt-16">
-        <div class="pointer-events-none absolute inset-0 opacity-[0.07]" style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 22px 22px;"></div>
+    <section
+        @class(['relative overflow-hidden bg-primary pt-12 pb-16 text-on-primary md:pt-16', 'lg:min-h-[34rem]' => $slides->isNotEmpty()])
+        @if ($slides->count() > 1)
+            aria-roledescription="carousel"
+            aria-label="{{ __('Slide beranda') }}"
+            x-data="{
+                current: 0,
+                count: {{ $slides->count() }},
+                paused: false,
+                timer: null,
+                touchX: null,
+                reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+                init() {
+                    this.paused = this.reduced;
+                    this.play();
+                    document.addEventListener('visibilitychange', () => document.hidden ? this.halt() : this.play());
+                },
+                play() { this.halt(); if (! this.paused) this.timer = setInterval(() => this.next(), 6000); },
+                halt() { clearInterval(this.timer); this.timer = null; },
+                next() { this.current = (this.current + 1) % this.count; },
+                prev() { this.current = (this.current - 1 + this.count) % this.count; },
+                go(index) { this.current = index; this.play(); },
+                togglePause() { this.paused = ! this.paused; this.play(); },
+                swipe(endX) { if (this.touchX === null) return; const distance = endX - this.touchX; if (Math.abs(distance) > 40) { distance < 0 ? this.next() : this.prev(); this.play(); } this.touchX = null; },
+            }"
+            x-on:mouseenter="halt()"
+            x-on:mouseleave="play()"
+            x-on:focusin="halt()"
+            x-on:focusout="play()"
+            x-on:keydown.arrow-right="next()"
+            x-on:keydown.arrow-left="prev()"
+            x-on:touchstart.passive="touchX = $event.touches[0].clientX"
+            x-on:touchend="swipe($event.changedTouches[0].clientX)"
+        @endif
+    >
+        @if ($slides->isNotEmpty())
+            {{-- Slide pictures behind a gradient that keeps the text on the left readable. --}}
+            <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+                @foreach ($slides as $slide)
+                    <img
+                        src="{{ $slide->image->url('large') }}"
+                        alt=""
+                        @if ($loop->first) fetchpriority="high" @else loading="lazy" @endif
+                        @if ($slides->count() > 1) x-bind:class="current === {{ $loop->index }} ? 'opacity-100' : 'opacity-0'" @endif
+                        @class(['absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 motion-reduce:transition-none', 'opacity-0' => ! $loop->first])
+                    >
+                @endforeach
+                <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/85 to-primary/35"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent lg:hidden"></div>
+            </div>
+        @else
+            <div class="pointer-events-none absolute inset-0 opacity-[0.07]" style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 22px 22px;"></div>
+        @endif
+
         <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:px-10">
             <div class="lg:col-span-7">
                 @if ($site->setting('identity.tagline'))
@@ -17,20 +69,58 @@
                         <x-site.icon name="verified" class="text-[14px]!" /> {{ $site->setting('identity.tagline') }}
                     </span>
                 @endif
-                <h1 class="mt-5 text-4xl leading-tight font-bold tracking-tight md:text-5xl">{{ $site->name }}</h1>
-                @if ($site->setting('identity.description'))
-                    <p class="mt-5 max-w-2xl text-lg leading-relaxed text-on-primary/80">{{ $site->setting('identity.description') }}</p>
+
+                @if ($slides->isEmpty())
+                    @include('sites.mahad.hero-text', ['title' => $site->name, 'text' => $site->setting('identity.description'), 'buttonLabel' => null, 'buttonUrl' => null, 'heading' => true])
+                @else
+                    <h1 class="sr-only">{{ $site->name }}</h1>
+                    @foreach ($slides as $slide)
+                        <div
+                            @if ($slides->count() > 1)
+                                x-show="current === {{ $loop->index }}"
+                                @unless ($loop->first) x-cloak @endunless
+                                role="group"
+                                aria-roledescription="slide"
+                                aria-label="{{ __(':n dari :total', ['n' => $loop->iteration, 'total' => $slides->count()]) }}"
+                            @endif
+                        >
+                            @include('sites.mahad.hero-text', [
+                                'title' => $slide->title ?: $site->name,
+                                'text' => $slide->text ?: $site->setting('identity.description'),
+                                'buttonLabel' => $slide->button_label,
+                                'buttonUrl' => $slide->button_url,
+                                'heading' => false,
+                            ])
+                        </div>
+                    @endforeach
                 @endif
-                <div class="mt-8 flex flex-wrap gap-3">
-                    @if ($hasCta)
-                        <a href="{{ $site->setting('header.cta_url') }}" class="inline-flex items-center gap-2 rounded-lg bg-secondary px-5 py-3 font-semibold text-on-secondary shadow-sm transition hover:brightness-110">
-                            {{ $site->setting('header.cta_label') }} <x-site.icon name="arrow_forward" class="text-[18px]!" />
-                        </a>
-                    @endif
-                    <a href="{{ route('site.posts.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-on-primary/30 px-5 py-3 font-semibold transition hover:bg-on-primary/10">
-                        {{ __('Berita Akademik') }}
-                    </a>
-                </div>
+
+                @if ($slides->count() > 1)
+                    <div class="mt-10 flex items-center gap-3">
+                        <button type="button" x-on:click="prev(); play()" class="flex size-9 items-center justify-center rounded-full border border-on-primary/30 transition hover:bg-on-primary/10" aria-label="{{ __('Slide sebelumnya') }}">
+                            <x-site.icon name="chevron_left" class="text-[20px]!" />
+                        </button>
+                        <div class="flex items-center gap-2">
+                            @foreach ($slides as $slide)
+                                <button
+                                    type="button"
+                                    x-on:click="go({{ $loop->index }})"
+                                    x-bind:aria-current="current === {{ $loop->index }}"
+                                    x-bind:class="current === {{ $loop->index }} ? 'w-7 bg-gold-light' : 'w-2.5 bg-on-primary/40 hover:bg-on-primary/70'"
+                                    @class(['h-2.5 rounded-full transition-all', 'w-7 bg-gold-light' => $loop->first, 'w-2.5 bg-on-primary/40' => ! $loop->first])
+                                    aria-label="{{ __('Tampilkan slide :n', ['n' => $loop->iteration]) }}"
+                                ></button>
+                            @endforeach
+                        </div>
+                        <button type="button" x-on:click="next(); play()" class="flex size-9 items-center justify-center rounded-full border border-on-primary/30 transition hover:bg-on-primary/10" aria-label="{{ __('Slide berikutnya') }}">
+                            <x-site.icon name="chevron_right" class="text-[20px]!" />
+                        </button>
+                        <button type="button" x-on:click="togglePause()" class="ms-1 flex size-9 items-center justify-center rounded-full transition hover:bg-on-primary/10" x-bind:aria-label="paused ? @js(__('Putar slide otomatis')) : @js(__('Jeda slide otomatis'))">
+                            <x-site.icon name="pause" class="text-[20px]!" x-show="! paused" />
+                            <x-site.icon name="play_arrow" class="text-[20px]!" x-show="paused" x-cloak />
+                        </button>
+                    </div>
+                @endif
             </div>
             <div class="hidden justify-center lg:col-span-5 lg:flex">
                 <div class="flex aspect-square w-full max-w-sm flex-col items-center justify-center gap-4 rounded-3xl border border-gold-light/20 bg-primary-container/50 p-10 text-center shadow-2xl">
