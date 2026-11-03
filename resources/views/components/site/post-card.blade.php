@@ -22,13 +22,13 @@
             <x-site.icon name="calendar_today" class="text-[14px]!" />
             <time datetime="{{ $post->published_at?->toDateString() }}">{{ $post->published_at?->translatedFormat('d F Y') }}</time>
         </div>
-        <h3 class="text-base leading-snug font-semibold text-on-surface transition group-hover:text-primary">
+        <h3 class="text-base leading-snug font-semibold text-on-surface transition group-hover:text-brand">
             <a href="{{ route('site.posts.show', $post->slug) }}">{{ $post->title }}</a>
         </h3>
         @if ($post->excerpt)
             <p class="line-clamp-2 text-sm text-on-surface-variant">{{ $post->excerpt }}</p>
         @endif
-        <span class="mt-auto inline-flex items-center gap-1 pt-2 text-sm font-semibold text-primary">
+        <span class="mt-auto inline-flex items-center gap-1 pt-2 text-sm font-semibold text-brand">
             {{ __('Baca selengkapnya') }} <x-site.icon name="arrow_forward" class="text-[16px]! transition group-hover:translate-x-1" />
         </span>
     </div>

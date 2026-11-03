@@ -88,6 +88,7 @@ new #[Title('Site settings')] class extends Component {
             'settings.prayer__longitude' => ['nullable', 'required_if_accepted:settings.prayer__enabled', 'numeric', 'between:-180,180'],
             'settings.prayer__method' => ['required', 'in:kemenag,mwl,umm_al_qura,egyptian'],
             'branding.logo' => ['nullable', 'image', 'max:4096'],
+            'branding.logo_dark' => ['nullable', 'image', 'max:4096'],
             'branding.calligraphy' => ['nullable', 'file', 'mimes:png,svg,webp', 'max:4096'],
             'branding.favicon' => ['nullable', 'file', 'mimes:png,ico,svg', 'max:1024'],
             'branding.og_default' => ['nullable', 'image', 'max:4096'],
@@ -148,7 +149,7 @@ new #[Title('Site settings')] class extends Component {
                     <flux:textarea wire:model="settings.identity__description" :label="__('Short description')" rows="3" :description="__('Used as the default meta description.')" />
 
                     <div class="grid gap-5 sm:grid-cols-2">
-                        @foreach (['logo' => __('Logo'), 'calligraphy' => __('Name in Arabic calligraphy'), 'favicon' => __('Favicon'), 'og_default' => __('Default social share image')] as $collection => $label)
+                        @foreach (['logo' => __('Logo'), 'logo_dark' => __('Logo for dark mode (optional)'), 'calligraphy' => __('Name in Arabic calligraphy'), 'favicon' => __('Favicon'), 'og_default' => __('Default social share image')] as $collection => $label)
                             <flux:field wire:key="branding-{{ $collection }}">
                                 <flux:label>{{ $label }}</flux:label>
                                 @if ($url = $this->site->brandingUrl($collection))

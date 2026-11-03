@@ -20,7 +20,7 @@
                         </button>
                         <ul x-show="sub" x-transition class="ms-3 space-y-1 border-s border-border-subtle ps-3">
                             @foreach ($item->children as $child)
-                                <li><a href="{{ $child->href() }}" @if ($child->open_in_new_tab) target="_blank" rel="noopener" @endif class="block rounded-lg px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-low hover:text-primary">{{ $child->label }}</a></li>
+                                <li><a href="{{ $child->href() }}" @if ($child->open_in_new_tab) target="_blank" rel="noopener" @endif class="block rounded-lg px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-low hover:text-brand">{{ $child->label }}</a></li>
                             @endforeach
                         </ul>
                     @else

@@ -8,7 +8,7 @@
             <span @class([
                 'flex size-8 shrink-0 items-center justify-center rounded-full font-bold',
                 'bg-primary text-on-primary' => $number === $current,
-                'bg-mint text-primary' => $number < $current,
+                'bg-mint text-brand' => $number < $current,
                 'bg-surface-container text-muted' => $number > $current,
             ])>{{ $number }}</span>
             <span @class(['font-semibold text-on-surface' => $number === $current, 'text-on-surface-variant' => $number !== $current])>{{ $name }}</span>

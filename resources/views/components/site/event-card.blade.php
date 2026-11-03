@@ -11,7 +11,7 @@
         @if ($event->label)
             <span class="inline-block rounded-full bg-gold-light px-2.5 py-0.5 text-[11px] font-bold text-on-surface">{{ $event->label }}</span>
         @endif
-        <h3 class="leading-snug font-semibold text-on-surface group-hover:text-primary">
+        <h3 class="leading-snug font-semibold text-on-surface group-hover:text-brand">
             <a href="{{ route('site.events.show', $event->slug) }}">{{ $event->title }}</a>
         </h3>
         @if ($event->summary)

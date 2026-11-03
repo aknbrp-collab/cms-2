@@ -3,8 +3,8 @@
 
     <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 md:py-14">
         <div class="mb-8 inline-flex rounded-lg bg-surface-low p-1 text-sm font-semibold">
-            <a href="{{ route('site.events.index') }}" @class(['rounded-md px-4 py-2', 'bg-primary text-on-primary shadow-sm' => ! $past, 'text-on-surface-variant hover:text-primary' => $past])>{{ __('Mendatang') }}</a>
-            <a href="{{ route('site.events.index', ['arsip' => 1]) }}" @class(['rounded-md px-4 py-2', 'bg-primary text-on-primary shadow-sm' => $past, 'text-on-surface-variant hover:text-primary' => ! $past])>{{ __('Arsip') }}</a>
+            <a href="{{ route('site.events.index') }}" @class(['rounded-md px-4 py-2', 'bg-primary text-on-primary shadow-sm' => ! $past, 'text-on-surface-variant hover:text-brand' => $past])>{{ __('Mendatang') }}</a>
+            <a href="{{ route('site.events.index', ['arsip' => 1]) }}" @class(['rounded-md px-4 py-2', 'bg-primary text-on-primary shadow-sm' => $past, 'text-on-surface-variant hover:text-brand' => ! $past])>{{ __('Arsip') }}</a>
         </div>
 
         @if ($events->isEmpty())

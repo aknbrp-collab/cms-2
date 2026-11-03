@@ -123,7 +123,16 @@ Source: [req/v2.md](req/v2.md). This builds on the finished v1 (Phases 0–5, se
 
 **Tests:** schedule and hide filtering, order, Ma'had-only (403 / absent on Pondok), and the fallback hero.
 
-## Phase 9 — Public dark mode (both sites)
+## Phase 9 — Public dark mode (both sites) ✅ done 2026-11-04
+
+**Notes from building it:**
+- **The `brand` token.** A new `brand` colour token is used for text, borders, focus rings and form accents. It equals the site's primary colour in light mode and a light tint of it in dark mode (`color-mix`, so it follows the colours set in site settings). The ~160 public uses of `text-/border-/ring-/accent-primary` were switched to it; `bg-primary` (hero, buttons, header bar) stays dark green in both modes. A test fails if a public view uses `*-primary` for text, borders or rings again.
+- **Dark palettes.** Each theme file defines its dark palette under `:root.dark`. The `dark:` variant is class-based, and only the status colours (red errors, amber notices) needed explicit dark variants.
+- **Toggle icons.** The Google icon font sets `display` on icons, which beats Tailwind's `hidden`, so the toggle hides wrapper spans instead.
+- **Optional dark logo.** "Logo for dark mode" in site settings swaps in on dark headers (and on the Pondok footer). The Ma'had footer is always dark and keeps the normal logo.
+- **"Warna gelap" overrides.** The plan's optional dark-colour fields in site settings were not added: the derived tints read well with both default palettes. They are easy to add later if a custom brand colour needs it.
+
+**Plan:**
 
 **Theme tokens:**
 - A dark token set per theme in `resources/css/sites/{pondok,mahad}.css` (surfaces, text, borders, cards, footer).

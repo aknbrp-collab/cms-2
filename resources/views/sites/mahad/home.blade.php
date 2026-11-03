@@ -139,7 +139,7 @@
         <section class="bg-surface-low py-10">
             <div class="mx-auto grid max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-10">
                 @foreach ($quickLinks as $link)
-                    <a href="{{ $link->href() }}" @if ($link->open_in_new_tab) target="_blank" rel="noopener" @endif class="group flex items-center gap-4 rounded-xl border border-primary/10 bg-surface-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                    <a href="{{ $link->href() }}" @if ($link->open_in_new_tab) target="_blank" rel="noopener" @endif class="group flex items-center gap-4 rounded-xl border border-brand/10 bg-surface-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                         <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-mint text-primary-container transition group-hover:bg-primary-container group-hover:text-on-primary">
                             <x-site.icon :name="$quickIcons[$loop->index] ?? 'east'" />
                         </span>
@@ -155,7 +155,7 @@
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
                 <div class="mb-10 text-center">
                     <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Program Takhassus') }}</p>
-                    <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Disiplin Keilmuan Pesantren Tinggi') }}</h2>
+                    <h2 class="mt-1 text-3xl font-bold text-brand">{{ __('Disiplin Keilmuan Pesantren Tinggi') }}</h2>
                 </div>
                 <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     @foreach ($programs as $program)
@@ -171,9 +171,9 @@
             <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Kabar Kampus') }}</p>
-                    <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Berita Akademik') }}</h2>
+                    <h2 class="mt-1 text-3xl font-bold text-brand">{{ __('Berita Akademik') }}</h2>
                 </div>
-                <a href="{{ route('site.posts.index') }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Semua berita') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                <a href="{{ route('site.posts.index') }}" class="inline-flex items-center gap-1 font-semibold text-brand hover:underline">{{ __('Semua berita') }} <x-site.icon name="east" class="text-[18px]!" /></a>
             </div>
 
             @if ($latest->isEmpty())
@@ -186,15 +186,15 @@
                         @endforeach
                     </div>
                     <aside class="lg:col-span-4">
-                        <div class="rounded-xl border border-primary/10 bg-surface-card p-6 shadow-sm">
-                            <h3 class="mb-4 flex items-center gap-2 font-bold text-primary"><x-site.icon name="campaign" /> {{ __('Pengumuman') }}</h3>
+                        <div class="rounded-xl border border-brand/10 bg-surface-card p-6 shadow-sm">
+                            <h3 class="mb-4 flex items-center gap-2 font-bold text-brand"><x-site.icon name="campaign" /> {{ __('Pengumuman') }}</h3>
                             @forelse ($announcements as $announcement)
                                 <a href="{{ route('site.posts.show', $announcement->slug) }}" class="group flex gap-4 border-b border-border-subtle py-3 last:border-0">
-                                    <span class="flex w-12 shrink-0 flex-col items-center rounded-lg bg-surface-low py-1.5 text-primary">
+                                    <span class="flex w-12 shrink-0 flex-col items-center rounded-lg bg-surface-low py-1.5 text-brand">
                                         <span class="text-lg leading-none font-bold">{{ $announcement->published_at?->format('d') }}</span>
                                         <span class="text-[11px] uppercase">{{ $announcement->published_at?->translatedFormat('M') }}</span>
                                     </span>
-                                    <span class="text-sm font-semibold text-on-surface group-hover:text-primary">{{ $announcement->title }}</span>
+                                    <span class="text-sm font-semibold text-on-surface group-hover:text-brand">{{ $announcement->title }}</span>
                                 </a>
                             @empty
                                 <p class="text-sm text-muted">{{ __('Belum ada pengumuman.') }}</p>
@@ -210,8 +210,8 @@
         <section @class(['py-16', 'bg-surface-low' => $loop->odd])>
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
                 <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
-                    <h2 class="text-2xl font-bold text-primary">{{ $category->name }}</h2>
-                    <a href="{{ route('site.categories.show', $category->slug) }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Selengkapnya') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                    <h2 class="text-2xl font-bold text-brand">{{ $category->name }}</h2>
+                    <a href="{{ route('site.categories.show', $category->slug) }}" class="inline-flex items-center gap-1 font-semibold text-brand hover:underline">{{ __('Selengkapnya') }} <x-site.icon name="east" class="text-[18px]!" /></a>
                 </div>
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     @foreach ($category->posts as $post)
@@ -228,9 +228,9 @@
                 <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Publikasi & Riset Ilmiah') }}</p>
-                        <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Bahtsul Masail, Jurnal & Repositori') }}</h2>
+                        <h2 class="mt-1 text-3xl font-bold text-brand">{{ __('Bahtsul Masail, Jurnal & Repositori') }}</h2>
                     </div>
-                    <a href="{{ route('site.publications.index') }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Kunjungi repositori') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                    <a href="{{ route('site.publications.index') }}" class="inline-flex items-center gap-1 font-semibold text-brand hover:underline">{{ __('Kunjungi repositori') }} <x-site.icon name="east" class="text-[18px]!" /></a>
                 </div>
                 <div class="grid gap-5 lg:grid-cols-3">
                     @foreach ($publications as $publication)
@@ -246,17 +246,17 @@
             <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:px-10">
                 <div class="lg:col-span-4">
                     <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Konsultasi Hukum Islam') }}</p>
-                    <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Tanya Hukum') }}</h2>
+                    <h2 class="mt-1 text-3xl font-bold text-brand">{{ __('Tanya Hukum') }}</h2>
                     <p class="mt-4 text-on-surface-variant">{{ __('Ajukan pertanyaan seputar fiqh. Jawaban dikaji oleh dewan asatidz Ma\'had Aly.') }}</p>
                     <div class="mt-6 flex flex-wrap gap-3">
                         <a href="{{ route('site.legal-questions.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-container">{{ __('Ajukan Pertanyaan') }}</a>
-                        <a href="{{ route('site.legal-questions.index') }}" class="inline-flex items-center gap-1 px-2 py-2.5 font-semibold text-primary hover:underline">{{ __('Arsip jawaban') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                        <a href="{{ route('site.legal-questions.index') }}" class="inline-flex items-center gap-1 px-2 py-2.5 font-semibold text-brand hover:underline">{{ __('Arsip jawaban') }} <x-site.icon name="east" class="text-[18px]!" /></a>
                     </div>
                 </div>
                 <div class="space-y-4 lg:col-span-8">
                     @forelse ($legalQuestions as $question)
-                        <a href="{{ route('site.legal-questions.show', $question->slug) }}" class="block rounded-xl border border-primary/10 bg-surface-card p-5 shadow-sm transition hover:shadow-md">
-                            <span class="rounded-full bg-mint px-2.5 py-0.5 text-xs font-bold text-primary">{{ $question->category->label() }}</span>
+                        <a href="{{ route('site.legal-questions.show', $question->slug) }}" class="block rounded-xl border border-brand/10 bg-surface-card p-5 shadow-sm transition hover:shadow-md">
+                            <span class="rounded-full bg-mint px-2.5 py-0.5 text-xs font-bold text-brand">{{ $question->category->label() }}</span>
                             <h3 class="mt-2 font-semibold text-on-surface">{{ $question->title }}</h3>
                             <p class="mt-1 line-clamp-2 text-sm text-on-surface-variant">{{ $question->public_question }}</p>
                         </a>
@@ -274,13 +274,13 @@
                 <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Dewan Pengasuh & Pendidik') }}</p>
-                        <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Pimpinan & Masyayikh') }}</h2>
+                        <h2 class="mt-1 text-3xl font-bold text-brand">{{ __('Pimpinan & Masyayikh') }}</h2>
                     </div>
-                    <a href="{{ route('site.leaders') }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Lihat semua') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                    <a href="{{ route('site.leaders') }}" class="inline-flex items-center gap-1 font-semibold text-brand hover:underline">{{ __('Lihat semua') }} <x-site.icon name="east" class="text-[18px]!" /></a>
                 </div>
                 <div class="grid gap-6 md:grid-cols-3">
                     @foreach ($leaders as $leader)
-                        <article class="rounded-2xl border border-primary/10 bg-surface-card p-6 text-center shadow-sm">
+                        <article class="rounded-2xl border border-brand/10 bg-surface-card p-6 text-center shadow-sm">
                             <x-site.image :asset="$leader->photo" conversion="thumb" :alt="$leader->name" icon="person" class="mx-auto size-28 rounded-full ring-4 ring-mint" />
                             <p class="mt-4 text-xs font-bold tracking-wider text-secondary uppercase">{{ $leader->position }}</p>
                             <h3 class="mt-1 text-lg font-bold text-on-surface">{{ $leader->name }}</h3>
@@ -300,9 +300,9 @@
                 <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Kegiatan Kampus') }}</p>
-                        <h2 class="mt-1 text-3xl font-bold text-primary">{{ __('Agenda & Halaqah Ilmiah') }}</h2>
+                        <h2 class="mt-1 text-3xl font-bold text-brand">{{ __('Agenda & Halaqah Ilmiah') }}</h2>
                     </div>
-                    <a href="{{ route('site.events.index') }}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline">{{ __('Kalender lengkap') }} <x-site.icon name="east" class="text-[18px]!" /></a>
+                    <a href="{{ route('site.events.index') }}" class="inline-flex items-center gap-1 font-semibold text-brand hover:underline">{{ __('Kalender lengkap') }} <x-site.icon name="east" class="text-[18px]!" /></a>
                 </div>
                 <div class="grid gap-5 lg:grid-cols-3">
                     @foreach ($events as $event)
@@ -319,11 +319,11 @@
                 <div class="grid gap-10 lg:grid-cols-12">
                     <div class="lg:col-span-5">
                         <p class="text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Penerimaan Mahasantri Baru') }}</p>
-                        <h2 class="mt-1 text-3xl font-bold text-primary">{{ $admission->title }} {{ $admission->academic_year }}</h2>
+                        <h2 class="mt-1 text-3xl font-bold text-brand">{{ $admission->title }} {{ $admission->academic_year }}</h2>
                         @if ($admission->summary)
                             <p class="mt-4 text-on-surface-variant">{{ $admission->summary }}</p>
                         @endif
-                        <p class="mt-4 inline-flex items-center gap-2 rounded-lg bg-surface-card px-4 py-2 text-sm font-semibold text-primary shadow-sm">
+                        <p class="mt-4 inline-flex items-center gap-2 rounded-lg bg-surface-card px-4 py-2 text-sm font-semibold text-brand shadow-sm">
                             <x-site.icon name="calendar_today" class="text-[18px]!" />
                             {{ $admission->opens_on->translatedFormat('d F') }} – {{ $admission->closes_on->translatedFormat('d F Y') }}
                         </p>
@@ -336,8 +336,8 @@
                     @if ($admission->steps)
                         <ol class="grid gap-4 sm:grid-cols-2 lg:col-span-7">
                             @foreach (array_slice($admission->steps, 0, 4) as $step)
-                                <li class="rounded-xl border border-primary/10 bg-surface-card p-5 shadow-sm">
-                                    <span class="text-3xl font-bold text-primary/20">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                                <li class="rounded-xl border border-brand/10 bg-surface-card p-5 shadow-sm">
+                                    <span class="text-3xl font-bold text-brand/20">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                                     <h3 class="mt-2 font-semibold text-on-surface">{{ $step['title'] }}</h3>
                                     @if ($step['description'] ?? '')
                                         <p class="mt-1 text-sm text-on-surface-variant">{{ $step['description'] }}</p>

@@ -8,7 +8,7 @@
             <form method="GET" class="space-y-5 rounded-xl bg-surface-card p-5 shadow-sm lg:sticky lg:top-28" role="search">
                 <div>
                     <label for="q" class="block text-sm font-semibold text-on-surface">{{ __('Cari') }}</label>
-                    <input id="q" name="q" value="{{ $search }}" placeholder="{{ __('Judul, penulis, kata kunci') }}" class="mt-1 w-full rounded-lg border border-border-subtle px-3 py-2 text-sm focus:border-primary focus:outline-none">
+                    <input id="q" name="q" value="{{ $search }}" placeholder="{{ __('Judul, penulis, kata kunci') }}" class="mt-1 w-full rounded-lg border border-border-subtle px-3 py-2 text-sm focus:border-brand focus:outline-none">
                 </div>
                 <div>
                     <label for="jenis" class="block text-sm font-semibold text-on-surface">{{ __('Jenis') }}</label>
@@ -30,7 +30,7 @@
                 </div>
                 <button class="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary">{{ __('Terapkan') }}</button>
                 @if ($type || $year || $search !== '')
-                    <a href="{{ route('site.publications.index') }}" class="block text-center text-sm text-primary">{{ __('Reset filter') }}</a>
+                    <a href="{{ route('site.publications.index') }}" class="block text-center text-sm text-brand">{{ __('Reset filter') }}</a>
                 @endif
             </form>
         </aside>

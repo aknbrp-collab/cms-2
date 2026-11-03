@@ -62,7 +62,7 @@
                     <h2 class="mb-3 font-bold text-on-surface">{{ __('Kitab Muqarrar Induk') }}</h2>
                     <ul class="space-y-2 text-sm text-on-surface-variant">
                         @foreach ($books as $book)
-                            <li class="flex gap-2"><x-site.icon name="menu_book" class="text-[18px]! text-primary" /> {{ $book }}</li>
+                            <li class="flex gap-2"><x-site.icon name="menu_book" class="text-[18px]! text-brand" /> {{ $book }}</li>
                         @endforeach
                     </ul>
                 </div>

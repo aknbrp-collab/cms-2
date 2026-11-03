@@ -7,7 +7,7 @@
         <div class="space-y-6 lg:col-span-8">
             <form method="GET" class="flex flex-wrap gap-2" role="search">
                 <label for="q" class="sr-only">{{ __('Cari') }}</label>
-                <input id="q" name="q" value="{{ $search }}" placeholder="{{ __('Cari pertanyaan…') }}" class="min-w-0 flex-1 rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 shadow-sm focus:border-primary focus:outline-none">
+                <input id="q" name="q" value="{{ $search }}" placeholder="{{ __('Cari pertanyaan…') }}" class="min-w-0 flex-1 rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 shadow-sm focus:border-brand focus:outline-none">
                 <label for="kategori" class="sr-only">{{ __('Kategori') }}</label>
                 <select id="kategori" name="kategori" class="rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 shadow-sm">
                     <option value="">{{ __('Semua kategori') }}</option>
@@ -21,10 +21,10 @@
             @forelse ($questions as $question)
                 <article class="rounded-xl border border-border-subtle bg-surface-card p-5 shadow-sm transition hover:shadow-md">
                     <div class="flex flex-wrap items-center gap-2 text-xs">
-                        <span class="rounded-full bg-mint px-2.5 py-0.5 font-bold text-primary">{{ $question->category->label() }}</span>
+                        <span class="rounded-full bg-mint px-2.5 py-0.5 font-bold text-brand">{{ $question->category->label() }}</span>
                         <span class="text-muted">{{ $question->published_at?->translatedFormat('d F Y') }}</span>
                     </div>
-                    <h2 class="mt-2 text-lg leading-snug font-semibold text-on-surface hover:text-primary">
+                    <h2 class="mt-2 text-lg leading-snug font-semibold text-on-surface hover:text-brand">
                         <a href="{{ route('site.legal-questions.show', $question->slug) }}">{{ $question->title }}</a>
                     </h2>
                     <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">{{ $question->public_question }}</p>
@@ -48,8 +48,8 @@
             <form method="GET" action="{{ route('site.legal-questions.status') }}" class="space-y-3 rounded-2xl bg-surface-card p-6 shadow-sm">
                 <h2 class="font-bold text-on-surface">{{ __('Cek status pertanyaan') }}</h2>
                 <label for="kode" class="sr-only">{{ __('Kode pelacakan') }}</label>
-                <input id="kode" name="kode" placeholder="TH-XXXXXXXX" class="w-full rounded-lg border border-border-subtle px-3 py-2 font-mono uppercase focus:border-primary focus:outline-none">
-                <button class="w-full rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-low">{{ __('Cek') }}</button>
+                <input id="kode" name="kode" placeholder="TH-XXXXXXXX" class="w-full rounded-lg border border-border-subtle px-3 py-2 font-mono uppercase focus:border-brand focus:outline-none">
+                <button class="w-full rounded-lg border border-brand px-4 py-2 text-sm font-semibold text-brand hover:bg-surface-low">{{ __('Cek') }}</button>
             </form>
         </aside>
     </div>

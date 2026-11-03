@@ -6,6 +6,7 @@
     $headerMenu = $theme->menu(MenuLocation::Header);
     $footerMenu = $theme->menu(MenuLocation::Footer);
     $logo = $site->brandingUrl('logo');
+    $logoDark = $site->brandingUrl('logo_dark');
     $phone = $site->setting('contact.phone');
     $email = $site->setting('contact.email');
     $whatsapp = preg_replace('/[^0-9]/', '', (string) $site->setting('contact.whatsapp'));
@@ -44,36 +45,40 @@
         <div class="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
             <a href="{{ route('site.home') }}" class="flex min-w-0 items-center gap-3">
                 @if ($logo)
-                    <img src="{{ $logo }}" alt="{{ $site->name }}" class="h-10 w-auto shrink-0 object-contain">
+                    <img src="{{ $logo }}" alt="{{ $site->name }}" @class(['h-10 w-auto shrink-0 object-contain', 'dark:hidden' => $logoDark])>
+                    @if ($logoDark)
+                        <img src="{{ $logoDark }}" alt="{{ $site->name }}" class="hidden h-10 w-auto shrink-0 object-contain dark:block">
+                    @endif
                 @else
                     <span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-on-primary"><x-site.icon name="mosque" /></span>
                 @endif
-                <span class="truncate text-lg font-bold tracking-tight text-primary">{{ $site->name }}</span>
+                <span class="truncate text-lg font-bold tracking-tight text-brand">{{ $site->name }}</span>
             </a>
 
             <nav class="hidden items-center gap-5 text-sm font-semibold whitespace-nowrap xl:flex" aria-label="{{ __('Navigasi utama') }}">
-                <a href="{{ route('site.home') }}" @class(['transition-colors', 'text-primary' => request()->routeIs('site.home'), 'text-on-surface-variant hover:text-primary' => ! request()->routeIs('site.home')])>{{ __('Beranda') }}</a>
+                <a href="{{ route('site.home') }}" @class(['transition-colors', 'text-brand' => request()->routeIs('site.home'), 'text-on-surface-variant hover:text-brand' => ! request()->routeIs('site.home')])>{{ __('Beranda') }}</a>
                 @foreach ($headerMenu as $item)
                     @if ($item->children->isNotEmpty())
                         <div class="group relative">
-                            <button type="button" class="flex items-center gap-1 text-on-surface-variant transition-colors hover:text-primary" aria-haspopup="true">
+                            <button type="button" class="flex items-center gap-1 text-on-surface-variant transition-colors hover:text-brand" aria-haspopup="true">
                                 {{ $item->label }} <x-site.icon name="expand_more" class="text-[16px]!" />
                             </button>
                             <div class="invisible absolute start-0 top-full z-50 w-56 pt-3 opacity-0 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                                 <div class="rounded-lg border border-border-subtle bg-surface-card py-2 shadow-[0_10px_15px_-3px_rgba(6,78,59,0.08)]">
                                     @foreach ($item->children as $child)
-                                        <a href="{{ $child->href() }}" @if ($child->open_in_new_tab) target="_blank" rel="noopener" @endif class="block px-4 py-2 text-sm font-normal text-on-surface-variant transition-colors hover:bg-surface-low hover:text-primary">{{ $child->label }}</a>
+                                        <a href="{{ $child->href() }}" @if ($child->open_in_new_tab) target="_blank" rel="noopener" @endif class="block px-4 py-2 text-sm font-normal text-on-surface-variant transition-colors hover:bg-surface-low hover:text-brand">{{ $child->label }}</a>
                                     @endforeach
                                 </div>
                             </div>
                         </div>
                     @else
-                        <a href="{{ $item->href() }}" @if ($item->open_in_new_tab) target="_blank" rel="noopener" @endif class="text-on-surface-variant transition-colors hover:text-primary">{{ $item->label }}</a>
+                        <a href="{{ $item->href() }}" @if ($item->open_in_new_tab) target="_blank" rel="noopener" @endif class="text-on-surface-variant transition-colors hover:text-brand">{{ $item->label }}</a>
                     @endif
                 @endforeach
             </nav>
 
             <div class="flex shrink-0 items-center gap-2">
+                <x-site.theme-toggle />
                 @if ($site->setting('header.cta_url') && $site->setting('header.cta_label'))
                     <a href="{{ $site->setting('header.cta_url') }}" class="hidden items-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-deep sm:inline-flex">{{ $site->setting('header.cta_label') }}</a>
                 @endif
@@ -107,50 +112,53 @@
             <div class="space-y-4">
                 <div class="flex items-center gap-3">
                     @if ($logo)
-                        <img src="{{ $logo }}" alt="" class="h-9 w-auto object-contain">
+                        <img src="{{ $logo }}" alt="" @class(['h-9 w-auto object-contain', 'dark:hidden' => $logoDark])>
+                        @if ($logoDark)
+                            <img src="{{ $logoDark }}" alt="" class="hidden h-9 w-auto object-contain dark:block">
+                        @endif
                     @endif
-                    <span class="text-lg font-bold text-primary">{{ $site->name }}</span>
+                    <span class="text-lg font-bold text-brand">{{ $site->name }}</span>
                 </div>
                 @if ($site->setting('identity.description'))
                     <p class="text-sm leading-relaxed text-on-surface-variant">{{ $site->setting('identity.description') }}</p>
                 @endif
                 @if ($site->setting('contact.address'))
-                    <p class="flex items-start gap-2 text-sm text-on-surface-variant"><x-site.icon name="location_on" class="text-[18px]! text-primary" /> {{ $site->setting('contact.address') }}</p>
+                    <p class="flex items-start gap-2 text-sm text-on-surface-variant"><x-site.icon name="location_on" class="text-[18px]! text-brand" /> {{ $site->setting('contact.address') }}</p>
                 @endif
             </div>
 
             <div class="space-y-4">
-                <h2 class="inline-block border-b-2 border-primary pb-1 font-semibold">{{ __('Informasi') }}</h2>
+                <h2 class="inline-block border-b-2 border-brand pb-1 font-semibold">{{ __('Informasi') }}</h2>
                 <ul class="space-y-2.5 text-sm text-on-surface-variant">
                     @forelse ($footerMenu as $item)
-                        <li><a href="{{ $item->href() }}" class="flex items-center gap-1 hover:text-primary"><x-site.icon name="chevron_right" class="text-[16px]! text-primary" /> {{ $item->label }}</a></li>
+                        <li><a href="{{ $item->href() }}" class="flex items-center gap-1 hover:text-brand"><x-site.icon name="chevron_right" class="text-[16px]! text-brand" /> {{ $item->label }}</a></li>
                     @empty
-                        <li><a href="{{ route('site.posts.index') }}" class="flex items-center gap-1 hover:text-primary"><x-site.icon name="chevron_right" class="text-[16px]! text-primary" /> {{ __('Berita') }}</a></li>
-                        <li><a href="{{ route('site.announcements') }}" class="flex items-center gap-1 hover:text-primary"><x-site.icon name="chevron_right" class="text-[16px]! text-primary" /> {{ __('Pengumuman') }}</a></li>
+                        <li><a href="{{ route('site.posts.index') }}" class="flex items-center gap-1 hover:text-brand"><x-site.icon name="chevron_right" class="text-[16px]! text-brand" /> {{ __('Berita') }}</a></li>
+                        <li><a href="{{ route('site.announcements') }}" class="flex items-center gap-1 hover:text-brand"><x-site.icon name="chevron_right" class="text-[16px]! text-brand" /> {{ __('Pengumuman') }}</a></li>
                     @endforelse
                 </ul>
             </div>
 
             <div class="space-y-4">
-                <h2 class="inline-block border-b-2 border-primary pb-1 font-semibold">{{ __('Hubungi Kami') }}</h2>
+                <h2 class="inline-block border-b-2 border-brand pb-1 font-semibold">{{ __('Hubungi Kami') }}</h2>
                 <ul class="space-y-3 text-sm text-on-surface-variant">
                     @if ($phone)
-                        <li class="flex items-center gap-2"><x-site.icon name="call" class="text-[18px]! text-primary" /> <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="hover:text-primary">{{ $phone }}</a></li>
+                        <li class="flex items-center gap-2"><x-site.icon name="call" class="text-[18px]! text-brand" /> <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="hover:text-brand">{{ $phone }}</a></li>
                     @endif
                     @if ($email)
-                        <li class="flex items-center gap-2"><x-site.icon name="mail" class="text-[18px]! text-primary" /> <a href="mailto:{{ $email }}" class="hover:text-primary">{{ $email }}</a></li>
+                        <li class="flex items-center gap-2"><x-site.icon name="mail" class="text-[18px]! text-brand" /> <a href="mailto:{{ $email }}" class="hover:text-brand">{{ $email }}</a></li>
                     @endif
                     @if ($whatsapp)
-                        <li class="flex items-center gap-2"><x-site.icon name="chat" class="text-[18px]! text-primary" /> <a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener" class="hover:text-primary">WhatsApp</a></li>
+                        <li class="flex items-center gap-2"><x-site.icon name="chat" class="text-[18px]! text-brand" /> <a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener" class="hover:text-brand">WhatsApp</a></li>
                     @endif
                 </ul>
             </div>
 
             <div class="space-y-4">
-                <h2 class="inline-block border-b-2 border-primary pb-1 font-semibold">{{ __('Media Sosial') }}</h2>
+                <h2 class="inline-block border-b-2 border-brand pb-1 font-semibold">{{ __('Media Sosial') }}</h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach ($socials as $icon => $url)
-                        <a href="{{ $url }}" target="_blank" rel="noopener" class="flex size-10 items-center justify-center rounded-lg border border-border-subtle bg-surface-card text-on-surface-variant transition hover:border-primary hover:text-primary" aria-label="{{ parse_url($url, PHP_URL_HOST) }}">
+                        <a href="{{ $url }}" target="_blank" rel="noopener" class="flex size-10 items-center justify-center rounded-lg border border-border-subtle bg-surface-card text-on-surface-variant transition hover:border-brand hover:text-brand" aria-label="{{ parse_url($url, PHP_URL_HOST) }}">
                             <x-site.icon :name="$icon" />
                         </a>
                     @endforeach

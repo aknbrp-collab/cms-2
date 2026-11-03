@@ -8,6 +8,7 @@
     $footerMenu = $theme->menu(MenuLocation::Footer);
     $prayer = $theme->prayer();
     $logo = $site->brandingUrl('logo');
+    $logoDark = $site->brandingUrl('logo_dark');
     $calligraphy = $site->brandingUrl('calligraphy');
 @endphp
 <!DOCTYPE html>
@@ -52,17 +53,20 @@
             </div>
         </div>
 
-        <div class="border-b border-primary/10 bg-surface/95 backdrop-blur-md">
+        <div class="border-b border-brand/10 bg-surface/95 backdrop-blur-md">
             <div class="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
                 <a href="{{ route('site.home') }}" class="flex min-w-0 items-center gap-3.5">
                     @if ($logo)
-                        <img src="{{ $logo }}" alt="{{ $site->name }}" class="h-12 w-auto shrink-0 object-contain">
+                        <img src="{{ $logo }}" alt="{{ $site->name }}" @class(['h-12 w-auto shrink-0 object-contain', 'dark:hidden' => $logoDark])>
+                        @if ($logoDark)
+                            <img src="{{ $logoDark }}" alt="{{ $site->name }}" class="hidden h-12 w-auto shrink-0 object-contain dark:block">
+                        @endif
                     @else
                         <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary"><x-site.icon name="menu_book" /></span>
                     @endif
                     <span class="flex min-w-0 flex-col">
                         <span class="flex items-center gap-2">
-                            <span class="truncate text-lg leading-none font-bold tracking-tight text-primary uppercase">{{ $site->name }}</span>
+                            <span class="truncate text-lg leading-none font-bold tracking-tight text-brand uppercase">{{ $site->name }}</span>
                             @if ($calligraphy)
                                 <img src="{{ $calligraphy }}" alt="" class="hidden h-7 w-auto object-contain sm:block">
                             @endif
@@ -82,7 +86,7 @@
                                     {{ $item->label }} <x-site.icon name="expand_more" class="text-[16px]!" />
                                 </button>
                                 <div class="invisible absolute start-0 top-full z-50 w-60 pt-2 opacity-0 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-                                    <div class="rounded-xl border border-primary/10 bg-surface-card py-2 shadow-lg">
+                                    <div class="rounded-xl border border-brand/10 bg-surface-card py-2 shadow-lg">
                                         @foreach ($item->children as $child)
                                             <a href="{{ $child->href() }}" @if ($child->open_in_new_tab) target="_blank" rel="noopener" @endif class="block px-4 py-2 text-sm font-normal text-on-surface-variant hover:bg-surface-low hover:text-on-surface">{{ $child->label }}</a>
                                         @endforeach
@@ -96,6 +100,7 @@
                 </nav>
 
                 <div class="flex shrink-0 items-center gap-2">
+                    <x-site.theme-toggle />
                     @if ($site->setting('header.cta_url') && $site->setting('header.cta_label'))
                         <a href="{{ $site->setting('header.cta_url') }}" class="hidden items-center gap-2 rounded bg-secondary px-4 py-2.5 text-sm font-semibold text-on-secondary shadow-sm transition hover:brightness-110 sm:inline-flex">
                             <span class="relative flex size-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-light opacity-75"></span><span class="relative inline-flex size-2 rounded-full bg-white"></span></span>

@@ -4,7 +4,7 @@
     <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 md:py-14 lg:px-10">
         @forelse ($groups as $category => $items)
             <section class="mb-12">
-                <h2 class="mb-5 text-xl font-bold text-primary">{{ $category }}</h2>
+                <h2 class="mb-5 text-xl font-bold text-brand">{{ $category }}</h2>
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($items as $item)
                         <article class="flex gap-4 rounded-xl bg-surface-card p-4 shadow-sm">

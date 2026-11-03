@@ -5,7 +5,7 @@
         <article class="space-y-8 lg:col-span-8">
             <section class="rounded-2xl border-s-4 border-secondary bg-surface-card p-6 shadow-sm">
                 <div class="mb-3 flex flex-wrap items-center gap-2 text-xs">
-                    <span class="rounded-full bg-mint px-2.5 py-0.5 font-bold text-primary">{{ $question->category->label() }}</span>
+                    <span class="rounded-full bg-mint px-2.5 py-0.5 font-bold text-brand">{{ $question->category->label() }}</span>
                     <span class="text-muted">{{ __('Ditanyakan oleh :name', ['name' => $question->publicAskerName()]) }}</span>
                 </div>
                 <h2 class="mb-2 text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Pertanyaan') }}</h2>
@@ -40,7 +40,7 @@
                     <h2 class="mb-3 font-bold text-on-surface">{{ __('Pertanyaan terkait') }}</h2>
                     <ul class="space-y-3">
                         @foreach ($related as $item)
-                            <li><a href="{{ route('site.legal-questions.show', $item->slug) }}" class="text-sm font-semibold text-on-surface hover:text-primary">{{ $item->title }}</a></li>
+                            <li><a href="{{ route('site.legal-questions.show', $item->slug) }}" class="text-sm font-semibold text-on-surface hover:text-brand">{{ $item->title }}</a></li>
                         @endforeach
                     </ul>
                 </div>

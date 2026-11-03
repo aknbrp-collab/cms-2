@@ -4,7 +4,7 @@
     <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6 md:py-14">
         @forelse ($groups as $group => $faqs)
             <section class="mb-10">
-                <h2 class="mb-4 text-xl font-bold text-primary">{{ $group }}</h2>
+                <h2 class="mb-4 text-xl font-bold text-brand">{{ $group }}</h2>
                 @include('sites.shared.faq-list', ['faqs' => $faqs])
             </section>
         @empty

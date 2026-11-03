@@ -7,7 +7,7 @@
     </div>
     <div class="flex flex-1 flex-col gap-1 p-5">
         <h3 class="leading-snug font-semibold text-on-surface">{{ $achievement->title }}</h3>
-        <p class="text-sm font-medium text-primary">{{ $achievement->student_name }}</p>
+        <p class="text-sm font-medium text-brand">{{ $achievement->student_name }}</p>
         @if ($achievement->event_name)
             <p class="text-sm text-on-surface-variant">{{ $achievement->event_name }}</p>
         @endif

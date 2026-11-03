@@ -25,7 +25,7 @@
                 <p><span class="text-sm text-muted">{{ __('Penulis') }}</span><br><span class="font-semibold text-on-surface">{{ $publication->authors }}</span></p>
                 <p><span class="text-sm text-muted">{{ __('Sumber') }}</span><br><span class="font-semibold text-on-surface">{{ $publication->citation() }}</span></p>
                 @if ($publication->doi)
-                    <p><span class="text-sm text-muted">DOI</span><br><a href="https://doi.org/{{ $publication->doi }}" target="_blank" rel="noopener" class="font-semibold break-all text-primary">{{ $publication->doi }}</a></p>
+                    <p><span class="text-sm text-muted">DOI</span><br><a href="https://doi.org/{{ $publication->doi }}" target="_blank" rel="noopener" class="font-semibold break-all text-brand">{{ $publication->doi }}</a></p>
                 @endif
 
                 <div class="flex flex-col gap-2 pt-2">
@@ -35,12 +35,12 @@
                         </a>
                     @endif
                     @if ($publication->external_url)
-                        <a href="{{ $publication->external_url }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-lg border border-primary px-4 py-2.5 text-sm font-semibold text-primary hover:bg-surface-low">
+                        <a href="{{ $publication->external_url }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-lg border border-brand px-4 py-2.5 text-sm font-semibold text-brand hover:bg-surface-low">
                             <x-site.icon name="public" class="text-[18px]!" /> {{ __('Baca di sumber') }}
                         </a>
                     @endif
                     @if ($publication->journal)
-                        <a href="{{ route('site.journals.show', $publication->journal->slug) }}" class="text-center text-sm text-primary">{{ __('Lihat jurnal :name', ['name' => $publication->journal->name]) }}</a>
+                        <a href="{{ route('site.journals.show', $publication->journal->slug) }}" class="text-center text-sm text-brand">{{ __('Lihat jurnal :name', ['name' => $publication->journal->name]) }}</a>
                     @endif
                 </div>
             </div>

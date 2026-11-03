@@ -8,7 +8,7 @@
                     <span class="inline-flex shrink-0 items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-xs font-bold text-on-primary">
                         <x-site.icon name="campaign" class="text-[16px]!" /> {{ __('Warta Terkini') }}
                     </span>
-                    <a href="{{ route('site.posts.show', $ticker->slug) }}" class="truncate text-sm font-medium text-on-surface hover:text-primary">{{ $ticker->title }}</a>
+                    <a href="{{ route('site.posts.show', $ticker->slug) }}" class="truncate text-sm font-medium text-on-surface hover:text-brand">{{ $ticker->title }}</a>
                 </div>
                 <span class="hidden shrink-0 items-center gap-1 text-sm text-on-surface-variant md:flex">
                     <x-site.icon name="calendar_today" class="text-[16px]!" /> {{ now()->translatedFormat('d F Y') }}
@@ -92,7 +92,7 @@
                                             <img src="{{ $video->videoThumbnail() }}" alt="" loading="lazy" class="aspect-video w-full object-cover">
                                             <span class="absolute inset-0 flex items-center justify-center"><x-site.icon name="play_circle" filled class="text-3xl! text-white drop-shadow" /></span>
                                         </span>
-                                        <span class="text-sm font-semibold text-on-surface group-hover:text-primary">{{ $video->caption ?: $video->gallery->title }}</span>
+                                        <span class="text-sm font-semibold text-on-surface group-hover:text-brand">{{ $video->caption ?: $video->gallery->title }}</span>
                                     </a>
                                 @endforeach
                             </div>
@@ -132,36 +132,36 @@
 
                 @if ($events->isNotEmpty())
                     <div class="rounded-xl bg-surface-card p-6 shadow-sm">
-                        <h2 class="mb-4 flex items-center gap-2 font-bold text-on-surface"><x-site.icon name="calendar_today" class="text-primary" /> {{ __('Agenda') }}</h2>
+                        <h2 class="mb-4 flex items-center gap-2 font-bold text-on-surface"><x-site.icon name="calendar_today" class="text-brand" /> {{ __('Agenda') }}</h2>
                         <ul class="space-y-3">
                             @foreach ($events as $event)
                                 <li>
                                     <a href="{{ route('site.events.show', $event->slug) }}" class="group flex gap-3">
-                                        <span class="flex w-12 shrink-0 flex-col items-center rounded-lg bg-surface-low py-1.5 text-primary">
+                                        <span class="flex w-12 shrink-0 flex-col items-center rounded-lg bg-surface-low py-1.5 text-brand">
                                             <span class="text-lg leading-none font-bold">{{ $event->starts_at->format('d') }}</span>
                                             <span class="text-[11px] uppercase">{{ $event->starts_at->translatedFormat('M') }}</span>
                                         </span>
-                                        <span class="text-sm font-semibold text-on-surface group-hover:text-primary">{{ $event->title }}</span>
+                                        <span class="text-sm font-semibold text-on-surface group-hover:text-brand">{{ $event->title }}</span>
                                     </a>
                                 </li>
                             @endforeach
                         </ul>
-                        <a href="{{ route('site.events.index') }}" class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">{{ __('Semua agenda') }} <x-site.icon name="east" class="text-[16px]!" /></a>
+                        <a href="{{ route('site.events.index') }}" class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand">{{ __('Semua agenda') }} <x-site.icon name="east" class="text-[16px]!" /></a>
                     </div>
                 @endif
 
                 @if ($announcements->isNotEmpty())
                     <div class="rounded-xl bg-surface-card p-6 shadow-sm">
-                        <h2 class="mb-4 flex items-center gap-2 font-bold text-on-surface"><x-site.icon name="campaign" class="text-primary" /> {{ __('Pengumuman') }}</h2>
+                        <h2 class="mb-4 flex items-center gap-2 font-bold text-on-surface"><x-site.icon name="campaign" class="text-brand" /> {{ __('Pengumuman') }}</h2>
                         <ul class="divide-y divide-border-subtle">
                             @foreach ($announcements as $announcement)
                                 <li class="py-3 first:pt-0">
-                                    <a href="{{ route('site.posts.show', $announcement->slug) }}" class="text-sm font-semibold text-on-surface hover:text-primary">{{ $announcement->title }}</a>
+                                    <a href="{{ route('site.posts.show', $announcement->slug) }}" class="text-sm font-semibold text-on-surface hover:text-brand">{{ $announcement->title }}</a>
                                     <p class="mt-1 text-xs text-muted">{{ $announcement->published_at?->translatedFormat('d F Y') }}</p>
                                 </li>
                             @endforeach
                         </ul>
-                        <a href="{{ route('site.announcements') }}" class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">{{ __('Semua pengumuman') }} <x-site.icon name="east" class="text-[16px]!" /></a>
+                        <a href="{{ route('site.announcements') }}" class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand">{{ __('Semua pengumuman') }} <x-site.icon name="east" class="text-[16px]!" /></a>
                     </div>
                 @endif
 

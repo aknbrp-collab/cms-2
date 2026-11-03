@@ -47,9 +47,9 @@
 
             <div class="mt-10 flex flex-wrap items-center gap-2 border-t border-border-subtle pt-6 text-sm">
                 <span class="font-semibold text-on-surface">{{ __('Bagikan:') }}</span>
-                <a class="rounded-lg bg-surface-low px-3 py-1.5 text-primary hover:bg-surface-container" target="_blank" rel="noopener" href="https://wa.me/?text={{ urlencode($post->title.' '.url()->current()) }}">WhatsApp</a>
-                <a class="rounded-lg bg-surface-low px-3 py-1.5 text-primary hover:bg-surface-container" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}">Facebook</a>
-                <a class="rounded-lg bg-surface-low px-3 py-1.5 text-primary hover:bg-surface-container" target="_blank" rel="noopener" href="https://x.com/intent/post?url={{ urlencode(url()->current()) }}&text={{ urlencode($post->title) }}">X</a>
+                <a class="rounded-lg bg-surface-low px-3 py-1.5 text-brand hover:bg-surface-container" target="_blank" rel="noopener" href="https://wa.me/?text={{ urlencode($post->title.' '.url()->current()) }}">WhatsApp</a>
+                <a class="rounded-lg bg-surface-low px-3 py-1.5 text-brand hover:bg-surface-container" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}">Facebook</a>
+                <a class="rounded-lg bg-surface-low px-3 py-1.5 text-brand hover:bg-surface-container" target="_blank" rel="noopener" href="https://x.com/intent/post?url={{ urlencode(url()->current()) }}&text={{ urlencode($post->title) }}">X</a>
             </div>
         </div>
     </article>

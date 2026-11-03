@@ -4,8 +4,8 @@
 
     $badge = [
         DocumentStatus::Pending->value => 'bg-surface-container text-on-surface-variant',
-        DocumentStatus::Accepted->value => 'bg-mint text-primary',
-        DocumentStatus::NeedsFix->value => 'bg-amber-100 text-amber-900',
+        DocumentStatus::Accepted->value => 'bg-mint text-brand',
+        DocumentStatus::NeedsFix->value => 'bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200',
     ];
 @endphp
 
@@ -17,7 +17,7 @@
 
         <div class="mb-6 rounded-2xl bg-surface-card p-5 shadow-sm">
             <p class="text-sm text-muted">{{ __('Nomor pendaftaran') }}</p>
-            <p class="font-mono text-xl font-bold tracking-wider text-primary">{{ $registration->registration_number }}</p>
+            <p class="font-mono text-xl font-bold tracking-wider text-brand">{{ $registration->registration_number }}</p>
             <p class="mt-1 text-sm text-on-surface-variant">{{ $registration->full_name }}</p>
             <p class="mt-3 text-sm text-on-surface-variant">
                 {{ __(':uploaded dari :total berkas sudah diunggah.', ['uploaded' => $summary['uploaded'], 'total' => $summary['total']]) }}
@@ -28,7 +28,7 @@
         </div>
 
         @if (session('uploaded'))
-            <div class="mb-6 rounded-xl border border-primary/30 bg-mint p-4 text-sm font-medium text-primary" role="status">{{ session('uploaded') }}</div>
+            <div class="mb-6 rounded-xl border border-brand/30 bg-mint p-4 text-sm font-medium text-brand" role="status">{{ session('uploaded') }}</div>
         @endif
 
         <div class="space-y-4">
@@ -44,7 +44,7 @@
                             <h2 class="font-bold text-on-surface">
                                 {{ $requirement->name }}
                                 @if ($requirement->is_required)
-                                    <span class="text-red-600" aria-label="{{ __('wajib') }}">*</span>
+                                    <span class="text-red-600 dark:text-red-400" aria-label="{{ __('wajib') }}">*</span>
                                 @endif
                             </h2>
                             @if ($requirement->description)
@@ -60,7 +60,7 @@
                     </div>
 
                     @if ($document?->status === DocumentStatus::NeedsFix && $document->note)
-                        <div class="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+                        <div class="mt-4 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 p-3 text-sm text-amber-900 dark:text-amber-200">
                             <span class="font-semibold">{{ __('Catatan panitia:') }}</span> {{ $document->note }}
                         </div>
                     @endif
@@ -107,7 +107,7 @@
                                     name="file"
                                     required
                                     accept="{{ collect($requirement->extensions())->map(fn ($extension) => '.'.$extension)->join(',') }}"
-                                    class="block w-full text-sm text-on-surface-variant file:me-3 file:rounded-lg file:border-0 file:bg-surface-container file:px-4 file:py-2 file:font-semibold file:text-primary hover:file:bg-surface-low"
+                                    class="block w-full text-sm text-on-surface-variant file:me-3 file:rounded-lg file:border-0 file:bg-surface-container file:px-4 file:py-2 file:font-semibold file:text-brand hover:file:bg-surface-low"
                                 >
                                 <button type="submit" x-bind:disabled="progress !== null" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-sm transition hover:bg-primary-container disabled:opacity-60">
                                     <x-site.icon name="upload" class="text-[18px]!" /> {{ $document ? __('Ganti berkas') : __('Unggah') }}
@@ -117,9 +117,9 @@
                                 <div class="h-2 overflow-hidden rounded-full bg-surface-container"><div class="h-full bg-primary transition-all" x-bind:style="`width: ${progress}%`"></div></div>
                                 <p class="mt-1 text-xs text-muted" x-text="progress < 100 ? `${progress}%` : @js(__('Memproses…'))"></p>
                             </div>
-                            <p x-show="error" x-text="error" x-cloak class="mt-2 text-sm text-red-600" role="alert"></p>
+                            <p x-show="error" x-text="error" x-cloak class="mt-2 text-sm text-red-600 dark:text-red-400" role="alert"></p>
                             @if ($bag->has('file'))
-                                <p class="mt-2 text-sm text-red-600" role="alert">{{ $bag->first('file') }}</p>
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">{{ $bag->first('file') }}</p>
                             @endif
                         </form>
                     @elseif (! $document)
@@ -129,7 +129,7 @@
             @endforeach
         </div>
 
-        <div class="mt-8 flex flex-col gap-3 rounded-2xl border-2 border-dashed border-primary/30 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div class="mt-8 flex flex-col gap-3 rounded-2xl border-2 border-dashed border-brand/30 p-5 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-sm text-on-surface-variant">
                 @if ($summary['missing_required'] > 0)
                     {{ __('Belum lengkap? Anda bisa kembali nanti melalui menu "Lengkapi berkas" dengan nomor pendaftaran dan tanggal lahir.') }}

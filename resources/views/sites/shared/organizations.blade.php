@@ -10,7 +10,7 @@
                     <article id="{{ $organization->slug }}" class="flex gap-5 rounded-2xl bg-surface-card p-6 shadow-sm">
                         <x-site.image :asset="$organization->logo" conversion="thumb" :alt="$organization->name" icon="public" class="size-20 shrink-0 rounded-xl" />
                         <div class="min-w-0 space-y-1.5">
-                            <span class="inline-block rounded-full bg-mint px-2.5 py-0.5 text-[11px] font-bold text-primary">{{ $organization->type->label() }}</span>
+                            <span class="inline-block rounded-full bg-mint px-2.5 py-0.5 text-[11px] font-bold text-brand">{{ $organization->type->label() }}</span>
                             <h2 class="text-lg font-bold text-on-surface">{{ $organization->name }}</h2>
                             @if ($organization->chairperson)
                                 <p class="text-sm text-on-surface-variant">{{ __('Ketua: :name', ['name' => $organization->chairperson]) }}@if ($organization->period) ({{ $organization->period }})@endif</p>
@@ -19,7 +19,7 @@
                                 <p class="text-sm text-on-surface-variant">{{ $organization->description }}</p>
                             @endif
                             @if ($organization->instagram_url)
-                                <a href="{{ $organization->instagram_url }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-sm font-semibold text-primary"><x-site.icon name="photo_camera" class="text-[16px]!" /> Instagram</a>
+                                <a href="{{ $organization->instagram_url }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-sm font-semibold text-brand"><x-site.icon name="photo_camera" class="text-[16px]!" /> Instagram</a>
                             @endif
                         </div>
                     </article>

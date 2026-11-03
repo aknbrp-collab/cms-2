@@ -9,6 +9,9 @@
 @source '../../views/errors';
 @source '../../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/tailwind.blade.php';
 
+/* Dark mode follows the "dark" class on <html>, set before first paint by the head script. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     --font-arabic: 'Amiri', 'Traditional Arabic', serif;
@@ -53,7 +56,7 @@
 }
 
 .prose-site a {
-    @apply font-medium text-primary underline underline-offset-2;
+    @apply font-medium text-brand underline underline-offset-2;
 }
 
 .prose-site ul {

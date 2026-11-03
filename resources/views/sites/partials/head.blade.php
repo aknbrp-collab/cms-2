@@ -2,7 +2,7 @@
 @php
     // Only the Material Symbols the themes use (sorted, as Google Fonts requires).
     $icons = collect([
-        'arrow_back', 'arrow_forward', 'calendar_today', 'call', 'campaign', 'chat', 'chevron_left', 'chevron_right', 'close',
+        'arrow_back', 'arrow_forward', 'calendar_today', 'call', 'campaign', 'chat', 'chevron_left', 'chevron_right', 'close', 'dark_mode', 'light_mode',
         'description', 'east', 'expand_more', 'location_on', 'mail', 'menu', 'menu_book', 'mosque',
         'music_note', 'person', 'photo_camera', 'play_circle', 'public', 'schedule', 'school', 'search',
         'pause', 'play_arrow', 'star', 'upload', 'verified',
@@ -11,6 +11,30 @@
 @endphp
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+{{-- Light/dark before first paint: the visitor's choice, else the system setting. window.siteTheme is used by the header toggle. --}}
+<script>
+    (() => {
+        const key = 'site-theme';
+        const root = document.documentElement;
+        const system = window.matchMedia('(prefers-color-scheme: dark)');
+        const stored = () => { try { return localStorage.getItem(key); } catch (e) { return null; } };
+        const apply = (dark) => root.classList.toggle('dark', dark);
+
+        apply(stored() ? stored() === 'dark' : system.matches);
+        system.addEventListener('change', (event) => { if (! stored()) apply(event.matches); });
+
+        window.siteTheme = {
+            isDark: () => root.classList.contains('dark'),
+            toggle() {
+                const dark = ! this.isDark();
+                apply(dark);
+                try { localStorage.setItem(key, dark ? 'dark' : 'light'); } catch (e) {}
+                return dark;
+            },
+        };
+    })();
+</script>
 <title>{{ $seo->title }}</title>
 @if ($seo->description !== '')
     <meta name="description" content="{{ Str::limit($seo->description, 300) }}">

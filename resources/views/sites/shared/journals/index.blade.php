@@ -13,7 +13,7 @@
                             @if ($journal->accreditation)
                                 <span class="inline-block rounded-full bg-gold-light px-3 py-1 text-xs font-bold text-on-surface">{{ $journal->accreditation }}</span>
                             @endif
-                            <h2 class="text-xl font-bold text-primary"><a href="{{ route('site.journals.show', $journal->slug) }}">{{ $journal->name }}</a></h2>
+                            <h2 class="text-xl font-bold text-brand"><a href="{{ route('site.journals.show', $journal->slug) }}">{{ $journal->name }}</a></h2>
                             <p class="text-sm text-muted">
                                 @if ($journal->issn) ISSN {{ $journal->issn }} @endif
                                 @if ($journal->e_issn) · E-ISSN {{ $journal->e_issn }} @endif
@@ -22,9 +22,9 @@
                                 <p class="text-on-surface-variant">{{ $journal->description }}</p>
                             @endif
                             <div class="flex flex-wrap gap-3 pt-2">
-                                <a href="{{ route('site.journals.show', $journal->slug) }}" class="text-sm font-semibold text-primary">{{ __('Daftar artikel') }}</a>
+                                <a href="{{ route('site.journals.show', $journal->slug) }}" class="text-sm font-semibold text-brand">{{ __('Daftar artikel') }}</a>
                                 @if ($journal->url)
-                                    <a href="{{ $journal->url }}" target="_blank" rel="noopener" class="text-sm font-semibold text-primary">{{ __('Situs jurnal (OJS)') }} ↗</a>
+                                    <a href="{{ $journal->url }}" target="_blank" rel="noopener" class="text-sm font-semibold text-brand">{{ __('Situs jurnal (OJS)') }} ↗</a>
                                 @endif
                             </div>
                         </div>

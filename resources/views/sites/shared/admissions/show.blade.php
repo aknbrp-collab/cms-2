@@ -88,7 +88,7 @@
                         <h2 class="mb-3 font-bold text-on-surface">{{ __('Program') }}</h2>
                         <ul class="space-y-2 text-sm text-on-surface-variant">
                             @foreach ($period->programs as $program)
-                                <li class="flex items-center gap-2"><x-site.icon name="school" class="text-[18px]! text-primary" /> {{ $program }}</li>
+                                <li class="flex items-center gap-2"><x-site.icon name="school" class="text-[18px]! text-brand" /> {{ $program }}</li>
                             @endforeach
                         </ul>
                     </div>

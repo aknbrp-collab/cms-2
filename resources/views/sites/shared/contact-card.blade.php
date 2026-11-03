@@ -4,16 +4,16 @@
 @endphp
 
 <div class="space-y-4 rounded-xl bg-surface-card p-5 shadow-sm">
-    <h2 class="border-b-2 border-primary pb-1 text-base font-semibold text-on-surface">{{ __('Hubungi Kami') }}</h2>
+    <h2 class="border-b-2 border-brand pb-1 text-base font-semibold text-on-surface">{{ __('Hubungi Kami') }}</h2>
     <ul class="space-y-3 text-sm text-on-surface-variant">
         @if ($address = $site->setting('contact.address'))
-            <li class="flex gap-2"><x-site.icon name="location_on" class="text-primary" /> <span>{{ $address }}</span></li>
+            <li class="flex gap-2"><x-site.icon name="location_on" class="text-brand" /> <span>{{ $address }}</span></li>
         @endif
         @if ($phone = $site->setting('contact.phone'))
-            <li class="flex gap-2"><x-site.icon name="call" class="text-primary" /> <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="hover:text-primary">{{ $phone }}</a></li>
+            <li class="flex gap-2"><x-site.icon name="call" class="text-brand" /> <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="hover:text-brand">{{ $phone }}</a></li>
         @endif
         @if ($email = $site->setting('contact.email'))
-            <li class="flex gap-2"><x-site.icon name="mail" class="text-primary" /> <a href="mailto:{{ $email }}" class="hover:text-primary">{{ $email }}</a></li>
+            <li class="flex gap-2"><x-site.icon name="mail" class="text-brand" /> <a href="mailto:{{ $email }}" class="hover:text-brand">{{ $email }}</a></li>
         @endif
     </ul>
     @if ($whatsapp = $site->setting('contact.whatsapp'))

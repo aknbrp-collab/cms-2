@@ -1,7 +1,7 @@
 @php
-    $input = 'mt-1 block w-full rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none';
+    $input = 'mt-1 block w-full rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 text-on-surface shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none';
     $label = 'block text-sm font-semibold text-on-surface';
-    $error = 'mt-1 text-sm text-red-600';
+    $error = 'mt-1 text-sm text-red-600 dark:text-red-400';
 @endphp
 
 <x-site.layout :site="$site" :seo="$seo">
@@ -13,7 +13,7 @@
         @endif
 
         @if ($errors->any())
-            <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
+            <div class="mb-6 rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 p-4 text-sm text-red-700 dark:text-red-300" role="alert">
                 {{ __('Mohon periksa kembali isian yang ditandai.') }}
             </div>
         @endif
@@ -28,7 +28,7 @@
 
             <fieldset class="space-y-5 rounded-2xl bg-surface-card p-6 shadow-sm md:p-8">
                 <legend class="sr-only">{{ __('Data Calon Santri') }}</legend>
-                <h2 class="text-lg font-bold text-primary" aria-hidden="true">{{ __('Data Calon Santri') }}</h2>
+                <h2 class="text-lg font-bold text-brand" aria-hidden="true">{{ __('Data Calon Santri') }}</h2>
 
                 <div>
                     <label for="full_name" class="{{ $label }}">{{ __('Nama lengkap') }} *</label>
@@ -40,8 +40,8 @@
                     <div>
                         <span class="{{ $label }}">{{ __('Jenis kelamin') }} *</span>
                         <div class="mt-2 flex gap-4 text-sm">
-                            <label class="inline-flex items-center gap-2"><input type="radio" name="gender" value="L" @checked(old('gender') === 'L') class="accent-primary"> {{ __('Laki-laki') }}</label>
-                            <label class="inline-flex items-center gap-2"><input type="radio" name="gender" value="P" @checked(old('gender') === 'P') class="accent-primary"> {{ __('Perempuan') }}</label>
+                            <label class="inline-flex items-center gap-2"><input type="radio" name="gender" value="L" @checked(old('gender') === 'L') class="accent-brand"> {{ __('Laki-laki') }}</label>
+                            <label class="inline-flex items-center gap-2"><input type="radio" name="gender" value="P" @checked(old('gender') === 'P') class="accent-brand"> {{ __('Perempuan') }}</label>
                         </div>
                         @error('gender') <p class="{{ $error }}">{{ $message }}</p> @enderror
                     </div>
@@ -86,7 +86,7 @@
 
             <fieldset class="space-y-5 rounded-2xl bg-surface-card p-6 shadow-sm md:p-8">
                 <legend class="sr-only">{{ __('Data Orang Tua / Wali') }}</legend>
-                <h2 class="text-lg font-bold text-primary" aria-hidden="true">{{ __('Data Orang Tua / Wali') }}</h2>
+                <h2 class="text-lg font-bold text-brand" aria-hidden="true">{{ __('Data Orang Tua / Wali') }}</h2>
 
                 <div class="grid gap-5 sm:grid-cols-2">
                     <div>
@@ -116,7 +116,7 @@
 
             <div class="space-y-4">
                 <label class="flex items-start gap-3 text-sm text-on-surface-variant">
-                    <input type="checkbox" name="agree" value="1" @checked(old('agree')) class="mt-0.5 size-4 accent-primary">
+                    <input type="checkbox" name="agree" value="1" @checked(old('agree')) class="mt-0.5 size-4 accent-brand">
                     <span>{{ __('Saya menyatakan data yang diisi benar dan bersedia dihubungi oleh panitia penerimaan. Data hanya digunakan untuk keperluan pendaftaran.') }}</span>
                 </label>
                 @error('agree') <p class="{{ $error }}">{{ $message }}</p> @enderror

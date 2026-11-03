@@ -33,7 +33,7 @@ class Site extends Model implements HasMedia
     /**
      * Branding images managed in site settings.
      */
-    public const BRANDING_COLLECTIONS = ['logo', 'calligraphy', 'favicon', 'og_default'];
+    public const BRANDING_COLLECTIONS = ['logo', 'logo_dark', 'calligraphy', 'favicon', 'og_default'];
 
     /**
      * Every setting with its default value. Keys use dot notation.

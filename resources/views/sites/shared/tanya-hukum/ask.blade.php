@@ -1,9 +1,9 @@
 @php
     use App\Enums\LegalCategory;
 
-    $input = 'mt-1 block w-full rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none';
+    $input = 'mt-1 block w-full rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 text-on-surface shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none';
     $label = 'block text-sm font-semibold text-on-surface';
-    $error = 'mt-1 text-sm text-red-600';
+    $error = 'mt-1 text-sm text-red-600 dark:text-red-400';
 @endphp
 
 <x-site.layout :site="$site" :seo="$seo">
@@ -11,7 +11,7 @@
 
     <div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 md:py-14">
         @if ($errors->any())
-            <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">{{ __('Mohon periksa kembali isian yang ditandai.') }}</div>
+            <div class="mb-6 rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 p-4 text-sm text-red-700 dark:text-red-300" role="alert">{{ __('Mohon periksa kembali isian yang ditandai.') }}</div>
         @endif
 
         <form method="POST" action="{{ route('site.legal-questions.store') }}" class="space-y-6 rounded-2xl bg-surface-card p-6 shadow-sm md:p-8" x-data="{ anonymous: @js((bool) old('is_anonymous')) }" novalidate>
@@ -41,7 +41,7 @@
             </div>
 
             <label class="flex items-center gap-3 text-sm font-medium text-on-surface">
-                <input type="checkbox" name="is_anonymous" value="1" x-model="anonymous" class="size-4 accent-primary">
+                <input type="checkbox" name="is_anonymous" value="1" x-model="anonymous" class="size-4 accent-brand">
                 {{ __('Kirim sebagai anonim (nama tidak ditampilkan)') }}
             </label>
 
@@ -64,7 +64,7 @@
             </div>
 
             <label class="flex items-start gap-3 text-sm text-on-surface-variant">
-                <input type="checkbox" name="agree" value="1" @checked(old('agree')) class="mt-0.5 size-4 accent-primary">
+                <input type="checkbox" name="agree" value="1" @checked(old('agree')) class="mt-0.5 size-4 accent-brand">
                 <span>{{ __('Saya setuju pertanyaan ini (tanpa data pribadi) dapat diterbitkan beserta jawabannya.') }}</span>
             </label>
             @error('agree') <p class="{{ $error }}">{{ $message }}</p> @enderror

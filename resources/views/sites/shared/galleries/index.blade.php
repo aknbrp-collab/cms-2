@@ -7,7 +7,7 @@
         <div class="mb-8 inline-flex rounded-lg bg-surface-low p-1 text-sm font-semibold">
             @foreach ([null => __('Semua'), 'photo' => __('Foto'), 'video' => __('Video')] as $value => $label)
                 @php $active = ($type?->value ?? '') === (string) $value; @endphp
-                <a href="{{ route('site.galleries.index', array_filter(['jenis' => $value])) }}" @class(['rounded-md px-4 py-2', 'bg-primary text-on-primary shadow-sm' => $active, 'text-on-surface-variant hover:text-primary' => ! $active])>{{ $label }}</a>
+                <a href="{{ route('site.galleries.index', array_filter(['jenis' => $value])) }}" @class(['rounded-md px-4 py-2', 'bg-primary text-on-primary shadow-sm' => $active, 'text-on-surface-variant hover:text-brand' => ! $active])>{{ $label }}</a>
             @endforeach
         </div>
 
@@ -33,7 +33,7 @@
                             <span class="absolute end-3 bottom-3 rounded-full bg-black/60 px-2.5 py-0.5 text-xs font-semibold text-white">{{ $gallery->items->count() }} {{ $gallery->type === GalleryType::Video ? __('video') : __('foto') }}</span>
                         </div>
                         <div class="p-5">
-                            <h2 class="font-semibold text-on-surface group-hover:text-primary">{{ $gallery->title }}</h2>
+                            <h2 class="font-semibold text-on-surface group-hover:text-brand">{{ $gallery->title }}</h2>
                             @if ($gallery->taken_on)
                                 <p class="mt-1 text-xs text-muted">{{ $gallery->taken_on->translatedFormat('d F Y') }}</p>
                             @endif

@@ -26,14 +26,14 @@
 
                     @if ($siblings->count() > 1)
                         <nav class="rounded-xl bg-surface-card p-5 shadow-sm" aria-label="{{ $page->parent?->title ?? $page->title }}">
-                            <h2 class="mb-3 border-b-2 border-primary pb-1 text-base font-semibold text-on-surface">{{ $page->parent?->title ?? $page->title }}</h2>
+                            <h2 class="mb-3 border-b-2 border-brand pb-1 text-base font-semibold text-on-surface">{{ $page->parent?->title ?? $page->title }}</h2>
                             <ul class="space-y-1">
                                 @foreach ($siblings as $sibling)
                                     <li>
                                         <a href="{{ route('site.pages.show', $sibling->slug) }}" @class([
                                             'flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm transition',
                                             'bg-primary text-on-primary font-semibold' => $sibling->is($page),
-                                            'text-on-surface-variant hover:bg-surface-low hover:text-primary' => ! $sibling->is($page),
+                                            'text-on-surface-variant hover:bg-surface-low hover:text-brand' => ! $sibling->is($page),
                                         ])>
                                             <x-site.icon name="chevron_right" class="text-[16px]!" /> {{ $sibling->title }}
                                         </a>

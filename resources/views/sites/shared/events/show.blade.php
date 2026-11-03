@@ -20,7 +20,7 @@
                 @endif
                 <dl class="space-y-4 text-sm">
                     <div class="flex gap-3">
-                        <x-site.icon name="calendar_today" class="text-primary" />
+                        <x-site.icon name="calendar_today" class="text-brand" />
                         <div>
                             <dt class="text-muted">{{ __('Tanggal') }}</dt>
                             <dd class="font-semibold text-on-surface">
@@ -33,7 +33,7 @@
                     </div>
                     @unless ($event->all_day)
                         <div class="flex gap-3">
-                            <x-site.icon name="schedule" class="text-primary" />
+                            <x-site.icon name="schedule" class="text-brand" />
                             <div>
                                 <dt class="text-muted">{{ __('Waktu') }}</dt>
                                 <dd class="font-semibold text-on-surface">{{ $event->starts_at->format('H:i') }}@if ($event->ends_at) – {{ $event->ends_at->format('H:i') }}@endif WIB</dd>
@@ -42,7 +42,7 @@
                     @endunless
                     @if ($event->location)
                         <div class="flex gap-3">
-                            <x-site.icon name="location_on" class="text-primary" />
+                            <x-site.icon name="location_on" class="text-brand" />
                             <div>
                                 <dt class="text-muted">{{ __('Tempat') }}</dt>
                                 <dd class="font-semibold text-on-surface">{{ $event->location }}</dd>
@@ -51,7 +51,7 @@
                     @endif
                     @if ($event->audience)
                         <div class="flex gap-3">
-                            <x-site.icon name="person" class="text-primary" />
+                            <x-site.icon name="person" class="text-brand" />
                             <div>
                                 <dt class="text-muted">{{ __('Peserta') }}</dt>
                                 <dd class="font-semibold text-on-surface">{{ $event->audience }}</dd>
@@ -59,7 +59,7 @@
                         </div>
                     @endif
                 </dl>
-                <a href="{{ route('site.events.index') }}" class="inline-flex items-center gap-1 pt-2 text-sm font-semibold text-primary"><x-site.icon name="arrow_back" class="text-[16px]!" /> {{ __('Semua agenda') }}</a>
+                <a href="{{ route('site.events.index') }}" class="inline-flex items-center gap-1 pt-2 text-sm font-semibold text-brand"><x-site.icon name="arrow_back" class="text-[16px]!" /> {{ __('Semua agenda') }}</a>
             </div>
         </aside>
     </div>

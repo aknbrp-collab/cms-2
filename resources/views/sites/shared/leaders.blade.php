@@ -15,7 +15,7 @@
                             <p class="text-sm font-bold tracking-wide text-secondary uppercase">{{ $leader->position }}</p>
                             <h2 class="text-2xl font-bold text-on-surface">{{ $leader->name }}</h2>
                             @if ($leader->expertise)
-                                <p class="inline-flex items-center gap-1 rounded-full bg-mint px-3 py-1 text-xs font-semibold text-primary"><x-site.icon name="verified" class="text-[14px]!" /> {{ $leader->expertise }}</p>
+                                <p class="inline-flex items-center gap-1 rounded-full bg-mint px-3 py-1 text-xs font-semibold text-brand"><x-site.icon name="verified" class="text-[14px]!" /> {{ $leader->expertise }}</p>
                             @endif
                             @if ($leader->bio)
                                 {{-- Sanitised by App\Support\RichText when saved. --}}

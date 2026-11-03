@@ -1,7 +1,7 @@
 @php
-    $input = 'mt-1 block w-full rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none';
+    $input = 'mt-1 block w-full rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 text-on-surface shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none';
     $label = 'block text-sm font-semibold text-on-surface';
-    $error = 'mt-1 text-sm text-red-600';
+    $error = 'mt-1 text-sm text-red-600 dark:text-red-400';
 @endphp
 
 <x-site.layout :site="$site" :seo="$seo">

@@ -22,6 +22,29 @@
     --color-footer: #eff4ff;
     --color-on-footer: #0d1c2e;
     --color-footer-bar: #0f5132;
+    /* Brand colour for text, borders and focus rings on surfaces. */
+    --color-brand: var(--color-primary);
 }
 
 @import './base.css';
+
+/*
+ * Dark mode: surfaces and text turn dark; brand backgrounds (bg-primary) stay,
+ * brand text becomes a light tint of the site's primary colour.
+ */
+:root.dark {
+    color-scheme: dark;
+    --color-brand: color-mix(in oklab, var(--color-primary) 30%, #d1fae5);
+    --color-mint: #12392b;
+    --color-surface: #0b1310;
+    --color-surface-card: #111b17;
+    --color-surface-low: #15211c;
+    --color-surface-container: #1b2a23;
+    --color-on-surface: #e4eee8;
+    --color-on-surface-variant: #b2c2b9;
+    --color-muted: #8b9c93;
+    --color-border-subtle: #25362e;
+    --color-footer: #0e1814;
+    --color-on-footer: #e4eee8;
+    --color-footer-bar: #06100c;
+}

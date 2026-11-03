@@ -13,7 +13,7 @@
                 <span class="text-muted">E-ISSN {{ $journal->e_issn }}</span>
             @endif
             @if ($journal->url)
-                <a href="{{ $journal->url }}" target="_blank" rel="noopener" class="font-semibold text-primary">{{ __('Kunjungi situs jurnal') }} ↗</a>
+                <a href="{{ $journal->url }}" target="_blank" rel="noopener" class="font-semibold text-brand">{{ __('Kunjungi situs jurnal') }} ↗</a>
             @endif
         </div>
 

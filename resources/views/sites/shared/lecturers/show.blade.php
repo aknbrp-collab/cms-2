@@ -6,14 +6,14 @@
             <div class="space-y-4 rounded-2xl bg-surface-card p-6 text-center shadow-sm">
                 <x-site.image :asset="$lecturer->photo" :alt="$lecturer->name" icon="person" class="mx-auto aspect-square w-48 rounded-2xl" />
                 @if ($lecturer->expertise)
-                    <p class="inline-flex items-center gap-1 rounded-full bg-mint px-3 py-1 text-xs font-semibold text-primary"><x-site.icon name="verified" class="text-[14px]!" /> {{ $lecturer->expertise }}</p>
+                    <p class="inline-flex items-center gap-1 rounded-full bg-mint px-3 py-1 text-xs font-semibold text-brand"><x-site.icon name="verified" class="text-[14px]!" /> {{ $lecturer->expertise }}</p>
                 @endif
                 <dl class="space-y-2 text-start text-sm">
                     @if ($lecturer->nidn)
                         <div><dt class="text-muted">{{ __('NIDN') }}</dt><dd class="font-medium text-on-surface">{{ $lecturer->nidn }}</dd></div>
                     @endif
                     @if ($lecturer->email)
-                        <div><dt class="text-muted">{{ __('Email') }}</dt><dd><a href="mailto:{{ $lecturer->email }}" class="font-medium text-primary">{{ $lecturer->email }}</a></dd></div>
+                        <div><dt class="text-muted">{{ __('Email') }}</dt><dd><a href="mailto:{{ $lecturer->email }}" class="font-medium text-brand">{{ $lecturer->email }}</a></dd></div>
                     @endif
                 </dl>
             </div>
@@ -25,7 +25,7 @@
                     <h2 class="mb-3 text-xl font-bold text-on-surface">{{ __('Pendidikan') }}</h2>
                     <ul class="space-y-2">
                         @foreach (array_filter(array_map('trim', explode("\n", $lecturer->education))) as $line)
-                            <li class="flex gap-2 text-on-surface-variant"><x-site.icon name="school" class="text-primary" /> {{ $line }}</li>
+                            <li class="flex gap-2 text-on-surface-variant"><x-site.icon name="school" class="text-brand" /> {{ $line }}</li>
                         @endforeach
                     </ul>
                 </section>
@@ -45,7 +45,7 @@
                     <ul class="divide-y divide-border-subtle rounded-xl bg-surface-card shadow-sm">
                         @foreach ($publications as $publication)
                             <li class="p-4">
-                                <a href="{{ route('site.publications.show', $publication->slug) }}" class="font-semibold text-on-surface hover:text-primary">{{ $publication->title }}</a>
+                                <a href="{{ route('site.publications.show', $publication->slug) }}" class="font-semibold text-on-surface hover:text-brand">{{ $publication->title }}</a>
                                 <p class="mt-1 text-xs text-muted">{{ $publication->type->label() }} · {{ $publication->year }}</p>
                             </li>
                         @endforeach
