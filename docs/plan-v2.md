@@ -153,7 +153,17 @@ Source: [req/v2.md](req/v2.md). This builds on the finished v1 (Phases 0–5, se
 
 **Checks:** a browser pass of every page type in light and dark at phone and desktop widths, plus a test that the toggle markup and head script render.
 
-## Phase 10 — Indonesian admin
+## Phase 10 — Indonesian admin ✅ done 2026-11-04
+
+**Notes from building it:**
+- **Language files.** `lang/id.json` holds ~970 entries: every admin string, plus Flux components, pagination, Fortify, the password-reset/verification emails and error pages. `lang/id/{validation,auth,passwords,pagination}.php` cover every validation rule, plus Indonesian names for common form fields. The public forms now show Indonesian validation messages as well.
+- **Code changes.** Page titles go through `__()` in the admin `<head>` (Livewire doesn't translate them). Role names are now translated (e.g. "Editor Utama", "Admin Web Pondok"). The permission matrix and the dashboard activity feed use `App\Support\AdminLabels` instead of raw codes ("Superadmin membuat Slide" rather than "created hero_slide"). The audit log screen keeps the raw event codes, since it's a technical log you filter by code.
+- **Tests run in English.** `phpunit.xml` sets `APP_LOCALE=en`; the keys are English and assertions stay stable. Dedicated tests check the Indonesian output: admin pages, validation messages and placeholders.
+- **Guard test.** `tests/Feature/TranslationTest.php` fails when an admin `__()` string (or page title) has no entry in `lang/id.json`, and names the missing strings. When adding a screen, add its strings there.
+- **Old notifications.** Database notifications store their message when created, so notifications from before this phase stay English; new ones are Indonesian.
+- **Glossary** as planned: Dashboard, Login/Logout, Audit log, Email, Password, Passkey, 2FA, Superadmin, Slug, SEO, URL, Link, Upload, Draft, Caption, Hashtag, Webhook and Token stay English.
+
+**Plan:**
 
 **Translations:**
 - `lang/id.json` for all admin strings, including the enum labels (statuses, roles, types), notifications and emails, toasts, confirmation dialogs, the Fortify auth pages, settings, the social composer, and the strings from Phases 6–9.

@@ -145,9 +145,9 @@ new #[Title('Dashboard')] class extends Component {
                 <div class="flex items-center justify-between border-b border-zinc-100 py-2 text-sm last:border-0 dark:border-zinc-700" wire:key="log-{{ $log->id }}">
                     <span>
                         <span class="font-medium">{{ $log->user?->name ?? __('System') }}</span>
-                        <span class="text-zinc-500">{{ $log->event }}</span>
+                        <span class="text-zinc-500" title="{{ $log->event }}">{{ App\Support\AdminLabels::event($log->event) }}</span>
                         @if ($log->auditable_type)
-                            <span class="text-zinc-500">{{ class_basename($log->auditable_type) }}</span>
+                            <span class="text-zinc-500">{{ App\Support\AdminLabels::type($log->auditable_type) }}</span>
                         @endif
                     </span>
                     <span class="text-zinc-500">{{ $log->created_at->diffForHumans() }}</span>

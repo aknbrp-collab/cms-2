@@ -71,11 +71,11 @@ new #[Title('Roles & permissions')] class extends Component {
             <tbody>
                 @foreach ($this->modules as $module => $actions)
                     <tr class="bg-zinc-100/60 dark:bg-zinc-800">
-                        <td colspan="{{ count(Role::cases()) + 1 }}" class="px-3 py-1.5 font-semibold">{{ str($module)->headline() }}</td>
+                        <td colspan="{{ count(Role::cases()) + 1 }}" class="px-3 py-1.5 font-semibold">{{ App\Support\AdminLabels::module($module) }}</td>
                     </tr>
                     @foreach ($actions as $action)
                         <tr class="border-t border-zinc-100 dark:border-zinc-700" wire:key="perm-{{ $module }}-{{ $action }}">
-                            <td class="px-3 py-1.5 ps-6 text-zinc-600 dark:text-zinc-300">{{ $action }}</td>
+                            <td class="px-3 py-1.5 ps-6 text-zinc-600 dark:text-zinc-300" title="{{ $module }}.{{ $action }}">{{ App\Support\AdminLabels::action($action) }}</td>
                             @foreach (Role::cases() as $role)
                                 <td class="px-3 py-1.5 text-center">
                                     @if (in_array("{$module}.{$action}", $this->grants[$role->value], true))

@@ -16,12 +16,12 @@ enum Role: string
     public function label(): string
     {
         return match ($this) {
-            self::Superadmin => 'Superadmin',
-            self::ManagingEditor => 'Managing Editor',
-            self::PondokAdmin => 'Pondok Web Admin',
-            self::MahadAdmin => "Ma'had Aly Web Admin",
-            self::SocialMediaManager => 'Social Media Manager',
-            self::TanyaHukumAdmin => 'Tanya Hukum Administrator',
+            self::Superadmin => __('Superadmin'),
+            self::ManagingEditor => __('Managing Editor'),
+            self::PondokAdmin => __('Pondok Web Admin'),
+            self::MahadAdmin => __("Ma'had Aly Web Admin"),
+            self::SocialMediaManager => __('Social Media Manager'),
+            self::TanyaHukumAdmin => __('Tanya Hukum Administrator'),
         };
     }
 

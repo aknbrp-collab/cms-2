@@ -218,7 +218,7 @@ new #[Title('Site settings')] class extends Component {
                             <option value="kemenag">Kemenag RI</option>
                             <option value="mwl">Muslim World League</option>
                             <option value="umm_al_qura">Umm al-Qura</option>
-                            <option value="egyptian">Egyptian</option>
+                            <option value="egyptian">{{ __('Egyptian General Authority') }}</option>
                         </flux:select>
                     </div>
                 @endif

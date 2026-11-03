@@ -19,6 +19,8 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <!-- Admin strings are English keys; Indonesian output is tested explicitly. -->
+        <env name="APP_LOCALE" value="en"/>
         <env name="ADMIN_DOMAIN" value="admin.pondok.test"/>
         <env name="SITE_PONDOK_DOMAIN" value="pondok.test"/>
         <env name="SITE_MAHAD_DOMAIN" value="mahad.test"/>
