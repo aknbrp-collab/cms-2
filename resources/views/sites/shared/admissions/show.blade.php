@@ -25,6 +25,11 @@
                     @elseif (! $period->isOpen())
                         <span class="rounded-lg bg-white/10 px-4 py-2 text-sm">{{ $period->closes_on->isPast() ? __('Pendaftaran telah ditutup') : __('Pendaftaran belum dibuka') }}</span>
                     @endif
+                    @if ($period->accepts_online_registration && $period->documentRequirements()->exists())
+                        <a href="{{ route('site.admissions.access') }}" class="inline-flex items-center gap-2 rounded-lg border border-on-primary/30 px-4 py-2 text-sm font-semibold hover:bg-white/10">
+                            <x-site.icon name="upload" class="text-[18px]!" /> {{ __('Lengkapi Berkas') }}
+                        </a>
+                    @endif
                     @if ($period->brochure)
                         <a href="{{ $period->brochure->url() }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-lg border border-on-primary/30 px-4 py-2 text-sm font-semibold hover:bg-white/10">
                             <x-site.icon name="description" class="text-[18px]!" /> {{ __('Unduh Brosur') }}

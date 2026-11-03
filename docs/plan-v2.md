@@ -50,7 +50,17 @@ Source: [req/v2.md](req/v2.md). This builds on the finished v1 (Phases 0–5, se
 
 **Tests:** hidden items are 404 / absent in lists, the sitemap and menus; status is unchanged; toggling is allowed per role and site; audit entries are written.
 
-## Phase 7 — Admission documents
+## Phase 7 — Admission documents ✅ done 2026-11-03
+
+**Notes from building it:**
+- The relation is `AdmissionPeriod::documentRequirements()`, because `requirements` is already the rich-text column.
+- Uploads work without JavaScript (plain form posts). With JavaScript, the same form uploads with a progress bar and shows errors inline.
+- Laravel's fake uploads report a MIME type from the file *name*; the content check is tested with a real temporary file. A test also confirms EXIF data is removed from photos.
+- Site admins cannot edit a *published* admission period (existing rule), so editors manage the requirements of a live period.
+- Public validation messages are still English until Phase 10 adds the Indonesian language files.
+- Demo data: the seeder adds four requirements to the demo period.
+
+**Plan:**
 
 **Data:**
 - `admission_requirements`, one per period: name (e.g. "Kartu Keluarga"), description, required yes/no, accepted types (PDF / JPG / PNG / WEBP), max size (default 5 MB), and order. They are edited in the admission period editor as a sortable list. The existing rich-text requirements stay as general information.

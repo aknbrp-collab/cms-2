@@ -8,6 +8,10 @@
     <x-site.page-header :title="__('Formulir Pendaftaran')" :description="$period->title.' • '.$period->academic_year" :crumbs="[__('Penerimaan') => route('site.admissions.show')]" />
 
     <div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 md:py-14">
+        @if ($period->documentRequirements()->exists())
+            @include('sites.shared.admissions.steps', ['current' => 1])
+        @endif
+
         @if ($errors->any())
             <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
                 {{ __('Mohon periksa kembali isian yang ditandai.') }}

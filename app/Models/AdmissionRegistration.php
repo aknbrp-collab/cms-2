@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\Auditable;
 use App\Concerns\BelongsToSite;
+use App\Enums\DocumentStatus;
 use App\Enums\RegistrationStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -37,6 +39,7 @@ use Illuminate\Support\Str;
  * @property string|null $ip_address
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read AdmissionPeriod $period
  */
 #[Fillable([
     'site_id', 'admission_period_id', 'full_name', 'gender', 'birth_place', 'birth_date', 'nisn',
@@ -85,6 +88,71 @@ class AdmissionRegistration extends Model
     public function period(): BelongsTo
     {
         return $this->belongsTo(AdmissionPeriod::class, 'admission_period_id');
+    }
+
+    /**
+     * @return HasMany<AdmissionDocument, $this>
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(AdmissionDocument::class);
+    }
+
+    /**
+     * Upload progress against the period's requirements. Expects
+     * period.documentRequirements and documents to be loaded for lists.
+     *
+     * @return array{total: int, required: int, uploaded: int, missing_required: int, accepted: int, needs_fix: int}
+     */
+    public function documentSummary(): array
+    {
+        $requirements = $this->period->documentRequirements;
+        $documents = $this->documents->keyBy('admission_requirement_id');
+
+        return [
+            'total' => $requirements->count(),
+            'required' => $requirements->where('is_required', true)->count(),
+            'uploaded' => $documents->count(),
+            'missing_required' => $requirements->where('is_required', true)->reject(fn (AdmissionRequirement $requirement) => $documents->has($requirement->id))->count(),
+            'accepted' => $documents->where('status', DocumentStatus::Accepted)->count(),
+            'needs_fix' => $documents->where('status', DocumentStatus::NeedsFix)->count(),
+        ];
+    }
+
+    /**
+     * Registrations still missing a required document.
+     *
+     * @param  Builder<static>  $query
+     */
+    public function scopeDocumentsIncomplete(Builder $query): void
+    {
+        $query->whereExists(fn ($sub) => $sub->selectRaw('1')
+            ->from('admission_requirements')
+            ->whereColumn('admission_requirements.admission_period_id', 'admission_registrations.admission_period_id')
+            ->where('admission_requirements.is_required', true)
+            ->whereNotExists(fn ($documents) => $documents->selectRaw('1')
+                ->from('admission_documents')
+                ->whereColumn('admission_documents.admission_requirement_id', 'admission_requirements.id')
+                ->whereColumn('admission_documents.admission_registration_id', 'admission_registrations.id')));
+    }
+
+    /**
+     * Registrations with every required document uploaded and none to fix.
+     *
+     * @param  Builder<static>  $query
+     */
+    public function scopeDocumentsComplete(Builder $query): void
+    {
+        $query->whereNot(fn (Builder $query) => $query->documentsIncomplete())
+            ->whereDoesntHave('documents', fn (Builder $query) => $query->where('status', DocumentStatus::NeedsFix->value));
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     */
+    public function scopeDocumentsNeedFix(Builder $query): void
+    {
+        $query->whereHas('documents', fn (Builder $query) => $query->where('status', DocumentStatus::NeedsFix->value));
     }
 
     /**

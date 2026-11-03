@@ -1,8 +1,11 @@
 <?php
 
+use App\Enums\DocumentStatus;
 use App\Enums\RegistrationStatus;
+use App\Models\AdmissionDocument;
 use App\Models\AdmissionPeriod;
 use App\Models\AdmissionRegistration;
+use App\Services\AdmissionDocuments;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -26,6 +29,14 @@ new #[Title('Registrations')] class extends Component {
     #[Url]
     public string $search = '';
 
+    /** '' (all), 'complete', 'incomplete' or 'needs_fix'. */
+    #[Url]
+    public string $documents = '';
+
+    public ?string $fixingDocumentId = null;
+
+    public string $fixNote = '';
+
     public ?string $viewingId = null;
 
     public string $newStatus = '';
@@ -39,7 +50,7 @@ new #[Title('Registrations')] class extends Component {
 
     public function updated(string $property): void
     {
-        if (in_array($property, ['period', 'status', 'search'], true)) {
+        if (in_array($property, ['period', 'status', 'search', 'documents'], true)) {
             $this->resetPage();
         }
     }
@@ -60,9 +71,12 @@ new #[Title('Registrations')] class extends Component {
     public function registrations(): LengthAwarePaginator
     {
         return AdmissionRegistration::query()
-            ->with('period')
+            ->with(['period.documentRequirements', 'documents'])
             ->whereIn('site_id', Auth::user()->accessibleSites()->modelKeys())
             ->when($this->period !== '', fn ($query) => $query->where('admission_period_id', $this->period))
+            ->when($this->documents === 'complete', fn ($query) => $query->documentsComplete())
+            ->when($this->documents === 'incomplete', fn ($query) => $query->documentsIncomplete())
+            ->when($this->documents === 'needs_fix', fn ($query) => $query->documentsNeedFix())
             ->when(RegistrationStatus::tryFrom($this->status), fn ($query, RegistrationStatus $status) => $query->where('status', $status->value))
             ->when($this->search !== '', fn ($query) => $query->where(fn ($query) => $query
                 ->whereLike('full_name', "%{$this->search}%")
@@ -83,8 +97,41 @@ new #[Title('Registrations')] class extends Component {
         $this->viewingId = $registration->id;
         $this->newStatus = $registration->status->value;
         $this->adminNotes = (string) $registration->admin_notes;
+        $this->reset('fixingDocumentId', 'fixNote');
 
         Flux::modal('registration-detail')->show();
+    }
+
+    public function acceptDocument(string $id, AdmissionDocuments $documents): void
+    {
+        $this->authorize('admissions.update');
+        $documents->review($this->findDocument($id), DocumentStatus::Accepted, null, Auth::user());
+        $this->reset('fixingDocumentId', 'fixNote');
+        unset($this->viewing, $this->registrations);
+
+        Flux::toast(variant: 'success', text: __('Document accepted.'));
+    }
+
+    public function startFix(string $id): void
+    {
+        $this->authorize('admissions.update');
+        $this->fixingDocumentId = $this->findDocument($id)->id;
+        $this->fixNote = '';
+    }
+
+    public function requestFix(AdmissionDocuments $documents): void
+    {
+        $this->authorize('admissions.update');
+        $document = $this->findDocument((string) $this->fixingDocumentId);
+        $this->validate(['fixNote' => ['required', 'string', 'max:1000']], [], ['fixNote' => __('note')]);
+
+        $documents->review($document, DocumentStatus::NeedsFix, $this->fixNote, Auth::user());
+        $this->reset('fixingDocumentId', 'fixNote');
+        unset($this->viewing, $this->registrations);
+
+        Flux::toast(variant: 'success', text: filled($document->registration->email)
+            ? __('Marked as needing a fix. The applicant was emailed.')
+            : __('Marked as needing a fix. No email was given: contact the parent by phone.'));
     }
 
     public function update(): void
@@ -103,10 +150,15 @@ new #[Title('Registrations')] class extends Component {
         Flux::toast(variant: 'success', text: __('Registration updated.'));
     }
 
+    protected function findDocument(string $id): AdmissionDocument
+    {
+        return $this->viewing?->documents->firstWhere('id', $id) ?? abort(404);
+    }
+
     protected function find(string $id): AdmissionRegistration
     {
         return AdmissionRegistration::query()
-            ->with('period')
+            ->with(['period.documentRequirements', 'documents.media'])
             ->whereIn('site_id', Auth::user()->accessibleSites()->modelKeys())
             ->findOrFail($id);
     }
@@ -136,6 +188,12 @@ new #[Title('Registrations')] class extends Component {
                 <option value="{{ $case->value }}">{{ $case->label() }}</option>
             @endforeach
         </flux:select>
+        <flux:select wire:model.live="documents" class="max-w-52">
+            <option value="">{{ __('All documents') }}</option>
+            <option value="complete">{{ __('Documents complete') }}</option>
+            <option value="incomplete">{{ __('Documents missing') }}</option>
+            <option value="needs_fix">{{ __('Documents to fix') }}</option>
+        </flux:select>
     </div>
 
     <flux:table :paginate="$this->registrations">
@@ -144,6 +202,7 @@ new #[Title('Registrations')] class extends Component {
             <flux:table.column>{{ __('Name') }}</flux:table.column>
             <flux:table.column>{{ __('Period') }}</flux:table.column>
             <flux:table.column>{{ __('Parent phone') }}</flux:table.column>
+            <flux:table.column>{{ __('Documents') }}</flux:table.column>
             <flux:table.column>{{ __('Status') }}</flux:table.column>
             <flux:table.column>{{ __('Submitted') }}</flux:table.column>
         </flux:table.columns>
@@ -156,18 +215,21 @@ new #[Title('Registrations')] class extends Component {
                     <flux:table.cell class="font-medium">{{ $registration->full_name }}</flux:table.cell>
                     <flux:table.cell>{{ $registration->period->title }}</flux:table.cell>
                     <flux:table.cell>{{ $registration->parent_phone }}</flux:table.cell>
+                    <flux:table.cell>
+                        @include('pages.admin.admissions.partials.document-summary', ['summary' => $registration->documentSummary()])
+                    </flux:table.cell>
                     <flux:table.cell><flux:badge size="sm" :color="$registration->status->color()">{{ $registration->status->label() }}</flux:badge></flux:table.cell>
                     <flux:table.cell class="whitespace-nowrap">{{ $registration->created_at?->translatedFormat('d M Y H:i') }}</flux:table.cell>
                 </flux:table.row>
             @empty
                 <flux:table.row>
-                    <flux:table.cell colspan="6">{{ __('No registrations found.') }}</flux:table.cell>
+                    <flux:table.cell colspan="7">{{ __('No registrations found.') }}</flux:table.cell>
                 </flux:table.row>
             @endforelse
         </flux:table.rows>
     </flux:table>
 
-    <flux:modal name="registration-detail" class="w-full md:w-[36rem]">
+    <flux:modal name="registration-detail" class="w-full md:w-[44rem]">
         @if ($registration = $this->viewing)
             <div class="space-y-5">
                 <div>
@@ -196,6 +258,10 @@ new #[Title('Registrations')] class extends Component {
                         <dd class="font-medium">{{ $registration->address }}</dd>
                     </div>
                 </dl>
+
+                @if ($registration->period->documentRequirements->isNotEmpty())
+                    @include('pages.admin.admissions.partials.registration-documents')
+                @endif
 
                 @can('admissions.update')
                     <form wire:submit="update" class="space-y-4 border-t border-zinc-200 pt-4 dark:border-zinc-700">

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Site\AdmissionDocumentController;
 use App\Http\Controllers\Site\DirectoryController;
 use App\Http\Controllers\Site\ModuleController;
 use App\Http\Controllers\Site\SiteController;
@@ -63,6 +64,15 @@ Route::middleware(ResolveSite::class)->name('site.')->group(function () {
     Route::get('penerimaan/selesai/{number}', [ModuleController::class, 'registered'])
         ->middleware('signed')
         ->name('admissions.done');
+    Route::get('penerimaan/berkas', [AdmissionDocumentController::class, 'index'])->name('admissions.documents');
+    Route::post('penerimaan/berkas/{requirement}', [AdmissionDocumentController::class, 'upload'])
+        ->whereUuid('requirement')
+        ->middleware('throttle:admission-upload')
+        ->name('admissions.documents.upload');
+    Route::get('penerimaan/lanjutkan', [AdmissionDocumentController::class, 'accessForm'])->name('admissions.access');
+    Route::post('penerimaan/lanjutkan', [AdmissionDocumentController::class, 'access'])
+        ->middleware('throttle:admission-access')
+        ->name('admissions.access.store');
 
     Route::get('fasilitas', [DirectoryController::class, 'facilities'])->name('facilities');
     Route::get('ekstrakurikuler', [DirectoryController::class, 'extracurriculars'])->name('extracurriculars');

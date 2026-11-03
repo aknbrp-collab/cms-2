@@ -103,6 +103,17 @@ class AppServiceProvider extends ServiceProvider
             Limit::perDay(20)->by($request->ip()),
         ]);
 
+        // Guessing registration number + birth date must stay impractical.
+        RateLimiter::for('admission-access', fn (Request $request) => [
+            Limit::perMinute(5)->by($request->ip()),
+            Limit::perDay(30)->by($request->ip()),
+        ]);
+
+        RateLimiter::for('admission-upload', fn (Request $request) => [
+            Limit::perMinute(20)->by($request->ip()),
+            Limit::perDay(200)->by($request->ip()),
+        ]);
+
         Gate::define('review-content', fn (User $user) => $user->canAny(array_map(
             fn (string $modelClass) => $modelClass::permissionModule().'.publish',
             ContentTypes::REVIEWABLE,
@@ -143,6 +154,8 @@ class AppServiceProvider extends ServiceProvider
             'leader' => Leader::class,
             'admission_period' => AdmissionPeriod::class,
             'admission_registration' => AdmissionRegistration::class,
+            'admission_requirement' => Models\AdmissionRequirement::class,
+            'admission_document' => Models\AdmissionDocument::class,
             'facility' => Models\Facility::class,
             'extracurricular' => Models\Extracurricular::class,
             'achievement' => Models\Achievement::class,

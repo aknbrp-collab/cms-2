@@ -1,6 +1,7 @@
 <?php
 
 use App\Cms\Resources;
+use App\Http\Controllers\Admin\AdmissionDocumentFileController;
 use App\Http\Controllers\Admin\ExportRegistrationsController;
 use App\Http\Controllers\Admin\SocialConnectController;
 use App\Http\Controllers\Admin\SwitchSiteController;
@@ -40,6 +41,9 @@ Route::middleware(['auth', 'verified', EnsureAdminAccess::class, SetAdminSite::c
     Route::get('admissions/registrations/export', ExportRegistrationsController::class)
         ->middleware('can:admissions.view')
         ->name('admin.admissions.export');
+    Route::get('admissions/documents/{document}', AdmissionDocumentFileController::class)
+        ->middleware('can:admissions.view')
+        ->name('admin.admissions.document');
 
     Route::livewire('resources/{resource}', 'pages::admin.resource')
         ->whereIn('resource', array_keys(Resources::all()))

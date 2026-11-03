@@ -12,6 +12,7 @@ use App\Models\Faq;
 use App\Models\Gallery;
 use App\Models\Leader;
 use App\Models\Site;
+use App\Support\AdmissionAccess;
 use App\Support\Seo;
 use App\Support\SiteTheme;
 use Illuminate\Contracts\View\View;
@@ -149,6 +150,12 @@ class ModuleController extends Controller
         ]);
 
         $request->session()->forget('registration_form_started');
+
+        if ($period->documentRequirements()->exists()) {
+            AdmissionAccess::grant($registration);
+
+            return redirect()->route('site.admissions.documents');
+        }
 
         return redirect()->to(URL::temporarySignedRoute(
             'site.admissions.done',

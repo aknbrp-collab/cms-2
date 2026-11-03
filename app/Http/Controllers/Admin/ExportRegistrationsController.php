@@ -21,7 +21,7 @@ class ExportRegistrationsController extends Controller
         $user = $request->user();
 
         $query = AdmissionRegistration::query()
-            ->with('period')
+            ->with(['period.documentRequirements', 'documents'])
             ->whereIn('site_id', $user->accessibleSites()->modelKeys())
             ->when($request->string('period')->toString(), fn ($query, string $period) => $query->where('admission_period_id', $period))
             ->when(RegistrationStatus::tryFrom($request->string('status')->toString()), fn ($query, RegistrationStatus $status) => $query->where('status', $status->value))
@@ -39,7 +39,7 @@ class ExportRegistrationsController extends Controller
             fwrite($out, "\xEF\xBB\xBF");
             fputcsv($out, [
                 'Nomor', 'Periode', 'Status', 'Nama Lengkap', 'L/P', 'Tempat Lahir', 'Tanggal Lahir', 'NISN',
-                'Asal Sekolah', 'Program', 'Nama Wali', 'No. HP Wali', 'Email', 'Alamat', 'Catatan', 'Tanggal Daftar',
+                'Asal Sekolah', 'Program', 'Nama Wali', 'No. HP Wali', 'Email', 'Alamat', 'Berkas', 'Catatan', 'Tanggal Daftar',
             ]);
 
             $query->chunk(500, function ($registrations) use ($out) {
@@ -59,6 +59,7 @@ class ExportRegistrationsController extends Controller
                         $registration->parent_phone,
                         (string) $registration->email,
                         $registration->address,
+                        $this->documentsCell($registration->documentSummary()),
                         (string) $registration->admin_notes,
                         (string) $registration->created_at?->toDateTimeString(),
                     ]));
@@ -67,6 +68,20 @@ class ExportRegistrationsController extends Controller
 
             fclose($out);
         }, 'pendaftaran-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    /**
+     * E.g. "3/5 diunggah, 2 diterima, 1 perlu perbaikan".
+     *
+     * @param  array{total: int, required: int, uploaded: int, missing_required: int, accepted: int, needs_fix: int}  $summary
+     */
+    protected function documentsCell(array $summary): string
+    {
+        if ($summary['total'] === 0) {
+            return '';
+        }
+
+        return "{$summary['uploaded']}/{$summary['total']} diunggah, {$summary['accepted']} diterima, {$summary['needs_fix']} perlu perbaikan";
     }
 
     /**

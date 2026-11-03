@@ -11,6 +11,12 @@
         </div>
 
         <p class="mt-8 text-sm text-on-surface-variant">{{ __('Panitia akan menghubungi Anda melalui nomor HP yang didaftarkan untuk langkah selanjutnya.') }}</p>
+        @if ($registration->period->documentRequirements()->exists())
+            <p class="mt-3 text-sm text-on-surface-variant">
+                {{ __('Berkas bisa dilengkapi atau diperbaiki kapan saja selama pendaftaran dibuka melalui') }}
+                <a href="{{ route('site.admissions.access') }}" class="font-semibold text-primary underline">{{ __('Lengkapi Berkas') }}</a>.
+            </p>
+        @endif
 
         <div class="mt-8 flex flex-wrap justify-center gap-3">
             <a href="{{ route('site.admissions.show') }}" class="rounded-lg bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-container">{{ __('Informasi pendaftaran') }}</a>

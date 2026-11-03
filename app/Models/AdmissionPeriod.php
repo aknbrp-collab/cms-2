@@ -84,6 +84,14 @@ class AdmissionPeriod extends Model
     }
 
     /**
+     * @return HasMany<AdmissionRequirement, $this>
+     */
+    public function documentRequirements(): HasMany
+    {
+        return $this->hasMany(AdmissionRequirement::class)->orderBy('sort_order');
+    }
+
+    /**
      * Published periods whose registration window includes today.
      *
      * @param  Builder<static>  $query

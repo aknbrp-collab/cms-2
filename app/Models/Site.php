@@ -151,6 +151,17 @@ class Site extends Model implements HasMedia
         return $this;
     }
 
+    /**
+     * Absolute URL on the site's public domain, e.g. for emails sent from the
+     * admin panel. Uses the scheme of APP_URL (https in production).
+     */
+    public function url(string $path = '/'): string
+    {
+        $scheme = parse_url((string) config('app.url'), PHP_URL_SCHEME) ?: 'https';
+
+        return $scheme.'://'.$this->domain.'/'.ltrim($path, '/');
+    }
+
     public function brandingUrl(string $collection): string
     {
         return $this->getFirstMediaUrl($collection);

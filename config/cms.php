@@ -54,6 +54,8 @@ return [
 
     'retention' => [
         'integration_logs' => (int) env('CMS_RETAIN_INTEGRATION_LOGS_DAYS', 180),
+        // Uploaded admission documents, counted from the period's closing date. Empty = keep.
+        'admission_documents' => env('CMS_ADMISSION_DOCUMENTS_RETENTION_DAYS'),
     ],
 
     /*

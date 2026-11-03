@@ -411,7 +411,7 @@ class DemoContentSeeder extends Seeder
             ])->forceFill(['is_published' => true])->save();
         }
 
-        AdmissionPeriod::query()->create([
+        $period = AdmissionPeriod::query()->create([
             'site_id' => $site->id,
             'title' => 'Gelombang II',
             'academic_year' => '2026/2027',
@@ -428,7 +428,23 @@ class DemoContentSeeder extends Seeder
             ],
             'programs' => $programs,
             'accepts_online_registration' => true,
-        ])->forceFill(['is_published' => true])->save();
+        ]);
+        $period->forceFill(['is_published' => true])->save();
+
+        foreach ([
+            ['Kartu Keluarga', 'Scan atau foto jelas, seluruh halaman.', true, ['pdf', 'jpg', 'png']],
+            ['Akta Kelahiran', null, true, ['pdf', 'jpg', 'png']],
+            ['Pas Foto 3x4', 'Latar belakang merah, berpakaian rapi.', true, ['jpg', 'png']],
+            ['Ijazah / Surat Keterangan Lulus', 'Boleh menyusul jika belum terbit.', false, ['pdf', 'jpg', 'png']],
+        ] as $position => [$name, $description, $required, $types]) {
+            $period->documentRequirements()->create([
+                'name' => $name,
+                'description' => $description,
+                'is_required' => $required,
+                'file_types' => $types,
+                'sort_order' => $position,
+            ]);
+        }
     }
 
     /**

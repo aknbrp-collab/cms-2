@@ -5,7 +5,7 @@
         'arrow_back', 'arrow_forward', 'calendar_today', 'call', 'campaign', 'chat', 'chevron_right', 'close',
         'description', 'east', 'expand_more', 'location_on', 'mail', 'menu', 'menu_book', 'mosque',
         'music_note', 'person', 'photo_camera', 'play_circle', 'public', 'schedule', 'school', 'search',
-        'star', 'verified',
+        'star', 'upload', 'verified',
     ])->sort()->join(',');
     $favicon = $site->brandingUrl('favicon');
 @endphp
