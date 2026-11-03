@@ -21,6 +21,9 @@ Route::domain(config('cms.admin_domain'))
     ->name('webhooks.siakad.')
     ->group(function () {
         Route::post('articles', [SiakadWebhookController::class, 'article'])->name('articles');
+        Route::get('articles/{externalId}', [SiakadWebhookController::class, 'showArticle'])
+            ->where('externalId', '[A-Za-z0-9._:-]+')
+            ->name('articles.show');
         Route::delete('articles/{externalId}', [SiakadWebhookController::class, 'withdrawArticle'])
             ->where('externalId', '[A-Za-z0-9._:-]+')
             ->name('articles.withdraw');

@@ -76,6 +76,18 @@ new #[Title('Tanya Hukum question')] class extends Component {
         $this->done(__('Published in the Tanya Hukum archive.'));
     }
 
+    public function applyCorrection(TanyaHukum $tanyaHukum): void
+    {
+        $tanyaHukum->applyCorrection($this->question, Auth::user());
+        $this->done(__('Correction applied to the published answer.'));
+    }
+
+    public function dismissCorrection(TanyaHukum $tanyaHukum): void
+    {
+        $tanyaHukum->dismissCorrection($this->question, Auth::user());
+        $this->done(__('Correction dismissed. The published answer is unchanged.'));
+    }
+
     public function unpublish(TanyaHukum $tanyaHukum): void
     {
         $tanyaHukum->unpublish($this->question, Auth::user());
@@ -127,6 +139,25 @@ new #[Title('Tanya Hukum question')] class extends Component {
                 <flux:card class="space-y-3">
                     <flux:heading>{{ __('Answer from SIAKAD') }}</flux:heading>
                     <div class="trix-content">{!! $question->answer !!}</div>
+                </flux:card>
+            @endif
+
+            @if ($question->pending_answer !== null)
+                <flux:card class="space-y-4 border-amber-300! dark:border-amber-700!">
+                    <div>
+                        <flux:heading>{{ __('Corrected answer from SIAKAD') }}</flux:heading>
+                        <flux:text class="mt-1">{{ __('Received :date from :name. The website still shows the published answer until you apply this correction.', ['date' => $question->pending_answer_at?->translatedFormat('d M Y H:i'), 'name' => $question->pending_answered_by]) }}</flux:text>
+                    </div>
+                    <div class="trix-content rounded-lg bg-zinc-50 p-4 dark:bg-zinc-800">{!! $question->pending_answer !!}</div>
+                    @if ($question->pending_answer_references)
+                        <flux:text size="sm" class="whitespace-pre-line"><strong>{{ __('References') }}:</strong> {{ $question->pending_answer_references }}</flux:text>
+                    @endif
+                    @can('legal_questions.publish')
+                        <div class="flex flex-wrap gap-2">
+                            <flux:button variant="primary" icon="check" wire:click="applyCorrection" wire:confirm="{{ __('Replace the published answer with this correction? Your edits to the published answer will be replaced.') }}">{{ __('Apply correction') }}</flux:button>
+                            <flux:button icon="x-mark" wire:click="dismissCorrection">{{ __('Keep the published answer') }}</flux:button>
+                        </div>
+                    @endcan
                 </flux:card>
             @endif
 

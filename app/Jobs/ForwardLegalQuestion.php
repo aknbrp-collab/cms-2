@@ -48,6 +48,13 @@ class ForwardLegalQuestion implements ShouldQueue
                 error: $e->getMessage(), durationMs: $this->elapsed($started),
             );
 
+            // A refused request fails the same way every time: hand it back now.
+            if ($e->isPermanent()) {
+                $this->fail($e);
+
+                return;
+            }
+
             throw $e;
         }
 

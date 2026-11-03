@@ -97,6 +97,8 @@ class AdminLabels
             'forward_queued' => __('forwarded'),
             'forward_failed' => __('failed to forward'),
             'data_deleted' => __('deleted data of'),
+            'correction_applied' => __('applied a correction to'),
+            'correction_dismissed' => __('dismissed a correction for'),
             default => $event,
         };
     }

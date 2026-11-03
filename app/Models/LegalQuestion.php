@@ -39,6 +39,10 @@ use Illuminate\Support\Str;
  * @property string|null $answered_by
  * @property string|null $answer_references
  * @property Carbon|null $answered_at
+ * @property string|null $pending_answer correction from SIAKAD after publication
+ * @property string|null $pending_answered_by
+ * @property string|null $pending_answer_references
+ * @property Carbon|null $pending_answer_at
  * @property Carbon|null $published_at
  * @property string|null $ip_address
  * @property Carbon|null $created_at
@@ -83,6 +87,7 @@ class LegalQuestion extends Model
             'is_anonymous' => 'boolean',
             'forwarded_at' => 'datetime',
             'answered_at' => 'datetime',
+            'pending_answer_at' => 'datetime',
             'published_at' => 'datetime',
         ];
     }

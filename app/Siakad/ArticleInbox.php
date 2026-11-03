@@ -56,15 +56,18 @@ class ArticleInbox
             'received_at' => now(),
         ]);
 
-        if (! $isNew && in_array($article->status, [SiakadArticleStatus::Approved, SiakadArticleStatus::Withdrawn], true)) {
-            // Changes after approval need a fresh look before they reach the website.
+        // Changes after approval need a fresh look before they reach the website;
+        // a re-sent rejected article is the author's fix and goes back to review.
+        $resubmitted = ! $isNew && $article->status === SiakadArticleStatus::Rejected;
+
+        if (! $isNew && in_array($article->status, [SiakadArticleStatus::Approved, SiakadArticleStatus::Withdrawn, SiakadArticleStatus::Rejected], true)) {
             $article->forceFill(['status' => SiakadArticleStatus::UnderReview, 'updated_after_approval' => $article->status === SiakadArticleStatus::Approved, 'withdrawn_at' => null]);
         }
 
         $article->save();
 
-        if ($isNew) {
-            Notification::send($this->reviewers($site), new SiakadArticleReceived($article));
+        if ($isNew || $resubmitted) {
+            Notification::send($this->reviewers($site), new SiakadArticleReceived($article, $resubmitted));
         }
 
         return $article;

@@ -16,4 +16,15 @@ class SiakadException extends RuntimeException
     {
         parent::__construct($message);
     }
+
+    /**
+     * Whether retrying cannot help: SIAKAD refused the request itself (bad key,
+     * signature or payload). Timeouts, 408, 429 and 5xx are worth retrying.
+     */
+    public function isPermanent(): bool
+    {
+        return $this->httpStatus !== null
+            && $this->httpStatus >= 400 && $this->httpStatus < 500
+            && ! in_array($this->httpStatus, [408, 429], true);
+    }
 }

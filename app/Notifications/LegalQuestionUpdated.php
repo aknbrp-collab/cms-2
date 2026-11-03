@@ -15,7 +15,7 @@ class LegalQuestionUpdated extends Notification
     use Queueable;
 
     /**
-     * @param  'submitted'|'answered'  $event
+     * @param  'submitted'|'answered'|'corrected'  $event
      */
     public function __construct(public LegalQuestion $question, public string $event) {}
 
@@ -35,9 +35,11 @@ class LegalQuestionUpdated extends Notification
         $excerpt = Str::limit($this->question->question, 80);
 
         return [
-            'message' => $this->event === 'answered'
-                ? __('SIAKAD answered Tanya Hukum :code: ":excerpt"', ['code' => $this->question->tracking_code, 'excerpt' => $excerpt])
-                : __('New Tanya Hukum question :code: ":excerpt"', ['code' => $this->question->tracking_code, 'excerpt' => $excerpt]),
+            'message' => match ($this->event) {
+                'answered' => __('SIAKAD answered Tanya Hukum :code: ":excerpt"', ['code' => $this->question->tracking_code, 'excerpt' => $excerpt]),
+                'corrected' => __('SIAKAD sent a corrected answer for published Tanya Hukum :code: ":excerpt"', ['code' => $this->question->tracking_code, 'excerpt' => $excerpt]),
+                default => __('New Tanya Hukum question :code: ":excerpt"', ['code' => $this->question->tracking_code, 'excerpt' => $excerpt]),
+            },
             'url' => route('admin.legal-questions.show', $this->question),
             'site_id' => $this->question->site_id,
         ];

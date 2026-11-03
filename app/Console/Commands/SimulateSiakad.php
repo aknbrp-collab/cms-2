@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  * whole flow can be tried before SIAKAD exists. Requests are handled in
  * process, exactly like real HTTP calls (signature check included).
  */
-#[CommandSignature('siakad:simulate {action : article|answer|withdraw} {--id= : SIAKAD article id or CMS question id/tracking code}')]
+#[CommandSignature('siakad:simulate {action : article|status|withdraw|answer} {--id= : SIAKAD article id or CMS question id/tracking code}')]
 #[Description('Send a signed test webhook as if it came from SIAKAD')]
 class SimulateSiakad extends Command
 {
@@ -31,6 +31,7 @@ class SimulateSiakad extends Command
 
         [$method, $route, $payload] = match ($this->argument('action')) {
             'article' => ['POST', route('webhooks.siakad.articles'), $this->articlePayload()],
+            'status' => ['GET', route('webhooks.siakad.articles.show', (string) $this->option('id')), []],
             'withdraw' => ['DELETE', route('webhooks.siakad.articles.withdraw', (string) $this->option('id')), []],
             'answer' => ['POST', route('webhooks.siakad.answers'), $this->answerPayload()],
             default => [null, null, null],

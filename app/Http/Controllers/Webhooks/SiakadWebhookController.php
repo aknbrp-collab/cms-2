@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Webhooks;
 
+use App\Enums\ContentStatus;
 use App\Enums\PublicationType;
+use App\Enums\SiakadArticleStatus;
 use App\Http\Controllers\Controller;
 use App\Models\IntegrationLog;
 use App\Models\LegalQuestion;
@@ -52,6 +54,35 @@ class SiakadWebhookController extends Controller
         $this->logSuccess($request, 'articles.received', $article, $data['id'], $body);
 
         return response()->json($body, $existing ? 200 : 201);
+    }
+
+    /**
+     * GET /api/webhooks/siakad/articles/{externalId}: review status and public
+     * URL, so SIAKAD can show where an article stands. Not written to the
+     * integration log (SIAKAD may poll it).
+     */
+    public function showArticle(string $externalId): JsonResponse
+    {
+        $article = SiakadArticle::query()->withoutGlobalScopes()->with('publication.site')->where('external_id', $externalId)->first();
+
+        if ($article === null) {
+            return response()->json(['message' => 'Article not found.'], 404);
+        }
+
+        $publication = $article->publication;
+        $isPublic = $publication !== null && $publication->status === ContentStatus::Published
+            && $publication->published_at?->isPast() && ! $publication->is_hidden;
+
+        return response()->json([
+            'id' => $article->external_id,
+            'cms_id' => $article->id,
+            'review_status' => $article->status->value,
+            'review_note' => $article->status === SiakadArticleStatus::Rejected ? $article->review_note : null,
+            'reviewed_at' => $article->reviewed_at?->toIso8601String(),
+            'changes_pending_review' => $article->updated_after_approval && $article->status === SiakadArticleStatus::UnderReview,
+            'public_url' => $isPublic ? $publication->site->url('publikasi/'.$publication->slug) : null,
+            'received_at' => $article->received_at->toIso8601String(),
+        ]);
     }
 
     /**
@@ -114,7 +145,13 @@ class SiakadWebhookController extends Controller
             return response()->json(['message' => $e->getMessage()], 409);
         }
 
-        $body = ['status' => 'received', 'cms_id' => $question->id, 'question_status' => $question->status->value];
+        $body = [
+            'status' => 'received',
+            'cms_id' => $question->id,
+            'question_status' => $question->status->value,
+            // After publication the answer waits for a moderator before it replaces the published one.
+            'correction_pending' => $question->pending_answer !== null,
+        ];
         $this->logSuccess($request, 'legal_questions.answered', $question, $question->external_id, $body);
 
         return response()->json($body);
