@@ -26,7 +26,7 @@
                 <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
             </div>
 
-            <fieldset class="space-y-5 rounded-2xl bg-surface-card p-6 shadow-sm md:p-8">
+            <fieldset class="site-card space-y-5 p-6 md:p-8">
                 <legend class="sr-only">{{ __('Data Calon Santri') }}</legend>
                 <h2 class="text-lg font-bold text-brand" aria-hidden="true">{{ __('Data Calon Santri') }}</h2>
 
@@ -84,7 +84,7 @@
                 @endif
             </fieldset>
 
-            <fieldset class="space-y-5 rounded-2xl bg-surface-card p-6 shadow-sm md:p-8">
+            <fieldset class="site-card space-y-5 p-6 md:p-8">
                 <legend class="sr-only">{{ __('Data Orang Tua / Wali') }}</legend>
                 <h2 class="text-lg font-bold text-brand" aria-hidden="true">{{ __('Data Orang Tua / Wali') }}</h2>
 
@@ -121,7 +121,7 @@
                 </label>
                 @error('agree') <p class="{{ $error }}">{{ $message }}</p> @enderror
 
-                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-on-primary shadow-sm transition hover:bg-primary-container sm:w-auto">
+                <button type="submit" class="site-btn-primary w-full py-3 sm:w-auto">
                     {{ __('Kirim Pendaftaran') }} <x-site.icon name="arrow_forward" class="text-[18px]!" />
                 </button>
             </div>

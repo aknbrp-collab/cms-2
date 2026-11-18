@@ -3,11 +3,11 @@
 
     <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-14 lg:px-10">
         @if ($leaders->isEmpty())
-            <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Belum ada profil pimpinan.') }}</p>
+            <p class="site-card p-10 text-center text-on-surface-variant">{{ __('Belum ada profil pimpinan.') }}</p>
         @else
             <div class="space-y-8">
                 @foreach ($leaders as $leader)
-                    <article class="flex flex-col gap-6 overflow-hidden rounded-2xl bg-surface-card p-6 shadow-sm md:flex-row md:p-8">
+                    <article class="site-card flex flex-col gap-6 overflow-hidden p-6 md:flex-row md:p-8">
                         <div class="shrink-0">
                             <x-site.image :asset="$leader->photo" conversion="thumb" :alt="$leader->name" icon="person" class="size-40 rounded-2xl" />
                         </div>

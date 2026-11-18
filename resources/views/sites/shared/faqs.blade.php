@@ -8,7 +8,7 @@
                 @include('sites.shared.faq-list', ['faqs' => $faqs])
             </section>
         @empty
-            <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Belum ada pertanyaan.') }}</p>
+            <p class="site-card p-10 text-center text-on-surface-variant">{{ __('Belum ada pertanyaan.') }}</p>
         @endforelse
     </div>
 </x-site.layout>

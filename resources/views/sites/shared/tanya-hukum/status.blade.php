@@ -5,7 +5,7 @@
 
     <div class="mx-auto max-w-2xl px-4 py-10 sm:px-6 md:py-14">
         @if (session('legal_question_submitted') && $question)
-            <div class="mb-8 rounded-2xl border-2 border-dashed border-brand/40 bg-surface-card p-6 text-center">
+            <div class="site-card mb-8 border-2 border-dashed border-brand/40 p-6 text-center">
                 <span class="mx-auto flex size-14 items-center justify-center rounded-full bg-mint text-brand"><x-site.icon name="verified" filled class="text-3xl!" /></span>
                 <h2 class="mt-4 text-xl font-bold text-on-surface">{{ __('Pertanyaan terkirim') }}</h2>
                 <p class="mt-2 text-on-surface-variant">{{ __('Simpan kode berikut untuk mengecek status pertanyaan Anda.') }}</p>
@@ -16,11 +16,11 @@
         <form method="GET" class="flex gap-2">
             <label for="kode" class="sr-only">{{ __('Kode pelacakan') }}</label>
             <input id="kode" name="kode" value="{{ $code }}" placeholder="TH-XXXXXXXX" class="min-w-0 flex-1 rounded-lg border border-border-subtle bg-surface-card px-3 py-2.5 font-mono uppercase shadow-sm focus:border-brand focus:outline-none">
-            <button class="rounded-lg bg-primary px-5 py-2.5 font-semibold text-on-primary">{{ __('Cek') }}</button>
+            <button class="site-btn-primary">{{ __('Cek') }}</button>
         </form>
 
         @if ($code !== '')
-            <div class="mt-8 rounded-xl bg-surface-card p-6 shadow-sm">
+            <div class="site-card mt-8 p-6">
                 @if ($question)
                     <p class="text-sm text-muted">{{ __('Status') }}</p>
                     <p class="mt-1 text-lg font-semibold text-on-surface">{{ $question->status->publicLabel() }}</p>

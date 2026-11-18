@@ -20,7 +20,7 @@
 
         @case(BlockType::Image)
             @if ($asset = $assets->get($block['data']['media_asset_id'] ?? ''))
-                <figure class="overflow-hidden rounded-2xl bg-surface-card shadow-sm">
+                <figure class="site-card overflow-hidden">
                     <x-site.image :asset="$asset" class="w-full" />
                     @if (filled($block['data']['caption'] ?? null))
                         <figcaption class="px-4 py-2 text-sm text-muted">{{ $block['data']['caption'] }}</figcaption>
@@ -52,7 +52,7 @@
 
         @case(BlockType::Embed)
             @if ($src = Embed::toEmbedUrl($block['data']['url'] ?? null))
-                <figure class="overflow-hidden rounded-2xl bg-surface-card shadow-sm">
+                <figure class="site-card overflow-hidden">
                     <iframe src="{{ $src }}" class="aspect-video w-full" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="{{ $block['data']['caption'] ?? __('Video') }}"></iframe>
                     @if (filled($block['data']['caption'] ?? null))
                         <figcaption class="px-4 py-2 text-sm text-muted">{{ $block['data']['caption'] }}</figcaption>

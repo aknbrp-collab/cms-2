@@ -7,7 +7,7 @@
                 <h2 class="mb-5 text-xl font-bold text-brand">{{ $category }}</h2>
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($items as $item)
-                        <article class="flex gap-4 rounded-xl bg-surface-card p-4 shadow-sm">
+                        <article class="site-card flex gap-4 p-4">
                             <x-site.image :asset="$item->image" conversion="thumb" :alt="$item->name" icon="star" class="size-24 shrink-0 rounded-lg" />
                             <div class="min-w-0">
                                 <h3 class="font-semibold text-on-surface">{{ $item->name }}</h3>
@@ -28,7 +28,7 @@
                 </div>
             </section>
         @empty
-            <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Belum ada data ekstrakurikuler.') }}</p>
+            <p class="site-card p-10 text-center text-on-surface-variant">{{ __('Belum ada data ekstrakurikuler.') }}</p>
         @endforelse
     </div>
 </x-site.layout>

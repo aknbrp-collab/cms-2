@@ -8,7 +8,7 @@
     <x-site.page-header :title="__('Lengkapi Berkas')" :description="__('Unggah atau perbaiki berkas pendaftaran yang sudah dikirim.')" :crumbs="[__('Penerimaan') => route('site.admissions.show')]" />
 
     <div class="mx-auto max-w-lg px-4 py-10 sm:px-6 md:py-14">
-        <form method="POST" action="{{ route('site.admissions.access.store') }}" class="space-y-5 rounded-2xl bg-surface-card p-6 shadow-sm md:p-8" novalidate>
+        <form method="POST" action="{{ route('site.admissions.access.store') }}" class="site-card space-y-5 p-6 md:p-8" novalidate>
             @csrf
             <p class="text-sm text-on-surface-variant">{{ __('Masukkan nomor pendaftaran dan tanggal lahir calon peserta sesuai formulir.') }}</p>
 
@@ -24,7 +24,7 @@
                 @error('birth_date') <p class="{{ $error }}" role="alert">{{ $message }}</p> @enderror
             </div>
 
-            <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-on-primary shadow-sm transition hover:bg-primary-container">
+            <button type="submit" class="site-btn-primary w-full py-3">
                 {{ __('Buka halaman berkas') }} <x-site.icon name="arrow_forward" class="text-[18px]!" />
             </button>
         </form>

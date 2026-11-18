@@ -4,7 +4,7 @@
     <div class="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-12 lg:px-10">
         <article class="space-y-8 lg:col-span-8">
             @if ($publication->image)
-                <figure class="overflow-hidden rounded-xl bg-surface-card shadow-sm">
+                <figure class="site-card overflow-hidden">
                     <x-site.image :asset="$publication->image" :alt="$publication->image_caption ?: $publication->title" class="aspect-[16/9] w-full" />
                     @if ($publication->image_caption)
                         <figcaption class="px-5 py-3 text-sm text-muted">{{ $publication->image_caption }}</figcaption>
@@ -13,7 +13,7 @@
             @endif
 
             @if ($publication->abstract)
-                <section class="rounded-xl bg-surface-card p-6 shadow-sm">
+                <section class="site-card p-6">
                     <h2 class="mb-2 text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Abstrak') }}</h2>
                     <p class="leading-relaxed whitespace-pre-line text-on-surface-variant">{{ $publication->abstract }}</p>
                     @if ($publication->keywords)
@@ -29,7 +29,7 @@
         </article>
 
         <aside class="space-y-6 lg:col-span-4">
-            <div class="space-y-3 rounded-xl bg-surface-card p-6 shadow-sm lg:sticky lg:top-28">
+            <div class="site-card space-y-3 p-6 lg:sticky lg:top-28">
                 <p><span class="text-sm text-muted">{{ __('Jenis') }}</span><br><span class="font-semibold text-on-surface">{{ $publication->type->label() }}</span></p>
                 <p><span class="text-sm text-muted">{{ __('Penulis') }}</span><br><span class="font-semibold text-on-surface">{{ $publication->authors }}</span></p>
                 <p><span class="text-sm text-muted">{{ __('Sumber') }}</span><br><span class="font-semibold text-on-surface">{{ $publication->citation() }}</span></p>
@@ -39,7 +39,7 @@
 
                 <div class="flex flex-col gap-2 pt-2">
                     @if ($publication->file)
-                        <a href="{{ $publication->file->url() }}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-container">
+                        <a href="{{ $publication->file->url() }}" target="_blank" rel="noopener" class="site-btn-primary">
                             <x-site.icon name="description" class="text-[18px]!" /> {{ __('Unduh PDF') }}
                         </a>
                     @endif

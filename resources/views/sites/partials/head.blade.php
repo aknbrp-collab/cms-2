@@ -5,9 +5,14 @@
         'arrow_back', 'arrow_forward', 'calendar_today', 'call', 'campaign', 'chat', 'chevron_left', 'chevron_right', 'close', 'dark_mode', 'light_mode',
         'description', 'east', 'expand_more', 'location_on', 'mail', 'menu', 'menu_book', 'mosque',
         'music_note', 'person', 'photo_camera', 'play_circle', 'public', 'schedule', 'school', 'search',
-        'pause', 'play_arrow', 'star', 'upload', 'verified',
+        'pause', 'play_arrow', 'star', 'upload', 'verified', 'account_balance', 'arrow_outward', 'edit_document',
     ])->sort()->join(',');
     $favicon = $site->brandingUrl('favicon');
+    // Each theme's typefaces (see resources/css/sites/{key}.css); Amiri for Arabic text.
+    $fonts = match ($site->key->value) {
+        'mahad' => 'family=Amiri:wght@400;700&family=Lato:wght@400;700&family=Spline+Sans+Mono:wght@500&family=Yrsa:wght@600;700',
+        default => 'family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500',
+    };
 @endphp
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -63,7 +68,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?{{ $fonts }}&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400,0..1,0&icon_names={{ $icons }}&display=block">
 
 @vite(['resources/css/sites/'.$site->key->value.'.css', 'resources/js/site.js'])

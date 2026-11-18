@@ -3,11 +3,11 @@
 
     <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-14 lg:px-10">
         @if ($journals->isEmpty())
-            <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Belum ada jurnal.') }}</p>
+            <p class="site-card p-10 text-center text-on-surface-variant">{{ __('Belum ada jurnal.') }}</p>
         @else
             <div class="space-y-6">
                 @foreach ($journals as $journal)
-                    <article class="flex flex-col gap-6 rounded-2xl bg-surface-card p-6 shadow-sm sm:flex-row">
+                    <article class="site-card flex flex-col gap-6 p-6 sm:flex-row">
                         <x-site.image :asset="$journal->cover" conversion="thumb" :alt="$journal->name" icon="menu_book" class="aspect-[3/4] w-32 shrink-0 rounded-lg" />
                         <div class="space-y-2">
                             @if ($journal->accreditation)

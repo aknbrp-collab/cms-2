@@ -1,18 +1,20 @@
 @props(['title', 'description' => null, 'crumbs' => []])
 
-{{-- Title band with breadcrumbs at the top of inner pages. --}}
-<section class="bg-primary text-on-primary">
-    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 md:py-14 lg:px-10">
-        <nav aria-label="Breadcrumb" class="mb-3 flex flex-wrap items-center gap-1 text-sm text-on-primary/70">
-            <a href="{{ route('site.home') }}" class="hover:text-on-primary">{{ __('Beranda') }}</a>
+{{-- Title band with breadcrumbs at the top of inner pages. Styled per theme (site-band). --}}
+<section class="site-band">
+    <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 sm:px-6 md:py-12 lg:px-10">
+        <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-xs font-bold opacity-75">
+            <a href="{{ route('site.home') }}" class="hover:underline">{{ __('Beranda') }}</a>
             @foreach ($crumbs as $label => $url)
-                <x-site.icon name="chevron_right" class="text-[16px]!" />
-                <a href="{{ $url }}" class="hover:text-on-primary">{{ $label }}</a>
+                <span aria-hidden="true">/</span>
+                <a href="{{ $url }}" class="hover:underline">{{ $label }}</a>
             @endforeach
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" class="truncate">{{ $title }}</span>
         </nav>
-        <h1 class="text-3xl font-bold tracking-tight md:text-4xl">{{ $title }}</h1>
+        <h1 class="site-band-title max-w-4xl">{{ $title }}</h1>
         @if ($description)
-            <p class="mt-3 max-w-2xl text-on-primary/80">{{ $description }}</p>
+            <p class="max-w-3xl text-base leading-relaxed opacity-80">{{ $description }}</p>
         @endif
     </div>
 </section>

@@ -12,7 +12,7 @@
         </div>
 
         @if ($galleries->isEmpty())
-            <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Belum ada galeri.') }}</p>
+            <p class="site-card p-10 text-center text-on-surface-variant">{{ __('Belum ada galeri.') }}</p>
         @else
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($galleries as $gallery)
@@ -20,7 +20,7 @@
                         $cover = $gallery->cover();
                         $thumb = $cover ? null : $gallery->items->first()?->videoThumbnail();
                     @endphp
-                    <a href="{{ route('site.galleries.show', $gallery->slug) }}" class="group overflow-hidden rounded-xl bg-surface-card shadow-sm transition hover:shadow-md">
+                    <a href="{{ route('site.galleries.show', $gallery->slug) }}" class="site-card site-card-hover group overflow-hidden">
                         <div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
                             @if ($thumb)
                                 <img src="{{ $thumb }}" alt="{{ $gallery->title }}" loading="lazy" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">

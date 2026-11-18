@@ -84,7 +84,7 @@ return [
         'mahad' => [
             'name' => "Ma'had Aly",
             'domain' => env('SITE_MAHAD_DOMAIN', 'mahad.test'),
-            'theme' => ['primary' => '#003527', 'primary_container' => '#064E3B', 'secondary' => '#B45309'],
+            'theme' => ['primary' => '#003426', 'primary_container' => '#0F4C3A', 'secondary' => '#7B5900'],
             'modules' => [
                 'pages', 'posts', 'events', 'galleries', 'faqs', 'admissions', 'leaders',
                 'lecturers', 'programs', 'curricula', 'publications', 'journals',

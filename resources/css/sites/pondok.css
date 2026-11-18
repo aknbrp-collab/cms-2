@@ -1,32 +1,130 @@
 @import 'tailwindcss';
 
-/* Pondok Pesantren theme: bright green and yellow gold, light news-portal look. */
+/*
+ * Pondok Pesantren theme, after docs/req/design-ui/stitch_darul_amanah_redesign_system
+ * (design system "Amanah Islamic Academic"): modern institutional with Islamic
+ * editorial warmth. Emerald and deep pine, academic gold for calls to action,
+ * white cards with a subtle stroke and soft green-tinted elevation.
+ * Plus Jakarta Sans throughout; a monospace for article metadata.
+ */
 @theme {
     --color-primary: #005d42;
     --color-primary-container: #047857;
     --color-on-primary: #ffffff;
     --color-on-primary-container: #9ffdd3;
-    --color-deep: #0f5132;
+    --color-deep: #064e3b;
     --color-secondary: #eab308;
     --color-on-secondary: #0d1c2e;
+    --color-secondary-container: #fef3c7;
+    --color-on-secondary-container: #b45309;
+    --color-tertiary: #d97706;
+    --color-on-tertiary: #ffffff;
     --color-gold-light: #fef3c7;
-    --color-mint: #d1fae5;
-    --color-surface: #f8f9ff;
+    --color-mint: #ecfdf5;
+    --color-surface: #f8fafc;
     --color-surface-card: #ffffff;
-    --color-surface-low: #eff4ff;
+    --color-surface-low: #f1f5f9;
     --color-surface-container: #e6eeff;
-    --color-on-surface: #0d1c2e;
+    --color-on-surface: #0f172a;
     --color-on-surface-variant: #3e4943;
     --color-muted: #64748b;
     --color-border-subtle: #e2e8f0;
-    --color-footer: #eff4ff;
-    --color-on-footer: #0d1c2e;
-    --color-footer-bar: #0f5132;
+    --color-footer: #f1f5f9;
+    --color-on-footer: #0f172a;
+    --color-footer-bar: #064e3b;
     /* Brand colour for text, borders and focus rings on surfaces. */
-    --color-brand: var(--color-primary);
+    --color-brand: var(--color-primary-container);
+
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'Spline Sans Mono', ui-monospace, monospace;
+
+    /* Ambient academic elevation, lightly tinted with deep pine. */
+    --shadow-level-1: 0 1px 3px rgb(15 23 42 / 0.05), 0 1px 2px rgb(15 23 42 / 0.03);
+    --shadow-level-2: 0 10px 15px -3px rgb(6 78 59 / 0.08), 0 4px 6px -2px rgb(6 78 59 / 0.04);
+    --shadow-level-3: 0 20px 25px -5px rgb(15 23 42 / 0.12), 0 8px 10px -6px rgb(15 23 42 / 0.06);
 }
 
 @import './base.css';
+
+/* Components shared by the theme templates (see base.css for the list). */
+@layer components {
+    .site-card {
+        @apply rounded-lg border border-border-subtle bg-surface-card shadow-level-1;
+    }
+
+    .site-card-hover {
+        @apply transition duration-200 hover:-translate-y-0.5 hover:shadow-level-2;
+    }
+
+    .site-eyebrow {
+        @apply text-[11px] leading-[14px] font-bold tracking-[0.04em] text-brand uppercase;
+    }
+
+    .site-heading {
+        @apply text-2xl leading-8 font-bold tracking-[-0.01em] text-on-surface md:text-[32px] md:leading-10;
+    }
+
+    .site-title {
+        @apply text-lg leading-[26px] font-semibold text-on-surface;
+    }
+
+    .site-meta {
+        @apply text-xs font-medium text-muted;
+    }
+
+    .site-chip {
+        @apply inline-flex items-center gap-1.5 rounded-full bg-mint px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-primary-container uppercase;
+    }
+
+    .site-band {
+        @apply bg-deep text-on-primary;
+    }
+
+    .site-band-title {
+        @apply text-[32px] leading-[38px] font-extrabold tracking-[-0.02em] text-balance md:text-[44px] md:leading-[52px];
+    }
+
+
+    .site-btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors duration-150 bg-primary-container text-on-primary shadow-level-1 hover:bg-deep;
+    }
+
+    .site-btn-accent {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors duration-150 bg-tertiary text-on-tertiary shadow-level-1 hover:brightness-110;
+    }
+
+    .site-btn-outline {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors duration-150 border-[1.5px] border-brand bg-transparent text-brand hover:bg-mint;
+    }
+
+    .site-link {
+        @apply inline-flex items-center gap-1 text-sm font-semibold text-brand transition-colors hover:text-deep;
+    }
+
+    /* Section heading with the emerald bar, e.g. "Artikel Terkini". */
+    .site-section-title {
+        @apply flex items-center gap-3 text-xl font-bold tracking-tight text-on-surface uppercase before:h-6 before:w-1.5 before:rounded-full before:bg-primary-container md:text-[22px];
+    }
+
+    /* 3px top accent of institutional cards (Pengumuman, PSB). */
+    .site-accent-top {
+        @apply border-t-[3px] border-t-primary-container;
+    }
+
+    .site-accent-gold {
+        @apply border-t-[3px] border-t-tertiary;
+    }
+}
+
+.prose-site h2,
+.prose-site h3 {
+    @apply flex items-center gap-3 before:h-6 before:w-1.5 before:shrink-0 before:rounded-full before:bg-primary-container;
+}
+
+.prose-site blockquote {
+    @apply rounded-e-xl border-s-4 border-primary-container bg-mint px-6 py-4 text-on-surface-variant;
+}
 
 /*
  * Dark mode: surfaces and text turn dark; brand backgrounds (bg-primary) stay,
@@ -36,6 +134,8 @@
     color-scheme: dark;
     --color-brand: color-mix(in oklab, var(--color-primary) 30%, #d1fae5);
     --color-mint: #12392b;
+    --color-secondary-container: #3a2c08;
+    --color-on-secondary-container: #fcd34d;
     --color-surface: #0b1310;
     --color-surface-card: #111b17;
     --color-surface-low: #15211c;
@@ -44,7 +144,7 @@
     --color-on-surface-variant: #b2c2b9;
     --color-muted: #8b9c93;
     --color-border-subtle: #25362e;
-    --color-footer: #0e1814;
-    --color-on-footer: #e4eee8;
-    --color-footer-bar: #06100c;
+    --color-footer: #0b1220;
+    --color-on-footer: #e2e8f0;
+    --color-footer-bar: #022c22;
 }

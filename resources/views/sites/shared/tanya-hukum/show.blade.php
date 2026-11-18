@@ -3,7 +3,7 @@
 
     <div class="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-12 lg:px-10">
         <article class="space-y-8 lg:col-span-8">
-            <section class="rounded-2xl border-s-4 border-secondary bg-surface-card p-6 shadow-sm">
+            <section class="site-card border-s-4 border-secondary p-6">
                 <div class="mb-3 flex flex-wrap items-center gap-2 text-xs">
                     <span class="rounded-full bg-mint px-2.5 py-0.5 font-bold text-brand">{{ $question->category->label() }}</span>
                     <span class="text-muted">{{ __('Ditanyakan oleh :name', ['name' => $question->publicAskerName()]) }}</span>
@@ -32,11 +32,11 @@
         </article>
 
         <aside class="space-y-6 lg:col-span-4">
-            <a href="{{ route('site.legal-questions.create') }}" class="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-semibold text-on-primary shadow-sm hover:bg-primary-container">
+            <a href="{{ route('site.legal-questions.create') }}" class="site-btn-primary py-3">
                 {{ __('Ajukan Pertanyaan') }} <x-site.icon name="arrow_forward" class="text-[18px]!" />
             </a>
             @if ($related->isNotEmpty())
-                <div class="rounded-xl bg-surface-card p-6 shadow-sm">
+                <div class="site-card p-6">
                     <h2 class="mb-3 font-bold text-on-surface">{{ __('Pertanyaan terkait') }}</h2>
                     <ul class="space-y-3">
                         @foreach ($related as $item)

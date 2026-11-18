@@ -2,7 +2,7 @@
     @if (! $period)
         <x-site.page-header :title="__('Penerimaan')" />
         <div class="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
-            <p class="rounded-xl bg-surface-card p-10 text-on-surface-variant shadow-sm">{{ __('Informasi pendaftaran belum tersedia. Silakan hubungi kami untuk informasi lebih lanjut.') }}</p>
+            <p class="site-card p-10 text-on-surface-variant">{{ __('Informasi pendaftaran belum tersedia. Silakan hubungi kami untuk informasi lebih lanjut.') }}</p>
         </div>
     @else
         <section class="relative overflow-hidden bg-primary text-on-primary">
@@ -46,7 +46,7 @@
                         <h2 class="mb-6 text-2xl font-bold text-on-surface">{{ __('Alur Pendaftaran') }}</h2>
                         <ol class="grid gap-4 sm:grid-cols-2">
                             @foreach ($period->steps as $step)
-                                <li class="flex gap-4 rounded-xl bg-surface-card p-5 shadow-sm">
+                                <li class="site-card flex gap-4 p-5">
                                     <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-on-primary">{{ $loop->iteration }}</span>
                                     <div>
                                         <h3 class="font-semibold text-on-surface">{{ $step['title'] }}</h3>
@@ -63,14 +63,14 @@
                 @if ($period->requirements)
                     <section>
                         <h2 class="mb-4 text-2xl font-bold text-on-surface">{{ __('Persyaratan') }}</h2>
-                        <div class="prose-site rounded-xl bg-surface-card p-6 shadow-sm">{!! $period->requirements !!}</div>
+                        <div class="site-card prose-site p-6">{!! $period->requirements !!}</div>
                     </section>
                 @endif
 
                 @if ($period->fees)
                     <section>
                         <h2 class="mb-4 text-2xl font-bold text-on-surface">{{ __('Biaya & Beasiswa') }}</h2>
-                        <div class="prose-site rounded-xl bg-surface-card p-6 shadow-sm">{!! $period->fees !!}</div>
+                        <div class="site-card prose-site p-6">{!! $period->fees !!}</div>
                     </section>
                 @endif
 
@@ -84,7 +84,7 @@
 
             <aside class="space-y-6 lg:col-span-4">
                 @if ($period->programs)
-                    <div class="rounded-xl bg-surface-card p-6 shadow-sm">
+                    <div class="site-card p-6">
                         <h2 class="mb-3 font-bold text-on-surface">{{ __('Program') }}</h2>
                         <ul class="space-y-2 text-sm text-on-surface-variant">
                             @foreach ($period->programs as $program)

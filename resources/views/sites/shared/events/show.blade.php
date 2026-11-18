@@ -14,7 +14,7 @@
         </div>
 
         <aside class="lg:col-span-4">
-            <div class="space-y-4 rounded-xl bg-surface-card p-6 shadow-sm lg:sticky lg:top-28">
+            <div class="site-card space-y-4 p-6 lg:sticky lg:top-28">
                 @if ($event->label)
                     <span class="inline-block rounded-full bg-gold-light px-3 py-1 text-xs font-bold text-on-surface">{{ $event->label }}</span>
                 @endif

@@ -18,7 +18,7 @@
         </div>
 
         @if ($articles->isEmpty())
-            <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Belum ada artikel di repositori.') }}</p>
+            <p class="site-card p-10 text-center text-on-surface-variant">{{ __('Belum ada artikel di repositori.') }}</p>
         @else
             <div class="space-y-4">
                 @foreach ($articles as $publication)

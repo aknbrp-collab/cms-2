@@ -14,7 +14,7 @@
             <div class="mb-6 rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 p-4 text-sm text-red-700 dark:text-red-300" role="alert">{{ __('Mohon periksa kembali isian yang ditandai.') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('site.legal-questions.store') }}" class="space-y-6 rounded-2xl bg-surface-card p-6 shadow-sm md:p-8" x-data="{ anonymous: @js((bool) old('is_anonymous')) }" novalidate>
+        <form method="POST" action="{{ route('site.legal-questions.store') }}" class="site-card space-y-6 p-6 md:p-8" x-data="{ anonymous: @js((bool) old('is_anonymous')) }" novalidate>
             @csrf
 
             {{-- Honeypot: humans never see or fill this field. --}}
@@ -69,7 +69,7 @@
             </label>
             @error('agree') <p class="{{ $error }}">{{ $message }}</p> @enderror
 
-            <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-on-primary shadow-sm hover:bg-primary-container sm:w-auto">
+            <button type="submit" class="site-btn-primary w-full py-3 sm:w-auto">
                 {{ __('Kirim Pertanyaan') }} <x-site.icon name="arrow_forward" class="text-[18px]!" />
             </button>
         </form>

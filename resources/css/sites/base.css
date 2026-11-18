@@ -2,6 +2,16 @@
  * Shared base for the public website themes. Each site file imports this
  * after defining its @theme tokens; shared templates only use token names
  * (primary, surface, on-surface …) so they pick up the site's palette.
+ *
+ * Each theme also defines --font-sans, --font-display and --font-mono, and
+ * these component classes, styled after its own design system:
+ *   site-card, site-card-hover   content cards and their hover state
+ *   site-eyebrow                 small label above a heading
+ *   site-heading, site-title     section heading, card/sidebar title
+ *   site-meta                    dates and other metadata
+ *   site-chip                    category / status pill
+ *   site-band, site-band-title   title band at the top of inner pages
+ *   site-btn-primary, site-btn-accent, site-btn-outline, site-link
  */
 
 @source '../../views/sites';
@@ -13,7 +23,6 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     --font-arabic: 'Amiri', 'Traditional Arabic', serif;
 }
 

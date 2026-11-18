@@ -15,11 +15,11 @@
                         <option value="{{ $case->value }}" @selected($category === $case)>{{ $case->label() }}</option>
                     @endforeach
                 </select>
-                <button class="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary"><x-site.icon name="search" /></button>
+                <button class="site-btn-primary"><x-site.icon name="search" /></button>
             </form>
 
             @forelse ($questions as $question)
-                <article class="rounded-xl border border-border-subtle bg-surface-card p-5 shadow-sm transition hover:shadow-md">
+                <article class="site-card site-card-hover p-5">
                     <div class="flex flex-wrap items-center gap-2 text-xs">
                         <span class="rounded-full bg-mint px-2.5 py-0.5 font-bold text-brand">{{ $question->category->label() }}</span>
                         <span class="text-muted">{{ $question->published_at?->translatedFormat('d F Y') }}</span>
@@ -30,7 +30,7 @@
                     <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">{{ $question->public_question }}</p>
                 </article>
             @empty
-                <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Belum ada tanya jawab yang diterbitkan.') }}</p>
+                <p class="site-card p-10 text-center text-on-surface-variant">{{ __('Belum ada tanya jawab yang diterbitkan.') }}</p>
             @endforelse
 
             <div>{{ $questions->links() }}</div>
@@ -45,7 +45,7 @@
                     {{ __('Ajukan Pertanyaan') }} <x-site.icon name="arrow_forward" class="text-[16px]!" />
                 </a>
             </div>
-            <form method="GET" action="{{ route('site.legal-questions.status') }}" class="space-y-3 rounded-2xl bg-surface-card p-6 shadow-sm">
+            <form method="GET" action="{{ route('site.legal-questions.status') }}" class="site-card space-y-3 p-6">
                 <h2 class="font-bold text-on-surface">{{ __('Cek status pertanyaan') }}</h2>
                 <label for="kode" class="sr-only">{{ __('Kode pelacakan') }}</label>
                 <input id="kode" name="kode" placeholder="TH-XXXXXXXX" class="w-full rounded-lg border border-border-subtle px-3 py-2 font-mono uppercase focus:border-brand focus:outline-none">

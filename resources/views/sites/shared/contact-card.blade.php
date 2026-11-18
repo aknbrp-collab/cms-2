@@ -3,8 +3,8 @@
     $mapSrc = App\Support\Embed::toEmbedUrl($site->setting('contact.map_embed_url'));
 @endphp
 
-<div class="space-y-4 rounded-xl bg-surface-card p-5 shadow-sm">
-    <h2 class="border-b-2 border-brand pb-1 text-base font-semibold text-on-surface">{{ __('Hubungi Kami') }}</h2>
+<div class="site-card site-accent-top space-y-4 p-6">
+    <h2 class="site-section-title text-lg!">{{ __('Hubungi Kami') }}</h2>
     <ul class="space-y-3 text-sm text-on-surface-variant">
         @if ($address = $site->setting('contact.address'))
             <li class="flex gap-2"><x-site.icon name="location_on" class="text-brand" /> <span>{{ $address }}</span></li>
@@ -17,7 +17,7 @@
         @endif
     </ul>
     @if ($whatsapp = $site->setting('contact.whatsapp'))
-        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $whatsapp) }}" target="_blank" rel="noopener" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary hover:bg-primary-container">
+        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $whatsapp) }}" target="_blank" rel="noopener" class="site-btn-primary w-full">
             <x-site.icon name="chat" class="text-[18px]!" /> {{ __('Chat WhatsApp') }}
         </a>
     @endif

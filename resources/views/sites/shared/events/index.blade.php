@@ -8,7 +8,7 @@
         </div>
 
         @if ($events->isEmpty())
-            <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ $past ? __('Belum ada arsip kegiatan.') : __('Belum ada agenda mendatang.') }}</p>
+            <p class="site-card p-10 text-center text-on-surface-variant">{{ $past ? __('Belum ada arsip kegiatan.') : __('Belum ada agenda mendatang.') }}</p>
         @else
             <div class="grid gap-5 md:grid-cols-2">
                 @foreach ($events as $event)

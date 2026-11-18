@@ -32,7 +32,7 @@ function slide(Site $site, array $attributes = []): HeroSlide
 test('without slides the ma\'had hero stays as before', function () {
     $this->get('http://mahad.test/')
         ->assertOk()
-        ->assertSee('<h1 class="mt-5', false)
+        ->assertSee('<h1 class="mt-6 font-display', false)
         ->assertDontSee('aria-roledescription="carousel"', false);
 });
 
@@ -66,7 +66,7 @@ test('a single slide has no carousel controls and falls back to the site name', 
         ->assertDontSee('aria-roledescription="carousel"', false)
         ->assertDontSee('Slide berikutnya')
         ->assertSee('fetchpriority="high"', false)
-        ->assertSee('<p class="mt-5 text-4xl', false);
+        ->assertSee('<p class="mt-6 font-display', false);
 });
 
 test('the slider is a ma\'had module only', function () {

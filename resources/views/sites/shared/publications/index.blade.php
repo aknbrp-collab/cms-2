@@ -5,7 +5,7 @@
 
     <div class="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-12 lg:px-10">
         <aside class="lg:col-span-3">
-            <form method="GET" class="space-y-5 rounded-xl bg-surface-card p-5 shadow-sm lg:sticky lg:top-28" role="search">
+            <form method="GET" class="site-card space-y-5 p-5 lg:sticky lg:top-28" role="search">
                 <div>
                     <label for="q" class="block text-sm font-semibold text-on-surface">{{ __('Cari') }}</label>
                     <input id="q" name="q" value="{{ $search }}" placeholder="{{ __('Judul, penulis, kata kunci') }}" class="mt-1 w-full rounded-lg border border-border-subtle px-3 py-2 text-sm focus:border-brand focus:outline-none">
@@ -28,7 +28,7 @@
                         @endforeach
                     </select>
                 </div>
-                <button class="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary">{{ __('Terapkan') }}</button>
+                <button class="site-btn-primary w-full">{{ __('Terapkan') }}</button>
                 @if ($type || $year || $search !== '')
                     <a href="{{ route('site.publications.index') }}" class="block text-center text-sm text-brand">{{ __('Reset filter') }}</a>
                 @endif
@@ -37,7 +37,7 @@
 
         <div class="lg:col-span-9">
             @if ($publications->isEmpty())
-                <p class="rounded-xl bg-surface-card p-10 text-center text-on-surface-variant shadow-sm">{{ __('Publikasi tidak ditemukan.') }}</p>
+                <p class="site-card p-10 text-center text-on-surface-variant">{{ __('Publikasi tidak ditemukan.') }}</p>
             @else
                 <div class="space-y-4">
                     @foreach ($publications as $publication)

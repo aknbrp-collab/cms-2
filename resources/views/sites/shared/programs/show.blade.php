@@ -11,7 +11,7 @@
             <section>
                 <h2 class="mb-4 text-2xl font-bold text-on-surface">{{ __('Kurikulum') }}</h2>
                 @forelse ($semesters as $semester => $courses)
-                    <div class="mb-6 overflow-hidden rounded-xl bg-surface-card shadow-sm">
+                    <div class="site-card mb-6 overflow-hidden">
                         <div class="flex items-center justify-between bg-primary px-5 py-3 text-on-primary">
                             <h3 class="font-semibold">{{ __('Semester :n', ['n' => $semester]) }}</h3>
                             <span class="text-sm text-on-primary/80">{{ $courses->sum('credits') }} SKS</span>
@@ -40,13 +40,13 @@
                         </div>
                     </div>
                 @empty
-                    <p class="rounded-xl bg-surface-card p-6 text-on-surface-variant shadow-sm">{{ __('Kurikulum belum tersedia.') }}</p>
+                    <p class="site-card p-6 text-on-surface-variant">{{ __('Kurikulum belum tersedia.') }}</p>
                 @endforelse
             </section>
         </div>
 
         <aside class="space-y-6 lg:col-span-4">
-            <div class="space-y-3 rounded-xl bg-surface-card p-6 shadow-sm">
+            <div class="site-card space-y-3 p-6">
                 <p><span class="text-sm text-muted">{{ __('Jenjang') }}</span><br><span class="font-semibold text-on-surface">{{ $program->level->label() }}</span></p>
                 @if ($program->degree)
                     <p><span class="text-sm text-muted">{{ __('Gelar') }}</span><br><span class="font-semibold text-on-surface">{{ $program->degree }}</span></p>
@@ -58,7 +58,7 @@
             </div>
 
             @if ($books = $program->coreBookList())
-                <div class="rounded-xl bg-surface-card p-6 shadow-sm">
+                <div class="site-card p-6">
                     <h2 class="mb-3 font-bold text-on-surface">{{ __('Kitab Muqarrar Induk') }}</h2>
                     <ul class="space-y-2 text-sm text-on-surface-variant">
                         @foreach ($books as $book)

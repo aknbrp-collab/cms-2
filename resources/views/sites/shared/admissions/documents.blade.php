@@ -15,7 +15,7 @@
     <div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 md:py-14">
         @include('sites.shared.admissions.steps', ['current' => 2])
 
-        <div class="mb-6 rounded-2xl bg-surface-card p-5 shadow-sm">
+        <div class="site-card mb-6 p-5">
             <p class="text-sm text-muted">{{ __('Nomor pendaftaran') }}</p>
             <p class="font-mono text-xl font-bold tracking-wider text-brand">{{ $registration->registration_number }}</p>
             <p class="mt-1 text-sm text-on-surface-variant">{{ $registration->full_name }}</p>
@@ -38,7 +38,7 @@
                     $canUpload = AdmissionDocument::applicantCanUpload($registration, $document);
                     $bag = $errors->getBag('upload_'.$requirement->id);
                 @endphp
-                <section id="berkas-{{ $requirement->id }}" class="scroll-mt-28 rounded-2xl bg-surface-card p-5 shadow-sm md:p-6">
+                <section id="berkas-{{ $requirement->id }}" class="site-card scroll-mt-28 p-5 md:p-6">
                     <div class="flex flex-wrap items-start justify-between gap-3">
                         <div class="min-w-0">
                             <h2 class="font-bold text-on-surface">
@@ -109,7 +109,7 @@
                                     accept="{{ collect($requirement->extensions())->map(fn ($extension) => '.'.$extension)->join(',') }}"
                                     class="block w-full text-sm text-on-surface-variant file:me-3 file:rounded-lg file:border-0 file:bg-surface-container file:px-4 file:py-2 file:font-semibold file:text-brand hover:file:bg-surface-low"
                                 >
-                                <button type="submit" x-bind:disabled="progress !== null" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-sm transition hover:bg-primary-container disabled:opacity-60">
+                                <button type="submit" x-bind:disabled="progress !== null" class="site-btn-primary shrink-0 disabled:opacity-60">
                                     <x-site.icon name="upload" class="text-[18px]!" /> {{ $document ? __('Ganti berkas') : __('Unggah') }}
                                 </button>
                             </div>
@@ -137,7 +137,7 @@
                     {{ __('Semua berkas wajib sudah diunggah. Panitia akan memeriksanya.') }}
                 @endif
             </p>
-            <a href="{{ $finishUrl }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-semibold text-on-primary hover:bg-primary-container">
+            <a href="{{ $finishUrl }}" class="site-btn-primary shrink-0">
                 {{ __('Selesai') }} <x-site.icon name="arrow_forward" class="text-[18px]!" />
             </a>
         </div>

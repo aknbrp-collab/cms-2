@@ -3,7 +3,7 @@
 
     <div class="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-12 lg:px-10">
         <aside class="lg:col-span-4">
-            <div class="space-y-4 rounded-2xl bg-surface-card p-6 text-center shadow-sm">
+            <div class="site-card space-y-4 p-6 text-center">
                 <x-site.image :asset="$lecturer->photo" :alt="$lecturer->name" icon="person" class="mx-auto aspect-square w-48 rounded-2xl" />
                 @if ($lecturer->expertise)
                     <p class="inline-flex items-center gap-1 rounded-full bg-mint px-3 py-1 text-xs font-semibold text-brand"><x-site.icon name="verified" class="text-[14px]!" /> {{ $lecturer->expertise }}</p>
@@ -42,7 +42,7 @@
             @if ($publications->isNotEmpty())
                 <section>
                     <h2 class="mb-3 text-xl font-bold text-on-surface">{{ __('Publikasi Terkait') }}</h2>
-                    <ul class="divide-y divide-border-subtle rounded-xl bg-surface-card shadow-sm">
+                    <ul class="site-card divide-y divide-border-subtle">
                         @foreach ($publications as $publication)
                             <li class="p-4">
                                 <a href="{{ route('site.publications.show', $publication->slug) }}" class="font-semibold text-on-surface hover:text-brand">{{ $publication->title }}</a>

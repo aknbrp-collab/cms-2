@@ -25,7 +25,7 @@
                     @endif
 
                     @if ($siblings->count() > 1)
-                        <nav class="rounded-xl bg-surface-card p-5 shadow-sm" aria-label="{{ $page->parent?->title ?? $page->title }}">
+                        <nav class="site-card p-5" aria-label="{{ $page->parent?->title ?? $page->title }}">
                             <h2 class="mb-3 border-b-2 border-brand pb-1 text-base font-semibold text-on-surface">{{ $page->parent?->title ?? $page->title }}</h2>
                             <ul class="space-y-1">
                                 @foreach ($siblings as $sibling)
