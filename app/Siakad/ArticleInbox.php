@@ -6,6 +6,7 @@ use App\Enums\ContentStatus;
 use App\Enums\PublicationType;
 use App\Enums\SiakadArticleStatus;
 use App\Enums\SiteKey;
+use App\Jobs\FetchSiakadArticleImage;
 use App\Models\Publication;
 use App\Models\SiakadArticle;
 use App\Models\Site;
@@ -46,12 +47,14 @@ class ArticleInbox
             'title' => $data['title'],
             'authors' => implode(', ', (array) $data['authors']),
             'abstract' => $data['abstract'] ?? null,
-            'body' => isset($data['body_html']) ? RichText::clean($data['body_html']) : null,
+            'body' => isset($data['body_html']) ? RichText::clean($this->withoutLeadingPicture($data['body_html'], $data['image_url'] ?? null)) : null,
             'year' => $data['year'],
             'keywords' => isset($data['keywords']) ? implode(', ', (array) $data['keywords']) : null,
             'doi' => $data['doi'] ?? null,
             'file_url' => $data['file_url'] ?? null,
             'source_url' => $data['source_url'] ?? null,
+            'image_url' => $data['image_url'] ?? null,
+            'image_caption' => $data['image_caption'] ?? null,
             'payload' => $data,
             'received_at' => now(),
         ]);
@@ -64,13 +67,37 @@ class ArticleInbox
             $article->forceFill(['status' => SiakadArticleStatus::UnderReview, 'updated_after_approval' => $article->status === SiakadArticleStatus::Approved, 'withdrawn_at' => null]);
         }
 
+        if ($article->image_url === null) {
+            // The article no longer has a picture (the publication keeps its own until re-approval).
+            $article->forceFill(['image_asset_id' => null, 'image_source_url' => null, 'image_error' => null]);
+        } elseif ($article->needsImageDownload()) {
+            $article->forceFill(['image_error' => null]);
+        }
+
         $article->save();
+
+        if ($article->needsImageDownload()) {
+            FetchSiakadArticleImage::dispatch($article, (string) $article->image_url);
+        }
 
         if ($isNew || $resubmitted) {
             Notification::send($this->reviewers($site), new SiakadArticleReceived($article, $resubmitted));
         }
 
         return $article;
+    }
+
+    /**
+     * Try the picture download again after it failed.
+     */
+    public function retryImage(SiakadArticle $article, User $actor): void
+    {
+        $this->authorize($actor, 'siakad_articles.review', $article);
+
+        if ($article->needsImageDownload()) {
+            $article->forceFill(['image_error' => null])->save();
+            FetchSiakadArticleImage::dispatch($article, (string) $article->image_url);
+        }
     }
 
     public function startReview(SiakadArticle $article, User $actor): void
@@ -110,6 +137,9 @@ class ArticleInbox
             'keywords' => $article->keywords,
             'doi' => $article->doi,
             'external_url' => $article->source_url ?? $article->file_url,
+            // The downloaded copy; a picture still downloading is attached when it arrives.
+            'image_id' => $article->image_asset_id,
+            'image_caption' => $article->image_asset_id ? $article->image_caption : null,
         ])->save();
 
         if ($publication->status !== ContentStatus::Published) {
@@ -200,5 +230,19 @@ class ArticleInbox
             ->get()
             ->filter(fn (User $user) => $user->canAccessSite($site))
             ->values();
+    }
+
+    /**
+     * SIAKAD repeats the picture as the first <figure> of the body for CMSes
+     * that ignore image_url (contract 1.2). This CMS shows image_url itself,
+     * so that copy is dropped to avoid showing the picture twice.
+     */
+    protected function withoutLeadingPicture(string $html, ?string $imageUrl): string
+    {
+        if ($imageUrl === null) {
+            return $html;
+        }
+
+        return (string) preg_replace('~^\s*(?:<p>\s*(?:&nbsp;)?\s*</p>\s*)*<figure\b[^>]*>.*?</figure>~is', '', $html, 1);
     }
 }

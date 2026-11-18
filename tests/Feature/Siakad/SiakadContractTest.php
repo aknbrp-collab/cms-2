@@ -22,7 +22,7 @@ use Livewire\Livewire;
 
 /*
  * Behaviour added in version 1.1 of docs/siakad-api-spec.md.
- * Uses siakadCall() and articlePayload() from SiakadWebhookTest.php.
+ * Uses siakadCall() and articlePayload() from tests/Pest.php.
  */
 
 beforeEach(function () {

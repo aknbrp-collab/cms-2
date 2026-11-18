@@ -147,7 +147,7 @@ class DirectoryController extends Controller
     public function publication(string $slug): View
     {
         $site = $this->site('publications');
-        $publication = Publication::query()->published()->with(['journal', 'file.media', 'seo.ogImage.media'])->where('slug', $slug)->firstOrFail();
+        $publication = Publication::query()->published()->with(['journal', 'file.media', 'image.media', 'seo.ogImage.media'])->where('slug', $slug)->firstOrFail();
 
         return $this->theme->view('publications.show', [
             'seo' => Seo::forContent($site, $publication),

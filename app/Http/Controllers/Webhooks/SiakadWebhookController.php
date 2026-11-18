@@ -45,6 +45,8 @@ class SiakadWebhookController extends Controller
             'doi' => ['nullable', 'string', 'max:255'],
             'file_url' => ['nullable', 'url', 'max:2048'],
             'source_url' => ['nullable', 'url', 'max:2048'],
+            'image_url' => ['nullable', 'url:http,https', 'max:2048'],
+            'image_caption' => ['nullable', 'string', 'max:255'],
         ]);
 
         $existing = SiakadArticle::query()->withoutGlobalScopes()->where('external_id', $data['id'])->exists();

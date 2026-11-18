@@ -29,7 +29,7 @@ new #[Title('SIAKAD article')] class extends Component {
     #[Computed]
     public function article(): SiakadArticle
     {
-        return SiakadArticle::query()->with(['publication', 'reviewer', 'site'])->findOrFail($this->articleId);
+        return SiakadArticle::query()->with(['publication', 'reviewer', 'site', 'image.media'])->findOrFail($this->articleId);
     }
 
     /**
@@ -60,6 +60,12 @@ new #[Title('SIAKAD article')] class extends Component {
         $inbox->reject($this->article, Auth::user(), $this->note);
         Flux::modal('reject-article')->close();
         $this->done(__('Article rejected.'));
+    }
+
+    public function retryImage(ArticleInbox $inbox): void
+    {
+        $inbox->retryImage($this->article, Auth::user());
+        $this->done(__('Downloading the picture again.'));
     }
 
     protected function done(string $message): void
@@ -146,6 +152,29 @@ new #[Title('SIAKAD article')] class extends Component {
                     <flux:link :href="route('admin.publications.edit', $article->publication)" wire:navigate>{{ __('Open publication') }} →</flux:link>
                 @endif
             </flux:card>
+
+            @if ($article->image_url)
+                <flux:card class="space-y-3">
+                    <flux:heading>{{ __('Picture') }}</flux:heading>
+                    @if ($article->image && ! $article->needsImageDownload())
+                        <img src="{{ $article->image->url('large') }}" alt="{{ $article->image_caption }}" class="w-full rounded-lg object-cover">
+                    @elseif ($article->image_error)
+                        <flux:callout icon="exclamation-triangle" color="red" :heading="__('The picture could not be downloaded')" :text="$article->image_error" />
+                        @can('siakad_articles.review')
+                            <flux:button size="sm" icon="arrow-path" wire:click="retryImage">{{ __('Try again') }}</flux:button>
+                        @endcan
+                    @else
+                        <flux:text size="sm">{{ __('Downloading the picture from SIAKAD…') }}</flux:text>
+                        @if ($article->image)
+                            <img src="{{ $article->image->url('thumb') }}" alt="" class="w-32 rounded opacity-60">
+                            <flux:text size="sm">{{ __('Previous picture, until the new one arrives.') }}</flux:text>
+                        @endif
+                    @endif
+                    @if ($article->image_caption)
+                        <flux:text size="sm">{{ $article->image_caption }}</flux:text>
+                    @endif
+                </flux:card>
+            @endif
 
             <flux:card class="space-y-2 text-sm">
                 <flux:text><strong>{{ __('Type') }}:</strong> {{ $article->type->label() }}</flux:text>

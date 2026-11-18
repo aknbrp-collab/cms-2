@@ -52,6 +52,10 @@ new #[Title('Edit publication')] class extends ContentEditor {
 
     public ?string $fileId = null;
 
+    public ?string $imageId = null;
+
+    public string $imageCaption = '';
+
     public string $externalUrl = '';
 
     /** @var array{meta_title: ?string, meta_description: ?string, og_image_id: ?string, canonical_url: ?string, noindex: bool} */
@@ -78,6 +82,8 @@ new #[Title('Edit publication')] class extends ContentEditor {
                 'doi' => (string) $publication->doi,
                 'keywords' => (string) $publication->keywords,
                 'fileId' => $publication->file_id,
+                'imageId' => $publication->image_id,
+                'imageCaption' => (string) $publication->image_caption,
                 'externalUrl' => (string) $publication->external_url,
             ]);
 
@@ -129,6 +135,8 @@ new #[Title('Edit publication')] class extends ContentEditor {
             'doi' => ['nullable', 'string', 'max:255', 'regex:/^10\.\d{4,9}\/\S+$/'],
             'keywords' => ['nullable', 'string', 'max:255'],
             'fileId' => ['nullable', 'exists:media_assets,id'],
+            'imageId' => ['nullable', 'exists:media_assets,id'],
+            'imageCaption' => ['nullable', 'string', 'max:255'],
             'externalUrl' => ['nullable', 'url', 'max:2048'],
             'seo.meta_title' => ['nullable', 'string', 'max:255'],
             'seo.meta_description' => ['nullable', 'string', 'max:500'],
@@ -153,6 +161,8 @@ new #[Title('Edit publication')] class extends ContentEditor {
             'doi' => $this->doi ?: null,
             'keywords' => $this->keywords ?: null,
             'file_id' => $this->fileId,
+            'image_id' => $this->imageId,
+            'image_caption' => $this->imageCaption ?: null,
             'external_url' => $this->externalUrl ?: null,
         ])->save();
         $publication->saveSeo($this->seo);
@@ -256,6 +266,8 @@ new #[Title('Edit publication')] class extends ContentEditor {
                 </fieldset>
                 @if ($this->canEdit)
                     <livewire:admin.media-picker wire:model="fileId" kind="document" :label="__('Document (PDF)')" />
+                    <livewire:admin.media-picker wire:model="imageId" kind="image" :label="__('Picture')" />
+                    <flux:input wire:model="imageCaption" :label="__('Picture caption')" />
                 @endif
             </flux:card>
         </div>

@@ -54,6 +54,7 @@ readonly class Seo
         $fallbackImage = match (true) {
             $content instanceof Post, $content instanceof Event => $content->featuredImage,
             $content instanceof Gallery => $content->cover(),
+            $content instanceof Publication => $content->image,
             default => null,
         };
         $image = $seo->ogImage ?? $fallbackImage;

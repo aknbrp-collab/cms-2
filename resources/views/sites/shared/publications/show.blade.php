@@ -3,6 +3,15 @@
 
     <div class="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-12 lg:px-10">
         <article class="space-y-8 lg:col-span-8">
+            @if ($publication->image)
+                <figure class="overflow-hidden rounded-xl bg-surface-card shadow-sm">
+                    <x-site.image :asset="$publication->image" :alt="$publication->image_caption ?: $publication->title" class="aspect-[16/9] w-full" />
+                    @if ($publication->image_caption)
+                        <figcaption class="px-5 py-3 text-sm text-muted">{{ $publication->image_caption }}</figcaption>
+                    @endif
+                </figure>
+            @endif
+
             @if ($publication->abstract)
                 <section class="rounded-xl bg-surface-card p-6 shadow-sm">
                     <h2 class="mb-2 text-sm font-bold tracking-wider text-secondary uppercase">{{ __('Abstrak') }}</h2>

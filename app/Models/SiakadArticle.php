@@ -30,6 +30,11 @@ use Illuminate\Support\Carbon;
  * @property string|null $doi
  * @property string|null $file_url
  * @property string|null $source_url
+ * @property string|null $image_url picture link sent by SIAKAD (contract 1.2)
+ * @property string|null $image_caption
+ * @property string|null $image_asset_id the CMS's own copy in the media library
+ * @property string|null $image_source_url the image_url that copy was made from
+ * @property string|null $image_error why the last download failed
  * @property array<string, mixed> $payload
  * @property Carbon $received_at
  * @property bool $updated_after_approval
@@ -43,7 +48,7 @@ use Illuminate\Support\Carbon;
  */
 #[Fillable([
     'site_id', 'external_id', 'type', 'title', 'authors', 'abstract', 'body', 'year', 'keywords',
-    'doi', 'file_url', 'source_url', 'payload', 'received_at',
+    'doi', 'file_url', 'source_url', 'image_url', 'image_caption', 'payload', 'received_at',
 ])]
 class SiakadArticle extends Model
 {
@@ -74,6 +79,22 @@ class SiakadArticle extends Model
             'withdrawn_at' => 'datetime',
             'updated_after_approval' => 'boolean',
         ];
+    }
+
+    /**
+     * @return BelongsTo<MediaAsset, $this>
+     */
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(MediaAsset::class, 'image_asset_id');
+    }
+
+    /**
+     * Whether the picture SIAKAD sent still has to be downloaded.
+     */
+    public function needsImageDownload(): bool
+    {
+        return $this->image_url !== null && $this->image_url !== $this->image_source_url;
     }
 
     /**

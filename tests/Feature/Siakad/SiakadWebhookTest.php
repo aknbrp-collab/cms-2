@@ -11,47 +11,12 @@ use App\Models\LegalQuestion;
 use App\Models\SiakadArticle;
 use App\Models\Site;
 use App\Siakad\ArticleInbox;
-use App\Siakad\Signature;
-use Illuminate\Testing\TestResponse;
 
 beforeEach(function () {
     seedCms();
     config(['siakad.webhook_secret' => 'test-secret', 'siakad.site' => 'mahad']);
     $this->mahad = Site::findByKey(SiteKey::Mahad);
 });
-
-/**
- * Send a JSON webhook signed like SIAKAD would.
- *
- * @param  array<string, mixed>  $payload
- */
-function siakadCall(string $method, string $route, array $payload = [], ?int $timestamp = null, string $secret = 'test-secret'): TestResponse
-{
-    $body = $payload === [] ? '' : json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    $headers = Signature::headers($body, $secret, $timestamp);
-
-    return test()->call($method, $route, [], [], [], [
-        'CONTENT_TYPE' => 'application/json',
-        'HTTP_ACCEPT' => 'application/json',
-        'HTTP_X_SIAKAD_TIMESTAMP' => $headers['X-Siakad-Timestamp'],
-        'HTTP_X_SIAKAD_SIGNATURE' => $headers['X-Siakad-Signature'],
-    ], $body);
-}
-
-function articlePayload(array $overrides = []): array
-{
-    return [
-        'id' => 'ART-1',
-        'type' => 'journal_article',
-        'title' => 'Metodologi Qiyas',
-        'authors' => ['Dr. Mahbub Ridwan'],
-        'year' => 2026,
-        'abstract' => 'Abstrak',
-        'body_html' => '<p>Isi</p><script>alert(1)</script>',
-        'keywords' => ['qiyas'],
-        ...$overrides,
-    ];
-}
 
 test('a signed article is stored as a draft for review', function () {
     siakadCall('POST', route('webhooks.siakad.articles'), articlePayload())

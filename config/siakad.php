@@ -34,4 +34,14 @@ return [
 
     'site' => env('SIAKAD_SITE', 'mahad'),
 
+    /*
+    | Hosts the CMS may download article pictures from (contract 1.2,
+    | image_url). Comma separated; empty means the host of SIAKAD_BASE_URL.
+    | Pictures larger than image_max_kb are refused.
+    */
+
+    'media_hosts' => array_values(array_filter(array_map('trim', explode(',', (string) env('SIAKAD_MEDIA_HOSTS', ''))))),
+
+    'image_max_kb' => (int) env('SIAKAD_IMAGE_MAX_KB', 10240),
+
 ];

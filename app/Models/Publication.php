@@ -41,6 +41,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $doi
  * @property string|null $keywords
  * @property string|null $file_id
+ * @property string|null $image_id
+ * @property string|null $image_caption
  * @property string|null $external_url
  * @property ContentStatus $status
  * @property Carbon|null $submitted_at
@@ -57,7 +59,7 @@ use Illuminate\Support\Carbon;
  */
 #[Fillable([
     'site_id', 'author_id', 'type', 'title', 'slug', 'authors', 'abstract', 'body', 'year', 'journal_id',
-    'volume', 'issue', 'pages', 'doi', 'keywords', 'file_id', 'external_url', 'publish_at',
+    'volume', 'issue', 'pages', 'doi', 'keywords', 'file_id', 'image_id', 'image_caption', 'external_url', 'publish_at',
     'external_source', 'external_id',
 ])]
 class Publication extends Model implements Reviewable
@@ -114,6 +116,14 @@ class Publication extends Model implements Reviewable
     public function file(): BelongsTo
     {
         return $this->belongsTo(MediaAsset::class, 'file_id');
+    }
+
+    /**
+     * @return BelongsTo<MediaAsset, $this>
+     */
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(MediaAsset::class, 'image_id');
     }
 
     /**

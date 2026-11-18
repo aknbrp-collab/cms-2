@@ -26,7 +26,7 @@ Files in [`deploy/`](../deploy): `nginx.conf`, `horizon.conf` (Supervisor), `dep
 | Composer | 2.x |
 | Node.js | 22 LTS or newer (only needed at build time) |
 
-Sizing: 2 vCPU / 4 GB RAM is comfortable for both sites, Horizon (5 workers) and PostgreSQL on one machine.
+Sizing: see [server-requirements.md](server-requirements.md) for minimum, ideal and maximum specs for a demo server and for production. In short, production starts at 2 vCPU / 4 GB RAM / 40 GB NVMe (3 queue workers), and 4 vCPU / 8 GB / 80 GB is recommended.
 
 PHP settings (`/etc/php/8.4/fpm/conf.d/99-cms.ini`):
 
