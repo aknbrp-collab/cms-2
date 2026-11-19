@@ -16,6 +16,7 @@ use App\Models\Site;
 use App\Support\Seo;
 use App\Support\SiteTheme;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -161,20 +162,22 @@ class DirectoryController extends Controller
 
         return $this->theme->view('journals.index', [
             'seo' => Seo::forSite($site, __('Jurnal Ilmiah')),
-            'journals' => Journal::query()->published()->with('cover.media')->orderBy('sort_order')->get(),
+            'journals' => Journal::query()->published()->orderBy('sort_order')->get(),
         ]);
     }
 
-    public function journal(string $slug): View
+    /**
+     * Journals have no page of their own: old links go to the journal's
+     * website, or back to the list when none is set.
+     */
+    public function journal(string $slug): RedirectResponse
     {
-        $site = $this->site('journals');
-        $journal = Journal::query()->published()->with('cover.media')->where('slug', $slug)->firstOrFail();
+        $this->site('journals');
+        $journal = Journal::query()->published()->where('slug', $slug)->firstOrFail();
 
-        return $this->theme->view('journals.show', [
-            'seo' => Seo::forSite($site, $journal->name),
-            'journal' => $journal,
-            'articles' => $journal->publications()->published()->orderByDesc('year')->orderByDesc('volume')->orderByDesc('issue')->paginate(20),
-        ]);
+        return $journal->url
+            ? redirect()->away($journal->url, 301)
+            : redirect()->route('site.journals.index', status: 301);
     }
 
     public function organizations(): View

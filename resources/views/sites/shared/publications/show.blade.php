@@ -48,8 +48,8 @@
                             <x-site.icon name="public" class="text-[18px]!" /> {{ __('Baca di sumber') }}
                         </a>
                     @endif
-                    @if ($publication->journal)
-                        <a href="{{ route('site.journals.show', $publication->journal->slug) }}" class="text-center text-sm text-brand">{{ __('Lihat jurnal :name', ['name' => $publication->journal->name]) }}</a>
+                    @if ($publication->journal?->url)
+                        <a href="{{ $publication->journal->url }}" target="_blank" rel="noopener" class="text-center text-sm text-brand">{{ __('Lihat jurnal :name', ['name' => $publication->journal->name]) }}</a>
                     @endif
                 </div>
             </div>

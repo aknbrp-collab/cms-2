@@ -103,8 +103,27 @@ test('publications go through review and appear in the repository', function () 
         ->assertOk()
         ->assertSee('Al-Ahkam, Vol. 12, No. 1 ('.now()->year.')')
         ->assertSee('https://doi.org/10.1234/ahkam.2026.1', false);
-    $this->get('http://mahad.test/jurnal/al-ahkam')->assertOk()->assertSee('Hukum Akad Digital');
     $this->get('http://mahad.test/sitemap.xml')->assertSee('http://mahad.test/publikasi/hukum-akad-digital', false);
+});
+
+test('journals show only their profile and link out to the journal website', function () {
+    published(Journal::query()->create([
+        'site_id' => $this->mahad->id, 'name' => 'Al-Ahkam', 'slug' => 'al-ahkam',
+        'description' => 'Jurnal studi fiqh kontemporer.', 'accreditation' => 'SINTA 4',
+        'issn' => '1111-2222', 'e_issn' => '3333-4444', 'url' => 'https://ojs.example.test/al-ahkam',
+    ]));
+    published(Journal::query()->create(['site_id' => $this->mahad->id, 'name' => 'Tanpa Situs', 'slug' => 'tanpa-situs']));
+
+    $this->get('http://mahad.test/jurnal')
+        ->assertOk()
+        ->assertSee(['Al-Ahkam', 'Jurnal studi fiqh kontemporer.', 'SINTA 4', 'E-ISSN 3333-4444', 'https://ojs.example.test/al-ahkam'])
+        ->assertDontSee('1111-2222')
+        ->assertDontSee('http://mahad.test/jurnal/al-ahkam', false);
+
+    // The old detail pages redirect: to the journal website, or back to the list.
+    $this->get('http://mahad.test/jurnal/al-ahkam')->assertRedirect('https://ojs.example.test/al-ahkam')->assertStatus(301);
+    $this->get('http://mahad.test/jurnal/tanpa-situs')->assertRedirect('http://mahad.test/jurnal');
+    $this->get('http://mahad.test/sitemap.xml')->assertDontSee('/jurnal/al-ahkam', false);
 });
 
 test('organizations are listed with their type', function () {

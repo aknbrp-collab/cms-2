@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Gallery;
-use App\Models\Journal;
 use App\Models\Lecturer;
 use App\Models\LegalQuestion;
 use App\Models\Page;
@@ -93,13 +92,12 @@ class SitemapController extends Controller
         $details = [
             'programs' => [Program::class, 'site.programs.show'],
             'lecturers' => [Lecturer::class, 'site.lecturers.show'],
-            'journals' => [Journal::class, 'site.journals.show'],
         ];
 
         foreach ($details as $module => [$modelClass, $route]) {
             if ($site->hasModule($module)) {
                 $urls = $urls->concat($modelClass::query()->published()->get(['slug', 'updated_at'])
-                    ->map(fn (Program|Lecturer|Journal $item) => ['loc' => route($route, $item->slug), 'lastmod' => $item->updated_at]));
+                    ->map(fn (Program|Lecturer $item) => ['loc' => route($route, $item->slug), 'lastmod' => $item->updated_at]));
             }
         }
 

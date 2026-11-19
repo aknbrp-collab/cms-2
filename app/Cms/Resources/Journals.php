@@ -31,7 +31,7 @@ class Journals extends AdminResource
 
     public function description(): string
     {
-        return __('Scholarly journals. Articles are added under Publications.');
+        return __('Journal profiles shown on the site, each linking to its own website.');
     }
 
     public function icon(): string
@@ -43,13 +43,11 @@ class Journals extends AdminResource
     {
         return [
             Field::text('name', __('Name'), required: true),
-            Field::text('accreditation', __('Accreditation'), help: __('e.g. Sinta 2')),
-            Field::text('issn', __('ISSN (print)'), max: 20),
-            Field::text('e_issn', __('ISSN (online)'), max: 20),
+            Field::text('accreditation', __('SINTA score'), help: __('e.g. SINTA 2')),
+            Field::text('e_issn', __('E-ISSN'), max: 20),
             Field::url('url', __('Journal website (OJS)')),
             Field::number('sort_order', __('Order')),
-            Field::textarea('description', __('Description')),
-            Field::image('cover_id', __('Cover')),
+            Field::textarea('description', __('About the journal')),
         ];
     }
 
