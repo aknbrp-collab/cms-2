@@ -8,9 +8,6 @@
     $footerMenu = $theme->menu(MenuLocation::Footer);
     $prayer = $theme->prayer();
     $logo = $site->brandingUrl('logo');
-    $logoDark = $site->brandingUrl('logo_dark');
-    $calligraphy = $site->brandingUrl('calligraphy');
-    $calligraphyDark = $site->brandingUrl('calligraphy_dark');
     $hasCta = $site->setting('header.cta_url') && $site->setting('header.cta_label');
     $navLink = 'border-b-2 py-1 text-sm font-bold transition-colors duration-150';
 @endphp
@@ -52,30 +49,12 @@
     {{-- Sticky main header --}}
     <header class="sticky top-0 z-50 border-b border-border-subtle bg-surface-card/95 backdrop-blur-md">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-10">
-            {{-- Brand: logo and calligraphy only; the name stays for screen readers. --}}
-            <a href="{{ route('site.home') }}" class="flex min-w-0 items-center gap-3">
-                <span class="sr-only">{{ $site->name }}</span>
-                @if ($logo)
-                    <img src="{{ $logo }}" alt="" @class(['size-12 shrink-0 object-contain', 'dark:hidden' => $logoDark])>
-                    @if ($logoDark)
-                        <img src="{{ $logoDark }}" alt="" class="hidden size-12 shrink-0 object-contain dark:block">
-                    @endif
-                @else
-                    <span class="flex size-12 shrink-0 items-center justify-center rounded-md bg-primary text-secondary-container"><x-site.icon name="account_balance" class="text-2xl!" /></span>
-                @endif
-                @if ($calligraphy)
-                    <img src="{{ $calligraphy }}" alt="" @class(['h-10 w-auto max-w-[220px] object-contain', 'dark:hidden' => $calligraphyDark])>
-                    @if ($calligraphyDark)
-                        <img src="{{ $calligraphyDark }}" alt="" class="hidden h-10 w-auto max-w-[220px] object-contain dark:block">
-                    @endif
-                @elseif ($calligraphyDark)
-                    {{-- Only a dark-mode version uploaded: it is made for dark backgrounds. --}}
-                    <img src="{{ $calligraphyDark }}" alt="" class="hidden h-10 w-auto max-w-[220px] object-contain dark:block">
-                @elseif (! $logo)
-                    {{-- Nothing uploaded yet: show the name so the header is not empty. --}}
-                    <span class="truncate font-display text-2xl leading-none font-semibold text-brand" aria-hidden="true">{{ $site->name }}</span>
-                @endif
-            </a>
+            <x-site.brand
+                :site="$site"
+                fallback-icon="account_balance"
+                fallback-icon-class="flex size-12 shrink-0 items-center justify-center rounded-md bg-primary text-secondary-container"
+                name-class="truncate font-display text-2xl leading-none font-semibold text-brand"
+            />
 
             <nav class="hidden items-center gap-7 whitespace-nowrap xl:flex" aria-label="{{ __('Navigasi utama') }}">
                 <a href="{{ route('site.home') }}" @class([$navLink, 'border-brand text-brand' => request()->routeIs('site.home'), 'border-transparent text-on-surface-variant hover:text-brand' => ! request()->routeIs('site.home')])>{{ __('Beranda') }}</a>

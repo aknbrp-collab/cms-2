@@ -43,17 +43,12 @@
         @endif
 
         <div class="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
-            <a href="{{ route('site.home') }}" class="flex min-w-0 items-center gap-3">
-                @if ($logo)
-                    <img src="{{ $logo }}" alt="{{ $site->name }}" @class(['h-10 w-auto shrink-0 object-contain', 'dark:hidden' => $logoDark])>
-                    @if ($logoDark)
-                        <img src="{{ $logoDark }}" alt="{{ $site->name }}" class="hidden h-10 w-auto shrink-0 object-contain dark:block">
-                    @endif
-                @else
-                    <span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-container text-on-primary"><x-site.icon name="mosque" /></span>
-                @endif
-                <span class="truncate text-lg font-extrabold tracking-tight text-brand md:text-xl">{{ $site->name }}</span>
-            </a>
+            <x-site.brand
+                :site="$site"
+                logo-class="h-10 w-auto shrink-0 object-contain"
+                fallback-icon-class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-container text-on-primary"
+                name-class="truncate text-lg font-extrabold tracking-tight text-brand md:text-xl"
+            />
 
             <nav class="hidden items-center gap-5 text-sm font-semibold whitespace-nowrap xl:flex" aria-label="{{ __('Navigasi utama') }}">
                 <a href="{{ route('site.home') }}" @class(['border-b-2 py-1 transition-colors', 'border-brand text-brand' => request()->routeIs('site.home'), 'border-transparent text-on-surface-variant hover:text-brand' => ! request()->routeIs('site.home')])>{{ __('Beranda') }}</a>

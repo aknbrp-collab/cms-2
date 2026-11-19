@@ -71,6 +71,31 @@ test("a dark mode calligraphy swaps in on the Ma'had header when uploaded", func
         ->assertSee('src="'.$dark.'" alt="" class="hidden h-10 w-auto max-w-[220px] object-contain dark:block"', false);
 });
 
+test('the Pondok header shows the calligraphy instead of the site name', function () {
+    $site = Site::findByKey(SiteKey::Pondok);
+    $name = e($site->name);
+
+    // Nothing uploaded: the name is shown so the header is not empty.
+    $this->get('http://pondok.test/')
+        ->assertOk()
+        ->assertSee('<span class="sr-only">'.$name.'</span>', false)
+        ->assertSee('aria-hidden="true">'.$name.'</span>', false);
+
+    $site->addMedia(UploadedFile::fake()->image('calligraphy.png'))->toMediaCollection('calligraphy');
+    $light = $site->fresh()->brandingUrl('calligraphy');
+
+    $this->get('http://pondok.test/')
+        ->assertSee('src="'.$light.'" alt="" class="h-10 w-auto max-w-[220px] object-contain"', false)
+        ->assertDontSee('aria-hidden="true">'.$name.'</span>', false);
+
+    $site->addMedia(UploadedFile::fake()->image('calligraphy-dark.png'))->toMediaCollection('calligraphy_dark');
+    $dark = $site->fresh()->brandingUrl('calligraphy_dark');
+
+    $this->get('http://pondok.test/')
+        ->assertSee('src="'.$light.'" alt="" class="h-10 w-auto max-w-[220px] object-contain dark:hidden"', false)
+        ->assertSee('src="'.$dark.'" alt="" class="hidden h-10 w-auto max-w-[220px] object-contain dark:block"', false);
+});
+
 test('public views use the brand token, not primary, for text, borders and rings', function () {
     $files = collect(['sites', 'components/site', 'errors', 'legal', 'social'])
         ->flatMap(fn (string $directory) => File::allFiles(resource_path("views/{$directory}")));
