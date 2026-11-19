@@ -54,6 +54,16 @@ class Alumni extends AdminResource
         return collect([$item->getAttribute('graduation_year'), $item->getAttribute('city')])->filter()->implode(' · ');
     }
 
+    public function searchColumns(): array
+    {
+        return ['name', 'city'];
+    }
+
+    public function headerAction(): ?array
+    {
+        return [__('Bulk add'), 'admin.alumni.import', 'arrow-up-tray'];
+    }
+
     public function order(Builder $query): Builder
     {
         return $query->orderByDesc('graduation_year')->orderBy('name');

@@ -6,18 +6,21 @@ use App\Cms\Resources;
 use App\Livewire\ReferenceList;
 use App\Support\RichText;
 use Flux\Flux;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
+use Livewire\WithPagination;
 
 /**
  * Generic list + modal editor for the simple resources in App\Cms\Resources.
  */
 new class extends ReferenceList {
+    use WithPagination;
+
     #[Locked]
     public string $resourceKey = '';
 
@@ -58,19 +61,28 @@ new class extends ReferenceList {
     }
 
     /**
-     * @return Collection<int, Model>
+     * @return LengthAwarePaginator<int, Model>
      */
     #[Computed]
-    public function items(): Collection
+    public function items(): LengthAwarePaginator
     {
         $resource = $this->resource;
         $query = $resource->model()::query()->with(['site', ...$resource->with()]);
 
         if ($this->search !== '') {
-            $query->whereLike($resource->titleField(), "%{$this->search}%");
+            $query->where(function ($query) use ($resource) {
+                foreach ($resource->searchColumns() as $column) {
+                    $query->orWhereLike($column, "%{$this->search}%");
+                }
+            });
         }
 
-        return $resource->order($query)->get();
+        return $resource->order($query)->paginate($resource->perPage());
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
     }
 
     public function create(): void
@@ -194,6 +206,9 @@ new class extends ReferenceList {
             <flux:input wire:model.live.debounce.300ms="search" :placeholder="__('Search')" icon="magnifying-glass" />
             @if (current_site())
                 @can($resource->key().'.create')
+                    @if ($action = $resource->headerAction())
+                        <flux:button :icon="$action[2]" :href="route($action[1])" wire:navigate>{{ $action[0] }}</flux:button>
+                    @endif
                     <flux:button variant="primary" icon="plus" wire:click="create">{{ __('New') }}</flux:button>
                 @endcan
             @endif
@@ -206,7 +221,7 @@ new class extends ReferenceList {
         <flux:callout icon="information-circle" color="amber" :text="__('This module is not shown on :site.', ['site' => current_site()->name])" />
     @endif
 
-    <flux:table>
+    <flux:table :paginate="$this->items">
         <flux:table.columns>
             <flux:table.column>{{ $resource->singularLabel() }}</flux:table.column>
             @unless (current_site())

@@ -2,6 +2,7 @@
 
 use App\Cms\Resources;
 use App\Http\Controllers\Admin\AdmissionDocumentFileController;
+use App\Http\Controllers\Admin\AlumniTemplateController;
 use App\Http\Controllers\Admin\ExportRegistrationsController;
 use App\Http\Controllers\Admin\SocialConnectController;
 use App\Http\Controllers\Admin\SwitchSiteController;
@@ -51,6 +52,10 @@ Route::middleware(['auth', 'verified', EnsureAdminAccess::class, SetAdminSite::c
         ->name('admin.resources');
     Route::livewire('programs/{program}/curriculum', 'pages::admin.programs.curriculum')->name('admin.programs.curriculum');
     Route::livewire('education-units/{unit}/curriculum', 'pages::admin.education-units.curriculum')->name('admin.education-units.curriculum');
+    Route::livewire('alumni/import', 'pages::admin.alumni.import')->name('admin.alumni.import');
+    Route::get('alumni/template.csv', AlumniTemplateController::class)
+        ->middleware('can:alumni.create')
+        ->name('admin.alumni.template');
 
     Route::livewire('publications', 'pages::admin.publications.index')->name('admin.publications.index');
     Route::livewire('publications/create', 'pages::admin.publications.edit')->name('admin.publications.create');

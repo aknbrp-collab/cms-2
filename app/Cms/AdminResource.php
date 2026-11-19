@@ -44,6 +44,24 @@ abstract class AdminResource
     }
 
     /**
+     * Columns searched by the list's search box.
+     *
+     * @return list<string>
+     */
+    public function searchColumns(): array
+    {
+        return [$this->titleField()];
+    }
+
+    /**
+     * Items per page in the admin list.
+     */
+    public function perPage(): int
+    {
+        return 50;
+    }
+
+    /**
      * Secondary line under the title in the list.
      */
     public function subtitle(Model $item): ?string
@@ -74,6 +92,17 @@ abstract class AdminResource
      * @return array{0: string, 1: string}|null
      */
     public function rowAction(): ?array
+    {
+        return null;
+    }
+
+    /**
+     * Extra button next to "New": [label, route name, Flux icon]. Shown to
+     * users who may create items.
+     *
+     * @return array{0: string, 1: string, 2: string}|null
+     */
+    public function headerAction(): ?array
     {
         return null;
     }
