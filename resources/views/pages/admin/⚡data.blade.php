@@ -1,15 +1,30 @@
 <?php
 
+use App\Jobs\RestoreBackup;
 use App\Jobs\RunBackup;
 use App\Services\Backups;
+use App\Services\Restore\BackupRestorer;
+use App\Services\Restore\RestoreStatus;
 use App\Support\Audit;
 use Flux\Flux;
+use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Number;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 new #[Title('Data & backups')] class extends Component {
+    /** Backup chosen for restoring: disk and path. */
+    public string $restoreDisk = '';
+
+    public string $restorePath = '';
+
+    public string $restorePassword = '';
+
+    public string $restoreConfirmation = '';
+
     public function mount(): void
     {
         $this->authorize('data.view');
@@ -39,10 +54,102 @@ new #[Title('Data & backups')] class extends Component {
         return app(Backups::class)->running();
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
+    #[Computed]
+    public function restoreStatus(): ?array
+    {
+        return app(RestoreStatus::class)->get();
+    }
+
+    #[Computed]
+    public function restoring(): bool
+    {
+        return app(RestoreStatus::class)->running();
+    }
+
+    /**
+     * @return list<array{label: string, ok: bool, message: string}>
+     */
+    #[Computed]
+    public function restoreChecks(): array
+    {
+        return app(BackupRestorer::class)->checks();
+    }
+
+    /**
+     * What the admin types to confirm: the backup's file name without ".zip".
+     */
+    #[Computed]
+    public function restoreCode(): string
+    {
+        return Str::beforeLast(basename($this->restorePath), '.zip');
+    }
+
+    public function chooseRestore(string $disk, string $path): void
+    {
+        $this->authorize('data.restore');
+        app(Backups::class)->find($disk, $path) ?? abort(404);
+
+        $this->fill(['restoreDisk' => $disk, 'restorePath' => $path, 'restorePassword' => '', 'restoreConfirmation' => '']);
+        $this->resetValidation();
+        unset($this->restoreChecks, $this->restoreCode);
+        Flux::modal('restore-backup')->show();
+    }
+
+    public function startRestore(): void
+    {
+        $this->authorize('data.restore');
+        app(Backups::class)->find($this->restoreDisk, $this->restorePath) ?? abort(404);
+
+        $this->validate([
+            'restorePassword' => ['required', 'current_password'],
+            'restoreConfirmation' => ['required', 'in:'.$this->restoreCode],
+        ], [
+            'restoreConfirmation.in' => __('Type the backup name exactly as shown.'),
+        ], [
+            'restorePassword' => __('password'),
+            'restoreConfirmation' => __('confirmation'),
+        ]);
+
+        if (! app(BackupRestorer::class)->ready()) {
+            $this->addError('restoreConfirmation', __('The server is not ready for a restore; see the checks above.'));
+
+            return;
+        }
+
+        if ($this->restoring || app(Backups::class)->running()) {
+            $this->addError('restoreConfirmation', __('A backup or restore is already running.'));
+
+            return;
+        }
+
+        // The admin keeps access while the site is in maintenance mode.
+        $secret = Str::random(40);
+        cookie()->queue(MaintenanceModeBypassCookie::create($secret));
+
+        $actor = Auth::user()->name;
+        app(RestoreStatus::class)->update(['state' => 'queued', 'file' => basename($this->restorePath), 'by' => $actor, 'started_at' => now()->toIso8601String(), 'message' => null, 'finished_at' => null]);
+        Audit::record('data.restore_started', meta: ['disk' => $this->restoreDisk, 'file' => basename($this->restorePath)]);
+        RestoreBackup::dispatch($this->restoreDisk, $this->restorePath, $secret, $actor);
+
+        $this->reset('restorePassword', 'restoreConfirmation');
+        unset($this->restoreStatus, $this->restoring);
+        Flux::modal('restore-backup')->close();
+        Flux::toast(variant: 'success', text: __('Restore started. Follow the progress on this page.'));
+    }
+
     public function backUp(bool $onlyDb = false): void
     {
         $this->authorize('data.backup');
         $backups = app(Backups::class);
+
+        if ($this->restoring) {
+            Flux::toast(variant: 'warning', text: __('A restore is running.'));
+
+            return;
+        }
 
         if ($backups->running()) {
             Flux::toast(variant: 'warning', text: __('A backup is already running.'));
@@ -75,15 +182,15 @@ new #[Title('Data & backups')] class extends Component {
      */
     public function refreshStatus(): void
     {
-        unset($this->status, $this->running);
+        unset($this->status, $this->running, $this->restoreStatus, $this->restoring);
 
-        if (! $this->running) {
+        if (! $this->running && ! $this->restoring) {
             unset($this->destinations);
         }
     }
 }; ?>
 
-<div class="flex w-full flex-1 flex-col gap-6" @if ($this->running) wire:poll.5s="refreshStatus" @endif>
+<div class="flex w-full flex-1 flex-col gap-6" @if ($this->running || $this->restoring) wire:poll.3s="refreshStatus" @endif>
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <flux:heading size="xl">{{ __('Data & backups') }}</flux:heading>
@@ -91,8 +198,8 @@ new #[Title('Data & backups')] class extends Component {
         </div>
         @can('data.backup')
             <div class="flex flex-wrap gap-2">
-                <flux:button icon="circle-stack" wire:click="backUp(true)" :disabled="$this->running">{{ __('Back up database') }}</flux:button>
-                <flux:button variant="primary" icon="archive-box-arrow-down" wire:click="backUp(false)" :disabled="$this->running">{{ __('Back up everything') }}</flux:button>
+                <flux:button icon="circle-stack" wire:click="backUp(true)" :disabled="$this->running || $this->restoring">{{ __('Back up database') }}</flux:button>
+                <flux:button variant="primary" icon="archive-box-arrow-down" wire:click="backUp(false)" :disabled="$this->running || $this->restoring">{{ __('Back up everything') }}</flux:button>
             </div>
         @endcan
     </div>
@@ -105,6 +212,10 @@ new #[Title('Data & backups')] class extends Component {
         @elseif ($status['state'] === 'done' && isset($status['finished_at']))
             <flux:callout icon="check-circle" color="emerald" :text="__('The last backup finished :time.', ['time' => \Illuminate\Support\Carbon::parse($status['finished_at'])->diffForHumans()])" />
         @endif
+    @endif
+
+    @if ($restore = $this->restoreStatus)
+        @include('pages.admin.partials.restore-progress', ['restore' => $restore, 'restoring' => $this->restoring])
     @endif
 
     @foreach ($this->destinations as $destination)
@@ -138,6 +249,9 @@ new #[Title('Data & backups')] class extends Component {
                                 <flux:table.cell class="font-mono text-xs">{{ $backup['file'] }}</flux:table.cell>
                                 <flux:table.cell class="whitespace-nowrap">{{ Number::fileSize($backup['size'], precision: 1) }}</flux:table.cell>
                                 <flux:table.cell align="end" class="whitespace-nowrap">
+                                    @can('data.restore')
+                                        <flux:button size="sm" variant="ghost" icon="arrow-uturn-left" wire:click="chooseRestore(@js($destination['disk']), @js($backup['path']))" :disabled="$this->restoring || $this->running">{{ __('Restore') }}</flux:button>
+                                    @endcan
                                     @can('data.backup')
                                         <flux:button size="sm" variant="ghost" icon="arrow-down-tray" :href="route('admin.data.download', ['disk' => $destination['disk'], 'path' => $backup['path']])" :tooltip="__('Download')" />
                                         <flux:button
@@ -157,6 +271,35 @@ new #[Title('Data & backups')] class extends Component {
             @endif
         </flux:card>
     @endforeach
+
+    <flux:modal name="restore-backup" class="w-full md:w-[36rem]">
+        <form wire:submit="startRestore" class="space-y-4">
+            <flux:heading size="lg">{{ __('Restore :name', ['name' => $this->restoreCode]) }}</flux:heading>
+            <flux:callout icon="exclamation-triangle" color="red" :text="__('All current data of both sites (database and uploaded files) is replaced by this backup. Anything changed since the backup was made is lost. A backup of the current data is taken first, and the sites are in maintenance mode for a few minutes.')" />
+
+            <div class="space-y-1">
+                @foreach ($this->restoreChecks as $check)
+                    <div class="flex items-start gap-2 text-sm">
+                        @if ($check['ok'])
+                            <flux:icon.check-circle class="size-5 shrink-0 text-emerald-600" />
+                        @else
+                            <flux:icon.x-circle class="size-5 shrink-0 text-red-600" />
+                        @endif
+                        <span><span class="font-medium">{{ $check['label'] }}</span> <span class="text-zinc-500">· {{ $check['message'] }}</span></span>
+                    </div>
+                @endforeach
+            </div>
+
+            <flux:input type="password" wire:model="restorePassword" :label="__('Your password')" autocomplete="current-password" />
+            <flux:input wire:model="restoreConfirmation" :label="__('Type :code to confirm', ['code' => $this->restoreCode])" autocomplete="off" class="font-mono" />
+            <flux:text size="sm">{{ __('You may need to sign in again afterwards.') }}</flux:text>
+
+            <div class="flex justify-end gap-2">
+                <flux:modal.close><flux:button variant="ghost">{{ __('Cancel') }}</flux:button></flux:modal.close>
+                <flux:button type="submit" variant="danger" icon="arrow-uturn-left">{{ __('Restore this backup') }}</flux:button>
+            </div>
+        </form>
+    </flux:modal>
 
     <flux:text size="sm" class="max-w-3xl">{{ __('Downloaded backups are encrypted with the backup password (BACKUP_ARCHIVE_PASSWORD on the server). Keep that password in the password manager: without it a backup cannot be opened.') }}</flux:text>
 </div>

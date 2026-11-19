@@ -214,7 +214,16 @@ php artisan backup:run            # now (add --only-db for just the database)
 php artisan backup:list           # backups and their health per disk
 ```
 
-**Restore** (practise this once before going live):
+The superadmin can also back up, download, delete and restore backups in the admin under **System → Data & backups**.
+
+**Restore** (practise this once before going live). Either:
+
+- **Admin:** Data & backups → **Restore** on a backup, re-enter the password and type the backup name. It runs in the background (Horizon must be running).
+- **Command:** `php artisan cms:restore --disk=local --path=cms-pondok/2026-11-20-02-00-00.zip` (or the path to a downloaded `.zip`; add `--no-backup` to skip the safety backup).
+
+Both check the server (`psql`, `BACKUP_ARCHIVE_PASSWORD`, zip), back up the current data, unpack and verify the archive, then put the sites in maintenance mode and load the dump with `psql` in **one transaction** after dropping and recreating the `public` schema: if anything fails, the database is left as it was. Uploaded files under `storage/app` are copied back afterwards (files not in the backup are kept), and the sites come back online. The database user (`DB_USERNAME`) must own the database, as created in section 3.1, so it can recreate the schema.
+
+Manual restore, if the application itself cannot run:
 1. `php artisan down`.
 2. Download the archive (`storage/app/private/cms-pondok/*.zip` or from the off-site bucket) and unzip it with the archive password (`7z x` or `unzip`, AES-256).
 3. Restore into an **empty** database. The audit-log trigger blocks deletes, so don't restore over existing data:
