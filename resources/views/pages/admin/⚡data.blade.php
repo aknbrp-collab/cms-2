@@ -1,13 +1,16 @@
 <?php
 
+use App\Jobs\PurgeData;
 use App\Jobs\RestoreBackup;
 use App\Jobs\RunBackup;
 use App\Services\Backups;
+use App\Services\DataPurge;
 use App\Services\Restore\BackupRestorer;
 use App\Services\Restore\RestoreStatus;
 use App\Support\Audit;
 use Flux\Flux;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
@@ -25,9 +28,97 @@ new #[Title('Data & backups')] class extends Component {
 
     public string $restoreConfirmation = '';
 
+    /** Clean-up: what (see DataPurge::KINDS) and the cut-off date. */
+    public string $purgeKind = 'admissions';
+
+    public string $purgeBefore = '';
+
+    /** @var array{total: int, details: array<string, int>, periods: list<array{title: string, site: string, closes_on: string, registrations: int}>}|null */
+    public ?array $purgePreview = null;
+
+    public string $purgePassword = '';
+
+    public string $purgeConfirmation = '';
+
     public function mount(): void
     {
         $this->authorize('data.view');
+        $this->purgeBefore = $this->defaultCutOff($this->purgeKind);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    #[Computed]
+    public function purgeStatus(): ?array
+    {
+        return PurgeData::status();
+    }
+
+    #[Computed]
+    public function purging(): bool
+    {
+        return PurgeData::running();
+    }
+
+    public function updatedPurgeKind(): void
+    {
+        $this->purgeBefore = $this->defaultCutOff($this->purgeKind);
+        $this->reset('purgePreview', 'purgePassword', 'purgeConfirmation');
+    }
+
+    public function updatedPurgeBefore(): void
+    {
+        $this->reset('purgePreview', 'purgePassword', 'purgeConfirmation');
+    }
+
+    public function previewPurge(): void
+    {
+        $this->authorize('data.purge');
+        $this->validatePurgeChoice();
+
+        $this->purgePreview = app(DataPurge::class)->preview($this->purgeKind, Carbon::parse($this->purgeBefore)->startOfDay());
+    }
+
+    public function startPurge(): void
+    {
+        $this->authorize('data.purge');
+        $this->validatePurgeChoice();
+        $this->validate([
+            'purgePassword' => ['required', 'current_password'],
+            'purgeConfirmation' => ['required', 'in:DELETE'],
+        ], ['purgeConfirmation.in' => __('Type DELETE in capitals.')], ['purgePassword' => __('password'), 'purgeConfirmation' => __('confirmation')]);
+
+        if ($this->purging || $this->restoring || app(Backups::class)->running()) {
+            $this->addError('purgeConfirmation', __('A backup, restore or clean-up is already running.'));
+
+            return;
+        }
+
+        $actor = Auth::user()->name;
+        PurgeData::setStatus(['state' => 'queued', 'kind' => $this->purgeKind, 'before' => $this->purgeBefore, 'by' => $actor, 'started_at' => now()->toIso8601String()]);
+        Audit::record('data.purge_started', meta: ['kind' => $this->purgeKind, 'before' => $this->purgeBefore]);
+        PurgeData::dispatch($this->purgeKind, $this->purgeBefore, $actor);
+
+        $this->reset('purgePreview', 'purgePassword', 'purgeConfirmation');
+        unset($this->purgeStatus, $this->purging);
+        Flux::toast(variant: 'success', text: __('Clean-up started. A backup is taken first.'));
+    }
+
+    protected function validatePurgeChoice(): void
+    {
+        $this->validate([
+            'purgeKind' => ['required', 'in:'.implode(',', DataPurge::KINDS)],
+            'purgeBefore' => ['required', 'date', 'before_or_equal:today'],
+        ], [], ['purgeBefore' => __('date')]);
+    }
+
+    protected function defaultCutOff(string $kind): string
+    {
+        return match ($kind) {
+            'integration_logs' => today()->subDays((int) config('cms.retention.integration_logs'))->toDateString(),
+            default => today()->subYear()->toDateString(),
+        };
     }
 
     /**
@@ -119,8 +210,8 @@ new #[Title('Data & backups')] class extends Component {
             return;
         }
 
-        if ($this->restoring || app(Backups::class)->running()) {
-            $this->addError('restoreConfirmation', __('A backup or restore is already running.'));
+        if ($this->restoring || $this->purging || app(Backups::class)->running()) {
+            $this->addError('restoreConfirmation', __('A backup, restore or clean-up is already running.'));
 
             return;
         }
@@ -145,8 +236,8 @@ new #[Title('Data & backups')] class extends Component {
         $this->authorize('data.backup');
         $backups = app(Backups::class);
 
-        if ($this->restoring) {
-            Flux::toast(variant: 'warning', text: __('A restore is running.'));
+        if ($this->restoring || $this->purging) {
+            Flux::toast(variant: 'warning', text: __('A restore or clean-up is running.'));
 
             return;
         }
@@ -182,7 +273,7 @@ new #[Title('Data & backups')] class extends Component {
      */
     public function refreshStatus(): void
     {
-        unset($this->status, $this->running, $this->restoreStatus, $this->restoring);
+        unset($this->status, $this->running, $this->restoreStatus, $this->restoring, $this->purgeStatus, $this->purging);
 
         if (! $this->running && ! $this->restoring) {
             unset($this->destinations);
@@ -190,7 +281,7 @@ new #[Title('Data & backups')] class extends Component {
     }
 }; ?>
 
-<div class="flex w-full flex-1 flex-col gap-6" @if ($this->running || $this->restoring) wire:poll.3s="refreshStatus" @endif>
+<div class="flex w-full flex-1 flex-col gap-6" @if ($this->running || $this->restoring || $this->purging) wire:poll.3s="refreshStatus" @endif>
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <flux:heading size="xl">{{ __('Data & backups') }}</flux:heading>
@@ -271,6 +362,10 @@ new #[Title('Data & backups')] class extends Component {
             @endif
         </flux:card>
     @endforeach
+
+    @can('data.purge')
+        @include('pages.admin.partials.data-purge')
+    @endcan
 
     <flux:modal name="restore-backup" class="w-full md:w-[36rem]">
         <form wire:submit="startRestore" class="space-y-4">
