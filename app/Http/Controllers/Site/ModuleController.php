@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Site;
 
 use App\Enums\GalleryType;
+use App\Enums\WhatsAppEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Site\RegisterAdmissionRequest;
 use App\Models\AdmissionPeriod;
@@ -12,6 +13,7 @@ use App\Models\Faq;
 use App\Models\Gallery;
 use App\Models\Leader;
 use App\Models\Site;
+use App\Services\WhatsApp\WhatsAppNotifier;
 use App\Support\AdmissionAccess;
 use App\Support\Seo;
 use App\Support\SiteTheme;
@@ -148,6 +150,9 @@ class ModuleController extends Controller
             'admission_period_id' => $period->id,
             'ip_address' => $request->ip(),
         ]);
+
+        // Tell the guardian on WhatsApp, when the site sends this automatically.
+        app(WhatsAppNotifier::class)->notify(WhatsAppEvent::Received, $registration);
 
         $request->session()->forget('registration_form_started');
 

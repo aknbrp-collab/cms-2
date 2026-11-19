@@ -101,6 +101,16 @@ class Site extends Model implements HasMedia
         'whatsapp.template_rejected' => null,
         'whatsapp.template_needs_fix' => null,
         'whatsapp.template_reminder' => null,
+        // Automatic sending through a gateway (see App\Services\WhatsApp\WhatsAppNotifier).
+        // The key is stored encrypted.
+        'whatsapp.gateway_enabled' => false,
+        'whatsapp.gateway_driver' => 'fonnte',
+        'whatsapp.gateway_token' => '',
+        'whatsapp.auto_received' => true,
+        'whatsapp.auto_verified' => true,
+        'whatsapp.auto_accepted' => true,
+        'whatsapp.auto_rejected' => false,
+        'whatsapp.auto_needs_fix' => true,
     ];
 
     /**

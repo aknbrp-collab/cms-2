@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Enums\DocumentStatus;
+use App\Enums\WhatsAppEvent;
 use App\Models\AdmissionDocument;
 use App\Models\AdmissionRegistration;
 use App\Models\AdmissionRequirement;
 use App\Models\User;
 use App\Notifications\AdmissionDocumentNeedsFix;
+use App\Services\WhatsApp\WhatsAppNotifier;
 use App\Support\Audit;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
@@ -78,6 +80,10 @@ class AdmissionDocuments
 
         if ($status === DocumentStatus::NeedsFix && filled($registration->email)) {
             Notification::route('mail', $registration->email)->notify(new AdmissionDocumentNeedsFix($document));
+        }
+
+        if ($status === DocumentStatus::NeedsFix) {
+            app(WhatsAppNotifier::class)->notify(WhatsAppEvent::NeedsFix, $registration->unsetRelation('documents'));
         }
     }
 

@@ -7,6 +7,7 @@ use App\Models\AdmissionDocument;
 use App\Models\AdmissionPeriod;
 use App\Models\AdmissionRegistration;
 use App\Services\AdmissionDocuments;
+use App\Services\WhatsApp\WhatsAppNotifier;
 use App\Support\WhatsApp;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
@@ -135,7 +136,11 @@ new #[Title('Registrations')] class extends Component {
         $documents->review($document, DocumentStatus::NeedsFix, $this->fixNote, Auth::user());
         $this->reset('fixingDocumentId', 'fixNote');
         unset($this->viewing, $this->registrations);
-        $this->prepareWhatsApp(WhatsAppEvent::NeedsFix);
+
+        // The review sends it automatically when the gateway is set up; otherwise prepare it.
+        if (! app(WhatsAppNotifier::class)->sendsAutomatically($document->registration->site, WhatsAppEvent::NeedsFix)) {
+            $this->prepareWhatsApp(WhatsAppEvent::NeedsFix);
+        }
 
         Flux::toast(variant: 'success', text: filled($document->registration->email)
             ? __('Marked as needing a fix. The applicant was emailed.')
@@ -156,8 +161,15 @@ new #[Title('Registrations')] class extends Component {
         $registration->forceFill(['status' => $this->newStatus, 'admin_notes' => $this->adminNotes ?: null])->save();
         unset($this->viewing, $this->registrations);
 
-        // A new status the guardian should hear about: keep the dialog open with the message ready.
+        // A new status the guardian should hear about: send it through the gateway,
+        // or keep the dialog open with the message ready to send by hand.
         $event = $changed ? WhatsAppEvent::forStatus($registration->status) : null;
+        if ($event && app(WhatsAppNotifier::class)->notify($event, $registration)) {
+            Flux::modal('registration-detail')->close();
+            Flux::toast(variant: 'success', text: __('Registration updated. The guardian is being sent a WhatsApp message automatically.'));
+
+            return;
+        }
         if ($event && $this->prepareWhatsApp($event)) {
             Flux::toast(variant: 'success', text: __('Registration updated. The WhatsApp message to the guardian is ready below.'));
 

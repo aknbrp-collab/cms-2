@@ -2,12 +2,15 @@
 
 use App\Enums\WhatsAppEvent;
 use App\Models\Site;
+use App\Services\WhatsApp\FonnteGateway;
+use App\Services\WhatsApp\WhatsAppNotifier;
 use App\Support\Embed;
 use App\Support\PondokHero;
 use App\Support\SvgSanitizer;
 use App\Support\WhatsApp;
 use Flux\Flux;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Crypt;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -33,6 +36,11 @@ new #[Title('Site settings')] class extends Component {
     /** @var array<string, UploadedFile|null> */
     public array $branding = [];
 
+    /** New WhatsApp gateway key; empty keeps the saved one (never sent to the browser). */
+    public string $gatewayToken = '';
+
+    public string $testPhone = '';
+
     public function mount(): void
     {
         $this->authorize('sites.update');
@@ -40,6 +48,7 @@ new #[Title('Site settings')] class extends Component {
         if ($this->site) {
             $this->name = $this->site->name;
             $this->settings = collect($this->site->allSettings())
+                ->except('whatsapp.gateway_token')
                 ->mapWithKeys(fn ($value, $key) => [str_replace('.', '__', $key) => $value])
                 ->all();
         }
@@ -112,9 +121,14 @@ new #[Title('Site settings')] class extends Component {
         }
 
         $site->name = $this->name;
-        $site->fillSettings(collect($this->settings)
-            ->mapWithKeys(fn ($value, $key) => [str_replace('__', '.', $key) => $value === '' ? null : $value])
-            ->all());
+        $site->fillSettings([
+            ...collect($this->settings)
+                ->mapWithKeys(fn ($value, $key) => [str_replace('__', '.', $key) => $value === '' ? null : $value])
+                ->all(),
+            'whatsapp.gateway_token' => filled($this->gatewayToken)
+                ? Crypt::encryptString(trim($this->gatewayToken))
+                : $site->setting('whatsapp.gateway_token'),
+        ]);
         $site->save();
 
         foreach (array_filter($this->branding) as $collection => $file) {
@@ -123,7 +137,7 @@ new #[Title('Site settings')] class extends Component {
             }
         }
 
-        $this->reset('branding');
+        $this->reset('branding', 'gatewayToken');
         unset($this->site);
 
         Flux::toast(variant: 'success', text: __('Settings saved.'));
@@ -177,12 +191,74 @@ new #[Title('Site settings')] class extends Component {
             return [];
         }
 
-        $rules = [];
+        $rules = [
+            'settings.whatsapp__gateway_enabled' => ['boolean', function ($attribute, $value, $fail) {
+                if ($value && blank($this->gatewayToken) && blank($this->site?->setting('whatsapp.gateway_token'))) {
+                    $fail(__('Enter the gateway API key to switch automatic sending on.'));
+                }
+            }],
+            'settings.whatsapp__gateway_driver' => ['required', 'in:'.implode(',', array_keys(WhatsAppNotifier::DRIVERS))],
+            'gatewayToken' => ['nullable', 'string', 'max:500'],
+        ];
         foreach (WhatsAppEvent::cases() as $event) {
             $rules['settings.'.str_replace('.', '__', $event->settingKey())] = ['nullable', 'string', 'max:2000'];
         }
+        foreach (WhatsAppNotifier::AUTO_EVENTS as $event) {
+            $rules["settings.whatsapp__auto_{$event->value}"] = ['boolean'];
+        }
 
         return $rules;
+    }
+
+    #[Computed]
+    public function hasGatewayToken(): bool
+    {
+        return filled($this->site?->setting('whatsapp.gateway_token'));
+    }
+
+    public function removeGatewayToken(): void
+    {
+        $this->authorize('sites.update');
+        $site = $this->site;
+        abort_if($site === null, 404);
+
+        $site->fillSettings([...$site->allSettings(), 'whatsapp.gateway_token' => null, 'whatsapp.gateway_enabled' => false])->save();
+        $this->settings['whatsapp__gateway_enabled'] = false;
+        unset($this->site, $this->hasGatewayToken);
+
+        Flux::toast(text: __('Gateway key removed. Automatic sending is off.'));
+    }
+
+    /**
+     * Send a test message with the typed key, or the saved one.
+     */
+    public function sendTestWhatsApp(WhatsAppNotifier $notifier): void
+    {
+        $this->authorize('sites.update');
+        $site = $this->site;
+        abort_if($site === null, 404);
+
+        $this->validate(['testPhone' => ['required', 'string', 'max:30']], [], ['testPhone' => __('phone number')]);
+        $phone = WhatsApp::normalizePhone($this->testPhone);
+        $token = filled($this->gatewayToken) ? trim($this->gatewayToken) : $notifier->token($site);
+
+        if ($phone === null) {
+            $this->addError('testPhone', __('This is not a valid WhatsApp number.'));
+
+            return;
+        }
+
+        if ($token === null) {
+            $this->addError('gatewayToken', __('Enter the gateway API key first.'));
+
+            return;
+        }
+
+        $result = (new FonnteGateway($token))->send($phone, __('Test message from :site. The WhatsApp gateway works.', ['site' => $site->name]));
+
+        $result->ok
+            ? Flux::toast(variant: 'success', text: __('Test message sent to +:phone.', ['phone' => $phone]))
+            : Flux::toast(variant: 'danger', text: __('The test message was not sent: :error', ['error' => $result->error]));
     }
 
     public function resetTemplate(string $event): void
@@ -306,6 +382,42 @@ new #[Title('Site settings')] class extends Component {
                             @endforeach
                         </dl>
                     </div>
+                    <div class="space-y-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+                        <flux:heading>{{ __('Automatic sending') }}</flux:heading>
+                        <flux:text size="sm">{{ __('With a WhatsApp gateway account, messages go out by themselves when a registration arrives or its status changes. Without one, admins send them with one click.') }}</flux:text>
+                        <flux:switch wire:model.live="settings.whatsapp__gateway_enabled" :label="__('Send messages automatically through the gateway')" />
+                        <div class="grid gap-4 sm:grid-cols-[12rem_1fr]">
+                            <flux:select wire:model="settings.whatsapp__gateway_driver" :label="__('Gateway')">
+                                @foreach (WhatsAppNotifier::DRIVERS as $driver => $driverLabel)
+                                    <option value="{{ $driver }}">{{ $driverLabel }}</option>
+                                @endforeach
+                            </flux:select>
+                            <flux:field>
+                                <flux:label>{{ __('API key (device token)') }}</flux:label>
+                                <flux:input type="password" wire:model="gatewayToken" autocomplete="off" :placeholder="$this->hasGatewayToken ? __('Saved. Type a new key to replace it.') : __('Paste the key from the gateway dashboard')" />
+                                @if ($this->hasGatewayToken)
+                                    <flux:description class="flex items-center gap-2">{{ __('A key is saved (stored encrypted).') }} <flux:button size="xs" variant="ghost" wire:click="removeGatewayToken" wire:confirm="{{ __('Remove the saved key and switch automatic sending off?') }}">{{ __('Remove') }}</flux:button></flux:description>
+                                @endif
+                                <flux:error name="gatewayToken" />
+                            </flux:field>
+                        </div>
+                        <flux:error name="settings.whatsapp__gateway_enabled" />
+                        <div>
+                            <flux:label>{{ __('Send automatically for') }}</flux:label>
+                            <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                                @foreach (WhatsAppNotifier::AUTO_EVENTS as $event)
+                                    <flux:checkbox wire:key="wa-auto-{{ $event->value }}" wire:model="settings.whatsapp__auto_{{ $event->value }}" :label="$event->label()" />
+                                @endforeach
+                            </div>
+                            <flux:description class="mt-1">{{ __('Reminders are always sent by hand. Unticked events are prepared for the admin to send.') }}</flux:description>
+                        </div>
+                        <div class="flex flex-wrap items-end gap-2">
+                            <flux:input wire:model="testPhone" :label="__('Test number')" placeholder="0812…" class="max-w-xs" />
+                            <flux:button wire:click="sendTestWhatsApp" icon="paper-airplane">{{ __('Send test message') }}</flux:button>
+                        </div>
+                        <flux:error name="testPhone" />
+                    </div>
+
                     @foreach (WhatsAppEvent::cases() as $event)
                         <flux:field wire:key="wa-template-{{ $event->value }}">
                             <div class="flex items-center justify-between gap-3">

@@ -57,12 +57,34 @@
             <flux:text size="sm" class="font-medium">{{ __('Sent messages') }}</flux:text>
             <ul class="divide-y divide-zinc-100 text-sm dark:divide-zinc-800">
                 @foreach ($history as $message)
-                    <li class="flex flex-wrap items-center justify-between gap-2 py-1.5" title="{{ $message->body }}">
-                        <span class="flex items-center gap-2">
-                            <flux:badge size="sm" :color="$message->status === 'failed' ? 'red' : 'zinc'">{{ $message->event->label() }}</flux:badge>
-                            <span class="text-zinc-500">{{ $message->channel === 'gateway' ? __('Sent automatically') : __('Opened by :name', ['name' => $message->user?->name ?? __('someone')]) }}</span>
-                        </span>
-                        <span class="text-xs text-zinc-500">{{ $message->created_at?->translatedFormat('d M Y H:i') }}</span>
+                    <li class="py-1.5" title="{{ $message->body }}">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="flex items-center gap-2">
+                                <flux:badge size="sm" :color="$message->status === 'failed' ? 'red' : 'zinc'">{{ $message->event->label() }}</flux:badge>
+                                <span @class(['text-zinc-500', 'text-red-600 dark:text-red-400' => $message->status === 'failed'])>
+                                    @if ($message->channel === 'link')
+                                        {{ __('Opened by :name', ['name' => $message->user?->name ?? __('someone')]) }}
+                                    @elseif ($message->status === 'sent')
+                                        {{ __('Sent automatically') }}
+                                    @elseif ($message->status === 'queued')
+                                        {{ __('Sending automatically…') }}
+                                    @else
+                                        {{ __('Not sent automatically') }}
+                                    @endif
+                                </span>
+                            </span>
+                            <span class="flex items-center gap-2">
+                                @if ($message->status === 'failed' && $phone && $waEvent === '')
+                                    @can('admissions.update')
+                                        <flux:button size="xs" wire:click="composeWhatsApp('{{ $message->event->value }}')">{{ __('Send by hand') }}</flux:button>
+                                    @endcan
+                                @endif
+                                <span class="text-xs text-zinc-500">{{ $message->created_at?->translatedFormat('d M Y H:i') }}</span>
+                            </span>
+                        </div>
+                        @if ($message->status === 'failed' && $message->error)
+                            <div class="mt-0.5 text-xs text-red-600 dark:text-red-400">{{ $message->error }}</div>
+                        @endif
                     </li>
                 @endforeach
             </ul>
