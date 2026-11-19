@@ -2,6 +2,7 @@
 
 use App\Models\Site;
 use App\Support\Embed;
+use App\Support\PondokHero;
 use App\Support\SvgSanitizer;
 use Flux\Flux;
 use Illuminate\Http\UploadedFile;
@@ -93,6 +94,7 @@ new #[Title('Site settings')] class extends Component {
             'branding.calligraphy_dark' => ['nullable', 'file', 'mimes:png,svg,webp', 'max:4096'],
             'branding.favicon' => ['nullable', 'file', 'mimes:png,ico,svg', 'max:1024'],
             'branding.og_default' => ['nullable', 'image', 'max:4096'],
+            ...$this->heroRules(),
         ]);
 
         foreach (array_filter($this->branding) as $collection => $file) {
@@ -117,6 +119,43 @@ new #[Title('Site settings')] class extends Component {
         Flux::toast(variant: 'success', text: __('Settings saved.'));
     }
 
+    /**
+     * Validation of the Pondok home hero tab (module "home_hero").
+     *
+     * @return array<string, list<mixed>>
+     */
+    protected function heroRules(): array
+    {
+        if (! $this->site?->hasModule('home_hero')) {
+            return [];
+        }
+
+        $link = ['nullable', 'string', 'max:2048', 'regex:#^(https?://|/)#'];
+        $rules = [
+            'settings.hero__enabled' => ['boolean'],
+            'settings.hero__badge' => ['nullable', 'string', 'max:120'],
+            'settings.hero__title' => ['nullable', 'required_if_accepted:settings.hero__enabled', 'string', 'max:200'],
+            'settings.hero__text' => ['nullable', 'string', 'max:600'],
+            'settings.hero__primary_label' => ['nullable', 'required_with:settings.hero__primary_url', 'string', 'max:60'],
+            'settings.hero__primary_url' => [...$link, 'required_with:settings.hero__primary_label'],
+            'settings.hero__primary_new_tab' => ['boolean'],
+            'settings.hero__brochure_label' => ['nullable', 'string', 'max:60'],
+            'settings.hero__brochure_url' => $link,
+            'settings.hero__tour_label' => ['nullable', 'required_with:settings.hero__tour_url', 'string', 'max:60'],
+            'settings.hero__tour_url' => [...$link, 'required_with:settings.hero__tour_label'],
+            'settings.hero__slider_badge' => ['nullable', 'string', 'max:40'],
+            'branding.hero_brochure' => ['nullable', 'file', 'mimes:pdf', 'max:20480'],
+        ];
+
+        foreach (range(1, 4) as $slot) {
+            $rules["settings.hero__stat{$slot}_icon"] = ['nullable', 'in:'.implode(',', array_keys(PondokHero::ICONS))];
+            $rules["settings.hero__stat{$slot}_title"] = ['nullable', 'string', 'max:40'];
+            $rules["settings.hero__stat{$slot}_text"] = ['nullable', 'string', 'max:60'];
+        }
+
+        return $rules;
+    }
+
     public function removeBranding(string $collection): void
     {
         $this->authorize('sites.update');
@@ -138,7 +177,7 @@ new #[Title('Site settings')] class extends Component {
     @else
         <form wire:submit="save" class="flex flex-col gap-6">
             <flux:navbar class="-mb-2 overflow-x-auto">
-                @foreach (['identity' => __('Identity'), 'contact' => __('Contact & social'), 'theme' => __('Theme'), 'layout' => __('Header & footer'), 'analytics' => __('Analytics'), 'prayer' => __('Prayer times')] as $key => $label)
+                @foreach (['identity' => __('Identity'), 'contact' => __('Contact & social'), 'theme' => __('Theme'), 'layout' => __('Header & footer'), ...($this->site->hasModule('home_hero') ? ['hero' => __('Home hero')] : []), 'analytics' => __('Analytics'), 'prayer' => __('Prayer times')] as $key => $label)
                     <flux:navbar.item as="button" type="button" wire:click="$set('tab', '{{ $key }}')" :current="$tab === $key">{{ $label }}</flux:navbar.item>
                 @endforeach
             </flux:navbar>
@@ -222,6 +261,56 @@ new #[Title('Site settings')] class extends Component {
                             <option value="egyptian">{{ __('Egyptian General Authority') }}</option>
                         </flux:select>
                     </div>
+                @elseif ($tab === 'hero' && $this->site->hasModule('home_hero'))
+                    <flux:switch wire:model.live="settings.hero__enabled" :label="__('Show the hero at the top of the home page')" :description="__('Photos come from the Homepage slider. The hero needs at least a title.')" />
+                    <flux:input wire:model="settings.hero__badge" :label="__('Badge')" :placeholder="__('e.g. Penerimaan Santri Baru (PSB) 2026/2027 Dibuka')" :description="__('Small pill with a pulsing dot above the title. Leave empty to hide it.')" />
+                    <flux:input wire:model="settings.hero__title" :label="__('Title')" />
+                    <flux:textarea wire:model="settings.hero__text" :label="__('Text')" rows="3" />
+
+                    <flux:separator :text="__('Buttons')" />
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <flux:input wire:model="settings.hero__primary_label" :label="__('Main button text')" :placeholder="__('e.g. Daftar Santri Baru (Online)')" />
+                        <flux:input wire:model="settings.hero__primary_url" :label="__('Main button link')" placeholder="https://… / /penerimaan/daftar" />
+                    </div>
+                    <flux:checkbox wire:model="settings.hero__primary_new_tab" :label="__('Open the main button in a new tab')" />
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <flux:input wire:model="settings.hero__brochure_label" :label="__('Brochure button text')" :placeholder="__('e.g. Unduh Brosur & Panduan Biaya')" />
+                        <flux:input wire:model="settings.hero__brochure_url" :label="__('Brochure link (if no file is uploaded)')" placeholder="https://…" />
+                    </div>
+                    <flux:field>
+                        <flux:label>{{ __('Brochure file (PDF)') }}</flux:label>
+                        @if ($url = $this->site->brandingUrl('hero_brochure'))
+                            <div class="flex items-center gap-3">
+                                <flux:link :href="$url" target="_blank" class="text-sm">{{ $this->site->getFirstMedia('hero_brochure')?->file_name }}</flux:link>
+                                <flux:button size="xs" variant="ghost" wire:click="removeBranding('hero_brochure')">{{ __('Remove') }}</flux:button>
+                            </div>
+                        @endif
+                        <flux:input type="file" wire:model="branding.hero_brochure" accept="application/pdf" />
+                        <flux:description>{{ __('The uploaded file is used instead of the link. Up to 20 MB.') }}</flux:description>
+                        <flux:error name="branding.hero_brochure" />
+                    </flux:field>
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <flux:input wire:model="settings.hero__tour_label" :label="__('Text link')" :placeholder="__('e.g. Virtual Tour Kampus')" />
+                        <flux:input wire:model="settings.hero__tour_url" :label="__('Text link address')" placeholder="https://youtube.com/…" />
+                    </div>
+
+                    <flux:separator :text="__('Slider')" />
+                    <flux:input wire:model="settings.hero__slider_badge" :label="__('Badge on the slider')" :placeholder="__('e.g. Pondok Berprestasi')" />
+                    <flux:text size="sm">{{ __('Manage the photos, labels and titles under Homepage slider.') }}</flux:text>
+
+                    <flux:separator :text="__('Highlights')" />
+                    <flux:text size="sm">{{ __('Up to four highlights under the hero. Leave the title empty to hide one.') }}</flux:text>
+                    @foreach (range(1, 4) as $slot)
+                        <div wire:key="hero-stat-{{ $slot }}" class="grid gap-3 sm:grid-cols-[12rem_1fr_1fr]">
+                            <flux:select wire:model="settings.hero__stat{{ $slot }}_icon" :label="__('Icon :n', ['n' => $slot])">
+                                @foreach (PondokHero::ICONS as $icon => $iconLabel)
+                                    <option value="{{ $icon }}">{{ $iconLabel }}</option>
+                                @endforeach
+                            </flux:select>
+                            <flux:input wire:model="settings.hero__stat{{ $slot }}_title" :label="__('Title')" :placeholder="['Akreditasi A', 'Top 5 Pesantren', '3.200+ Santri', '100% Berasrama'][$slot - 1]" />
+                            <flux:input wire:model="settings.hero__stat{{ $slot }}_text" :label="__('Subtitle')" :placeholder="['Unggul BAN-S/M & Kemenag', 'Transformatif Jawa Tengah', 'Dari Penjuru Nusantara', 'Kurikulum Terpadu Modern'][$slot - 1]" />
+                        </div>
+                    @endforeach
                 @endif
             </flux:card>
 

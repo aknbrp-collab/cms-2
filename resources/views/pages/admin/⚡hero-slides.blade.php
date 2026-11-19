@@ -17,6 +17,8 @@ new #[Title('Homepage slider')] class extends Component {
 
     public ?string $imageId = null;
 
+    public string $label = '';
+
     public string $slideTitle = '';
 
     public string $text = '';
@@ -45,7 +47,17 @@ new #[Title('Homepage slider')] class extends Component {
     {
         $site = current_site();
 
-        return $site?->hasModule('hero_slides') ? $site : null;
+        return $site?->hasModule('hero_slides') && Auth::user()->canAccessSite($site) ? $site : null;
+    }
+
+    /**
+     * Pondok shows slides as photo cards with a label and title (home_hero);
+     * Ma'had shows them behind the hero text with a button.
+     */
+    #[Computed]
+    public function cards(): bool
+    {
+        return (bool) $this->site?->hasModule('home_hero');
     }
 
     /**
@@ -75,6 +87,7 @@ new #[Title('Homepage slider')] class extends Component {
         $this->fill([
             'editingId' => $slide->id,
             'imageId' => $slide->image_id,
+            'label' => (string) $slide->label,
             'slideTitle' => (string) $slide->title,
             'text' => (string) $slide->text,
             'buttonLabel' => (string) $slide->button_label,
@@ -93,9 +106,10 @@ new #[Title('Homepage slider')] class extends Component {
 
         $this->validate([
             'imageId' => ['required', 'exists:media_assets,id'],
+            'label' => ['nullable', 'string', 'max:60'],
             'slideTitle' => ['nullable', 'string', 'max:120'],
             'text' => ['nullable', 'string', 'max:300'],
-            'buttonLabel' => ['nullable', 'required_with:buttonUrl', 'string', 'max:40'],
+            'buttonLabel' => ['nullable', $this->cards ? 'prohibited' : 'required_with:buttonUrl', 'string', 'max:40'],
             'buttonUrl' => ['nullable', 'required_with:buttonLabel', 'string', 'max:2048', 'regex:#^(https?://|/)#'],
             'startsAt' => ['nullable', 'date'],
             'endsAt' => ['nullable', 'date', 'after:startsAt'],
@@ -117,6 +131,7 @@ new #[Title('Homepage slider')] class extends Component {
 
         $slide->fill([
             'image_id' => $this->imageId,
+            'label' => $this->label ?: null,
             'title' => $this->slideTitle ?: null,
             'text' => $this->text ?: null,
             'button_label' => $this->buttonLabel ?: null,
@@ -197,7 +212,7 @@ new #[Title('Homepage slider')] class extends Component {
 
     protected function resetForm(): void
     {
-        $this->reset('editingId', 'imageId', 'slideTitle', 'text', 'buttonLabel', 'buttonUrl', 'startsAt', 'endsAt');
+        $this->reset('editingId', 'imageId', 'label', 'slideTitle', 'text', 'buttonLabel', 'buttonUrl', 'startsAt', 'endsAt');
         $this->resetValidation();
         $this->formVersion++;
     }
@@ -207,7 +222,7 @@ new #[Title('Homepage slider')] class extends Component {
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <flux:heading size="xl">{{ __('Homepage slider') }}</flux:heading>
-            <flux:text class="mt-1">{{ __('Pictures behind the hero at the top of the home page. They change every few seconds; the site name and calligraphy stay on top.') }}</flux:text>
+            <flux:text class="mt-1">{{ $this->cards ? __('Photo cards in the hero at the top of the home page. They change every few seconds.') : __('Pictures behind the hero at the top of the home page. They change every few seconds; the site name and calligraphy stay on top.') }}</flux:text>
         </div>
         @if ($this->site)
             @can('hero_slides.create')
@@ -219,7 +234,7 @@ new #[Title('Homepage slider')] class extends Component {
     @if (! current_site())
         <x-admin.needs-site />
     @elseif (! $this->site)
-        <flux:callout icon="information-circle" color="zinc" :heading="__('Not used on this site')" :text="__('The homepage slider is part of the Ma\'had Aly theme. Switch to Ma\'had Aly in the sidebar.')" />
+        <flux:callout icon="information-circle" color="zinc" :heading="__('Not used on this site')" :text="__('This site does not use the homepage slider, or you do not manage it.')" />
     @else
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             @forelse ($this->slides as $slide)
@@ -244,7 +259,10 @@ new #[Title('Homepage slider')] class extends Component {
                                 <flux:badge size="sm" color="emerald">{{ __('Until :date', ['date' => $slide->ends_at->translatedFormat('d M Y')]) }}</flux:badge>
                             @endif
                         </div>
-                        <div class="font-medium">{{ $slide->title ?: __('(no title: site name is shown)') }}</div>
+                        @if ($slide->label)
+                            <flux:badge size="sm" color="emerald" class="self-start">{{ $slide->label }}</flux:badge>
+                        @endif
+                        <div class="font-medium">{{ $slide->title ?: ($this->cards ? __('(no title)') : __('(no title: site name is shown)')) }}</div>
                         @if ($slide->button_label)
                             <div class="truncate text-xs text-zinc-500">{{ $slide->button_label }} → {{ $slide->button_url }}</div>
                         @endif
@@ -272,15 +290,23 @@ new #[Title('Homepage slider')] class extends Component {
             <flux:heading size="lg">{{ $editingId ? __('Edit slide') : __('New slide') }}</flux:heading>
             <div wire:key="slide-media-{{ $formVersion }}">
                 <livewire:admin.media-picker wire:model="imageId" kind="image" :label="__('Image')" :key="'slide-image-'.$formVersion" />
-                <flux:text size="sm" class="mt-1">{{ __('Landscape, at least 1600 px wide. The left side sits behind the text, so keep faces and details on the right.') }}</flux:text>
+                <flux:text size="sm" class="mt-1">{{ $this->cards ? __('Landscape (4:3), at least 1200 px wide. The bottom is darkened behind the label and title.') : __('Landscape, at least 1600 px wide. The left side sits behind the text, so keep faces and details on the right.') }}</flux:text>
                 <flux:error name="imageId" />
             </div>
-            <flux:input wire:model="slideTitle" :label="__('Title (optional)')" :description="__('Shown instead of the site name while this slide is visible.')" />
-            <flux:textarea wire:model="text" :label="__('Text (optional)')" rows="2" />
-            <div class="grid gap-4 sm:grid-cols-2">
-                <flux:input wire:model="buttonLabel" :label="__('Button text (optional)')" :placeholder="__('e.g. Daftar sekarang')" />
-                <flux:input wire:model="buttonUrl" :label="__('Button link')" placeholder="/penerimaan" />
-            </div>
+            @if ($this->cards)
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <flux:input wire:model="label" :label="__('Label (optional)')" :placeholder="__('e.g. Prestasi Nasional')" />
+                    <flux:input wire:model="buttonUrl" :label="__('Link (optional)')" placeholder="/berita/…" />
+                </div>
+                <flux:input wire:model="slideTitle" :label="__('Title (optional)')" />
+            @else
+                <flux:input wire:model="slideTitle" :label="__('Title (optional)')" :description="__('Shown instead of the site name while this slide is visible.')" />
+                <flux:textarea wire:model="text" :label="__('Text (optional)')" rows="2" />
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <flux:input wire:model="buttonLabel" :label="__('Button text (optional)')" :placeholder="__('e.g. Daftar sekarang')" />
+                    <flux:input wire:model="buttonUrl" :label="__('Button link')" placeholder="/penerimaan" />
+                </div>
+            @endif
             <div class="grid gap-4 sm:grid-cols-2">
                 <flux:input type="datetime-local" wire:model="startsAt" :label="__('Show from (optional)')" />
                 <flux:input type="datetime-local" wire:model="endsAt" :label="__('Show until (optional)')" />

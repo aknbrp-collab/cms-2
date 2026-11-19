@@ -32,6 +32,15 @@
     --color-footer: #f1f5f9;
     --color-on-footer: #0f172a;
     --color-footer-bar: #064e3b;
+    /* Extra tones of the home hero (reference: beranda_pondok_pesantren_darul_amanah). */
+    --color-emerald: #15803d;
+    --color-accent-mint: #adedd3;
+    --color-on-accent-mint: #306d58;
+    --color-tertiary-deep: #7d4200;
+    --color-gold-tint: #fef3c7;
+    --color-surface-high: #dce9ff;
+    --color-surface-tint: #eff4ff;
+    --color-background-tint: #f8f9ff;
     /* Brand colour for text, borders and focus rings on surfaces. */
     --color-brand: var(--color-primary-container);
 
@@ -147,4 +156,12 @@
     --color-footer: #0b1220;
     --color-on-footer: #e2e8f0;
     --color-footer-bar: #022c22;
+    --color-emerald: #4ade80;
+    --color-accent-mint: #133b2e;
+    --color-on-accent-mint: #9fe3c6;
+    --color-tertiary-deep: #fbbf24;
+    --color-gold-tint: #3a2c08;
+    --color-surface-high: #1c2b3d;
+    --color-surface-tint: #0e1714;
+    --color-background-tint: #0b1310;
 }

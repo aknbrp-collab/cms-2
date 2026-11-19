@@ -6,6 +6,7 @@
         'description', 'east', 'expand_more', 'location_on', 'mail', 'menu', 'menu_book', 'mosque',
         'music_note', 'person', 'photo_camera', 'play_circle', 'public', 'schedule', 'school', 'search',
         'pause', 'play_arrow', 'star', 'upload', 'verified', 'account_balance', 'arrow_outward', 'edit_document', 'format_quote',
+        'how_to_reg', 'download', 'verified_user', 'military_tech', 'groups', 'apartment',
     ])->sort()->join(',');
     $favicon = $site->brandingUrl('favicon');
     // Each theme's typefaces (see resources/css/sites/{key}.css); Amiri for Arabic text.

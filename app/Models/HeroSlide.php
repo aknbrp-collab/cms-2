@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property bool $is_hidden
  * @property string $site_id
  * @property string|null $image_id
+ * @property string|null $label
  * @property string|null $title
  * @property string|null $text
  * @property string|null $button_label
@@ -30,7 +31,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read MediaAsset|null $image
  */
-#[Fillable(['site_id', 'image_id', 'title', 'text', 'button_label', 'button_url', 'sort_order', 'starts_at', 'ends_at'])]
+#[Fillable(['site_id', 'image_id', 'label', 'title', 'text', 'button_label', 'button_url', 'sort_order', 'starts_at', 'ends_at'])]
 class HeroSlide extends Model
 {
     use Auditable, BelongsToSite, HasUuids, HasVisibility;

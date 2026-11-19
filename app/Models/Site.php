@@ -33,7 +33,7 @@ class Site extends Model implements HasMedia
     /**
      * Branding images managed in site settings.
      */
-    public const BRANDING_COLLECTIONS = ['logo', 'logo_dark', 'calligraphy', 'calligraphy_dark', 'favicon', 'og_default'];
+    public const BRANDING_COLLECTIONS = ['logo', 'logo_dark', 'calligraphy', 'calligraphy_dark', 'favicon', 'og_default', 'hero_brochure'];
 
     /**
      * Every setting with its default value. Keys use dot notation.
@@ -67,6 +67,31 @@ class Site extends Model implements HasMedia
         'prayer.latitude' => null,
         'prayer.longitude' => null,
         'prayer.method' => 'kemenag',
+        // Pondok home hero (module "home_hero"), see App\Support\PondokHero.
+        'hero.enabled' => false,
+        'hero.badge' => '',
+        'hero.title' => '',
+        'hero.text' => '',
+        'hero.primary_label' => '',
+        'hero.primary_url' => '',
+        'hero.primary_new_tab' => false,
+        'hero.brochure_label' => '',
+        'hero.brochure_url' => '',
+        'hero.tour_label' => '',
+        'hero.tour_url' => '',
+        'hero.slider_badge' => '',
+        'hero.stat1_icon' => 'verified_user',
+        'hero.stat1_title' => '',
+        'hero.stat1_text' => '',
+        'hero.stat2_icon' => 'military_tech',
+        'hero.stat2_title' => '',
+        'hero.stat2_text' => '',
+        'hero.stat3_icon' => 'groups',
+        'hero.stat3_title' => '',
+        'hero.stat3_text' => '',
+        'hero.stat4_icon' => 'apartment',
+        'hero.stat4_title' => '',
+        'hero.stat4_text' => '',
     ];
 
     /**

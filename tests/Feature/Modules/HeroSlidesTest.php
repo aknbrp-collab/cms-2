@@ -69,15 +69,32 @@ test('a single slide has no carousel controls and falls back to the site name', 
         ->assertSee('<p class="mt-6 font-display', false);
 });
 
-test('the slider is a ma\'had module only', function () {
+test('pondok slides are cards with a label and an optional link, shown only in its hero', function () {
     $pondok = Site::findByKey(SiteKey::Pondok);
     slide($pondok, ['title' => 'Slide Pondok']);
 
+    // The Pondok hero is off until an admin switches it on.
     $this->get('http://pondok.test/')->assertOk()->assertDontSee('Slide Pondok');
 
     onSite(SiteKey::Pondok);
-    $this->actingAs(cmsUser(Role::Superadmin));
-    Livewire::test('pages::admin.hero-slides')->assertSee('Not used on this site')->call('create')->assertForbidden();
+    $this->actingAs(cmsUser(Role::PondokAdmin));
+    Livewire::test('pages::admin.hero-slides')
+        ->assertSee('Photo cards in the hero')
+        ->call('create')
+        ->set('imageId', slideImage($pondok)->id)
+        ->set('label', 'Prestasi Nasional')
+        ->set('slideTitle', 'Juara Umum Pencak Silat')
+        ->set('buttonUrl', '/berita/juara')
+        ->call('save')
+        ->assertHasNoErrors()
+        ->call('create')
+        ->set('imageId', slideImage($pondok)->id)
+        ->set('buttonLabel', 'Daftar')
+        ->call('save')
+        ->assertHasErrors('buttonLabel');
+
+    expect(HeroSlide::query()->where('label', 'Prestasi Nasional')->sole()->only(['title', 'button_url']))
+        ->toBe(['title' => 'Juara Umum Pencak Silat', 'button_url' => '/berita/juara']);
 });
 
 test('ma\'had admins create, reorder, hide and delete slides', function () {
@@ -134,8 +151,9 @@ test('other roles cannot manage slides', function () {
     $slide = slide($this->mahad, ['title' => 'Milik Mahad']);
 
     onSite(SiteKey::Mahad);
+    // Pondok admins have the slider for their own site, not for the Ma'had.
     $this->actingAs(cmsUser(Role::PondokAdmin));
-    Livewire::test('pages::admin.hero-slides')->assertForbidden();
+    Livewire::test('pages::admin.hero-slides')->assertSee('or you do not manage it')->call('toggleHidden', $slide->id)->assertForbidden();
 
     $this->actingAs(cmsUser(Role::SocialMediaManager));
     Livewire::test('pages::admin.hero-slides')->assertForbidden();

@@ -1,5 +1,11 @@
+@php
+    $hero = new App\Support\PondokHero($site);
+@endphp
+
 <x-site.layout :site="$site" :seo="$seo">
-    <h1 class="sr-only">{{ $site->name }}</h1>
+    @unless ($hero->enabled())
+        <h1 class="sr-only">{{ $site->name }}</h1>
+    @endunless
 
     @if ($ticker = $announcements->first())
         <section class="border-b border-border-subtle bg-surface-card py-2.5 shadow-sm">
@@ -15,6 +21,10 @@
                 </span>
             </div>
         </section>
+    @endif
+
+    @if ($hero->enabled())
+        @include('sites.pondok.hero', ['hero' => $hero, 'slides' => $slides])
     @endif
 
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-10 lg:px-10">

@@ -79,7 +79,7 @@ return [
             'modules' => [
                 'pages', 'posts', 'events', 'galleries', 'faqs',
                 'admissions', 'leaders', 'facilities', 'achievements', 'extracurriculars',
-                'education_units', 'alumni', 'testimonials',
+                'education_units', 'alumni', 'testimonials', 'hero_slides', 'home_hero',
             ],
         ],
         'mahad' => [
