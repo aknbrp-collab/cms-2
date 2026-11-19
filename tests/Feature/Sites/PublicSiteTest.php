@@ -20,8 +20,9 @@ beforeEach(function () {
 });
 
 test('each site renders its own theme', function () {
-    $this->get('http://pondok.test/')->assertOk()->assertSee(e($this->pondok->name), false)->assertDontSee('السَّلَامُ', false);
-    $this->get('http://mahad.test/')->assertOk()->assertSee('السَّلَامُ', false);
+    $this->get('http://pondok.test/')->assertOk()->assertSee(e($this->pondok->name), false)->assertDontSee('تَفَقُّهٌ فِي الدِّينِ', false);
+    // The Ma'had theme has the Arabic footer motto; its top bar no longer carries the salam.
+    $this->get('http://mahad.test/')->assertOk()->assertSee('تَفَقُّهٌ فِي الدِّينِ', false)->assertDontSee('السَّلَامُ', false);
 });
 
 test('only published posts of the current site are shown', function () {

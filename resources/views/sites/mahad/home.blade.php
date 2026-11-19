@@ -3,7 +3,6 @@
 
     $quickLinks = app(App\Support\SiteTheme::class)->menu(MenuLocation::TopBar)->take(4);
     $quickIcons = ['menu_book', 'school', 'description', 'public'];
-    $calligraphy = $site->brandingUrl('calligraphy');
     $hasCta = $site->setting('header.cta_url') && $site->setting('header.cta_label');
     $spotlight = $programs->first();
     $leader = $leaders->first();
@@ -11,7 +10,7 @@
 @endphp
 
 <x-site.layout :site="$site" :seo="$seo">
-    {{-- Hero: slides (when set) behind a gradient, text on the left, calligraphy on the right. --}}
+    {{-- Hero: slides (when set) behind a gradient; text on the left, the photo left clear on the right. --}}
     <section
         @class(['relative overflow-hidden bg-primary py-16 text-on-primary lg:py-24', 'lg:min-h-[34rem]' => $slides->isNotEmpty()])
         @if ($slides->count() > 1)
@@ -59,7 +58,7 @@
                         @class(['absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 motion-reduce:transition-none', 'opacity-0' => ! $loop->first])
                     >
                 @endforeach
-                <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/40"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/75 to-transparent"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent lg:hidden"></div>
             </div>
         @else
@@ -111,7 +110,8 @@
                                     x-on:click="go({{ $loop->index }})"
                                     x-bind:aria-current="current === {{ $loop->index }}"
                                     x-bind:class="current === {{ $loop->index }} ? 'w-7 bg-secondary-container' : 'w-2.5 bg-on-primary/40 hover:bg-on-primary/70'"
-                                    @class(['h-2.5 rounded-full transition-all', 'w-7 bg-secondary-container' => $loop->first, 'w-2.5 bg-on-primary/40' => ! $loop->first])
+                                    {{-- Width and colour come only from x-bind: Alpine never removes static classes. --}}
+                                    class="h-2.5 rounded-full transition-all"
                                     aria-label="{{ __('Tampilkan slide :n', ['n' => $loop->iteration]) }}"
                                 ></button>
                             @endforeach
@@ -125,17 +125,6 @@
                         </button>
                     </div>
                 @endif
-            </div>
-
-            <div class="hidden justify-end lg:col-span-5 lg:flex">
-                <div class="flex aspect-square w-full max-w-sm flex-col items-center justify-center gap-4 rounded-lg border border-on-primary/20 bg-primary-container/60 p-10 text-center backdrop-blur-sm">
-                    @if ($calligraphy)
-                        <img src="{{ $calligraphy }}" alt="{{ $site->name }}" class="max-h-48 w-auto object-contain">
-                    @else
-                        <p class="font-arabic text-4xl leading-relaxed text-secondary-container" lang="ar" dir="rtl">تَفَقُّهٌ فِي الدِّينِ</p>
-                    @endif
-                    <p class="font-mono text-[13px] tracking-widest text-on-primary/75 uppercase">{{ $site->name }}</p>
-                </div>
             </div>
         </div>
     </section>

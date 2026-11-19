@@ -26,8 +26,6 @@
         <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2 sm:px-6 lg:px-10">
             <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold tracking-wide">
                 <x-site.icon name="mosque" class="text-[18px]! text-secondary-container" />
-                <span class="hidden font-arabic text-sm font-normal whitespace-nowrap text-on-primary/90 lg:inline" lang="ar" dir="rtl">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</span>
-                <span class="hidden text-on-primary-container lg:inline" aria-hidden="true">•</span>
                 <span class="tabular-nums">
                     @if ($prayer)
                         {{ $prayer['hijri'] }} /
@@ -53,26 +51,23 @@
     {{-- Sticky main header --}}
     <header class="sticky top-0 z-50 border-b border-border-subtle bg-surface-card/95 backdrop-blur-md">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-10">
+            {{-- Brand: logo and calligraphy only; the name stays for screen readers. --}}
             <a href="{{ route('site.home') }}" class="flex min-w-0 items-center gap-3">
+                <span class="sr-only">{{ $site->name }}</span>
                 @if ($logo)
-                    <img src="{{ $logo }}" alt="" @class(['size-11 shrink-0 object-contain', 'dark:hidden' => $logoDark])>
+                    <img src="{{ $logo }}" alt="" @class(['size-12 shrink-0 object-contain', 'dark:hidden' => $logoDark])>
                     @if ($logoDark)
-                        <img src="{{ $logoDark }}" alt="" class="hidden size-11 shrink-0 object-contain dark:block">
+                        <img src="{{ $logoDark }}" alt="" class="hidden size-12 shrink-0 object-contain dark:block">
                     @endif
                 @else
-                    <span class="flex size-11 shrink-0 items-center justify-center rounded-md bg-primary text-secondary-container"><x-site.icon name="account_balance" class="text-2xl!" /></span>
+                    <span class="flex size-12 shrink-0 items-center justify-center rounded-md bg-primary text-secondary-container"><x-site.icon name="account_balance" class="text-2xl!" /></span>
                 @endif
-                <span class="flex min-w-0 flex-col">
-                    <span class="flex items-center gap-2">
-                        <span class="truncate font-display text-2xl leading-none font-semibold text-brand">{{ $site->name }}</span>
-                        @if ($calligraphy)
-                            <img src="{{ $calligraphy }}" alt="" class="hidden h-7 w-auto object-contain sm:block">
-                        @endif
-                    </span>
-                    @if ($site->setting('identity.tagline'))
-                        <span class="mt-1 hidden truncate text-xs font-bold tracking-wide text-on-surface-variant sm:block">{{ $site->setting('identity.tagline') }}</span>
-                    @endif
-                </span>
+                @if ($calligraphy)
+                    <img src="{{ $calligraphy }}" alt="" class="h-10 w-auto max-w-[220px] object-contain">
+                @elseif (! $logo)
+                    {{-- Nothing uploaded yet: show the name so the header is not empty. --}}
+                    <span class="truncate font-display text-2xl leading-none font-semibold text-brand" aria-hidden="true">{{ $site->name }}</span>
+                @endif
             </a>
 
             <nav class="hidden items-center gap-7 whitespace-nowrap xl:flex" aria-label="{{ __('Navigasi utama') }}">
