@@ -11,11 +11,11 @@ use App\Models\User;
 use App\Notifications\AdmissionDocumentNeedsFix;
 use App\Services\WhatsApp\WhatsAppNotifier;
 use App\Support\Audit;
+use App\Support\ImageReencoder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Spatie\Image\Image;
 use Throwable;
 
 /**
@@ -94,7 +94,7 @@ class AdmissionDocuments
     protected function reencodeImage(string $path): void
     {
         try {
-            Image::load($path)->orientation()->save($path);
+            ImageReencoder::reencode($path);
         } catch (Throwable) {
             @unlink($path);
 

@@ -8,12 +8,12 @@ use App\Models\MediaAsset;
 use App\Models\SiakadArticle;
 use App\Siakad\IntegrationLogger;
 use App\Siakad\SiakadException;
+use App\Support\ImageReencoder;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Spatie\Image\Image;
 use Throwable;
 
 /**
@@ -138,7 +138,7 @@ class FetchSiakadArticleImage implements ShouldQueue
         file_put_contents($path, $body);
 
         try {
-            Image::load($path)->orientation()->save($path);
+            ImageReencoder::reencode($path);
         } catch (Throwable) {
             @unlink($path);
 
