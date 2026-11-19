@@ -136,7 +136,7 @@
                     </flux:sidebar.group>
                 @endcanany
 
-                @canany(['users.view', 'roles.view', 'audit_logs.view'])
+                @canany(['users.view', 'roles.view', 'audit_logs.view', 'data.view'])
                     <flux:sidebar.group :heading="__('System')" class="grid">
                         @can('users.view')
                             <flux:sidebar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
@@ -151,6 +151,11 @@
                         @can('audit_logs.view')
                             <flux:sidebar.item icon="clipboard-document-list" :href="route('admin.audit-logs')" :current="request()->routeIs('admin.audit-logs')" wire:navigate>
                                 {{ __('Audit logs') }}
+                            </flux:sidebar.item>
+                        @endcan
+                        @can('data.view')
+                            <flux:sidebar.item icon="circle-stack" :href="route('admin.data')" :current="request()->routeIs('admin.data*')" wire:navigate>
+                                {{ __('Data & backups') }}
                             </flux:sidebar.item>
                         @endcan
                     </flux:sidebar.group>

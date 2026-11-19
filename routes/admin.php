@@ -3,6 +3,7 @@
 use App\Cms\Resources;
 use App\Http\Controllers\Admin\AdmissionDocumentFileController;
 use App\Http\Controllers\Admin\AlumniTemplateController;
+use App\Http\Controllers\Admin\DownloadBackupController;
 use App\Http\Controllers\Admin\ExportRegistrationsController;
 use App\Http\Controllers\Admin\SocialConnectController;
 use App\Http\Controllers\Admin\SwitchSiteController;
@@ -118,4 +119,11 @@ Route::middleware(['auth', 'verified', EnsureAdminAccess::class, SetAdminSite::c
     Route::livewire('audit-logs', 'pages::admin.audit-logs')
         ->middleware('can:audit_logs.view')
         ->name('admin.audit-logs');
+
+    Route::livewire('data', 'pages::admin.data')
+        ->middleware('can:data.view')
+        ->name('admin.data');
+    Route::get('data/download', DownloadBackupController::class)
+        ->middleware('can:data.backup')
+        ->name('admin.data.download');
 });

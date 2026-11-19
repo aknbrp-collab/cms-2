@@ -31,6 +31,7 @@ class Permissions
         'categories' => ['view', 'create', 'update', 'delete'],
         'media' => ['view', 'create', 'update', 'delete'],
         'audit_logs' => ['view'],
+        'data' => ['view', 'backup', 'restore', 'purge'],
         'integration_logs' => ['view', 'retry'],
         'siakad_articles' => ['view', 'review', 'publish'],
         'legal_questions' => ['view', 'moderate', 'forward', 'publish'],
