@@ -127,7 +127,7 @@ class DemoContentSeeder extends Seeder
             ['Galeri', null, [['Foto', '/galeri?jenis=photo'], ['Video', '/galeri?jenis=video']]],
             ['Kontak', $pages['kontak']],
         ]);
-        $this->call([ProgramPendidikanSeeder::class, AlumniMenuSeeder::class]);
+        $this->call([ProgramPendidikanSeeder::class, AlumniMenuSeeder::class, KolomAlumniSeeder::class]);
 
         $this->menu($site, MenuLocation::Footer, [
             ['Pengumuman', '/pengumuman'],
