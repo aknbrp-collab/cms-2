@@ -79,6 +79,8 @@ Route::middleware(ResolveSite::class)->name('site.')->group(function () {
     Route::get('prestasi', [DirectoryController::class, 'achievements'])->name('achievements');
     Route::get('program-pendidikan', [DirectoryController::class, 'educationUnits'])->name('education-units.index');
     Route::get('program-pendidikan/{slug}', [DirectoryController::class, 'educationUnit'])->name('education-units.show');
+    Route::get('alumni', [DirectoryController::class, 'alumni'])->name('alumni.index');
+    Route::get('alumni/testimoni', [DirectoryController::class, 'testimonials'])->name('alumni.testimonials');
     Route::get('dosen', [DirectoryController::class, 'lecturers'])->name('lecturers.index');
     Route::get('dosen/{slug}', [DirectoryController::class, 'lecturer'])->name('lecturers.show');
     Route::get('program', [DirectoryController::class, 'programs'])->name('programs.index');

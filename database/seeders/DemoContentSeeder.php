@@ -18,6 +18,7 @@ use App\Enums\PublicationType;
 use App\Enums\SiteKey;
 use App\Models\Achievement;
 use App\Models\AdmissionPeriod;
+use App\Models\Alumnus;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Extracurricular;
@@ -36,6 +37,7 @@ use App\Models\Program;
 use App\Models\Publication;
 use App\Models\SiakadArticle;
 use App\Models\Site;
+use App\Models\Testimonial;
 use App\Models\User;
 use App\Support\CurrentSite;
 use Illuminate\Database\Eloquent\Model;
@@ -125,7 +127,7 @@ class DemoContentSeeder extends Seeder
             ['Galeri', null, [['Foto', '/galeri?jenis=photo'], ['Video', '/galeri?jenis=video']]],
             ['Kontak', $pages['kontak']],
         ]);
-        $this->call(ProgramPendidikanSeeder::class);
+        $this->call([ProgramPendidikanSeeder::class, AlumniMenuSeeder::class]);
 
         $this->menu($site, MenuLocation::Footer, [
             ['Pengumuman', '/pengumuman'],
@@ -231,6 +233,20 @@ class DemoContentSeeder extends Seeder
             ['title' => 'Juara 1 MTQ Putri', 'student_name' => 'Siti Aisyah', 'level' => AchievementLevel::District, 'event_name' => 'MTQ Kabupaten Kendal', 'achieved_on' => now()->subMonth()],
             ['title' => 'Medali Perak Olimpiade Sains', 'student_name' => 'Muhammad Faiz', 'level' => AchievementLevel::National, 'event_name' => 'OSN Pesantren', 'achieved_on' => now()->subMonths(2)],
             ['title' => 'Juara 2 Debat Bahasa Arab', 'student_name' => 'Tim Debat', 'level' => AchievementLevel::Province, 'event_name' => 'Festival Bahasa Arab Jateng', 'achieved_on' => now()->subMonths(3)],
+        ]);
+
+        $this->reference(Alumnus::class, $site, [
+            ['name' => 'Ahmad Fauzi', 'graduation_year' => 2018, 'city' => 'Kendal'],
+            ['name' => 'Siti Nurhaliza', 'graduation_year' => 2018, 'city' => 'Semarang'],
+            ['name' => 'Muhammad Rizqi', 'graduation_year' => 2020, 'city' => 'Batang'],
+            ['name' => 'Laila Fitriani', 'graduation_year' => 2021, 'city' => 'Temanggung'],
+            ['name' => 'Hasan Basri', 'graduation_year' => 2022, 'city' => 'Kendal'],
+            ['name' => 'Nur Aini', 'graduation_year' => 2023, 'city' => 'Pekalongan'],
+        ]);
+
+        $this->reference(Testimonial::class, $site, [
+            ['name' => 'Muhammad Rizqi', 'graduation_year' => 2020, 'occupation' => 'Mahasiswa Universitas Al-Azhar Kairo', 'quote' => 'Bekal kitab kuning dan bahasa Arab di pondok sangat membantu saya kuliah di Kairo.'],
+            ['name' => 'Laila Fitriani', 'graduation_year' => 2021, 'occupation' => 'Guru MI di Temanggung', 'quote' => 'Disiplin dan adab yang ditanamkan para asatidz terbawa sampai sekarang saat saya mengajar.'],
         ]);
     }
 

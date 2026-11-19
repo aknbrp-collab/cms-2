@@ -5,7 +5,7 @@
         'arrow_back', 'arrow_forward', 'calendar_today', 'call', 'campaign', 'chat', 'chevron_left', 'chevron_right', 'close', 'dark_mode', 'light_mode',
         'description', 'east', 'expand_more', 'location_on', 'mail', 'menu', 'menu_book', 'mosque',
         'music_note', 'person', 'photo_camera', 'play_circle', 'public', 'schedule', 'school', 'search',
-        'pause', 'play_arrow', 'star', 'upload', 'verified', 'account_balance', 'arrow_outward', 'edit_document',
+        'pause', 'play_arrow', 'star', 'upload', 'verified', 'account_balance', 'arrow_outward', 'edit_document', 'format_quote',
     ])->sort()->join(',');
     $favicon = $site->brandingUrl('favicon');
     // Each theme's typefaces (see resources/css/sites/{key}.css); Amiri for Arabic text.

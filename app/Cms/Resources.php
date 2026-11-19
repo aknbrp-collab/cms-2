@@ -3,6 +3,7 @@
 namespace App\Cms;
 
 use App\Cms\Resources\Achievements;
+use App\Cms\Resources\Alumni;
 use App\Cms\Resources\EducationUnits;
 use App\Cms\Resources\Extracurriculars;
 use App\Cms\Resources\Facilities;
@@ -10,6 +11,7 @@ use App\Cms\Resources\Journals;
 use App\Cms\Resources\Lecturers;
 use App\Cms\Resources\Organizations;
 use App\Cms\Resources\Programs;
+use App\Cms\Resources\Testimonials;
 
 /**
  * Registry of the simple admin resources.
@@ -21,6 +23,8 @@ class Resources
         Achievements::class,
         Extracurriculars::class,
         EducationUnits::class,
+        Alumni::class,
+        Testimonials::class,
         Programs::class,
         Lecturers::class,
         Journals::class,

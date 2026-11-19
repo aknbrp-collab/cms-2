@@ -13,6 +13,7 @@ class Permissions
     public const CONTENT_MODULES = [
         'pages', 'posts', 'events', 'galleries', 'faqs', 'admissions', 'leaders',
         'facilities', 'achievements', 'extracurriculars', 'education_units',
+        'alumni', 'testimonials',
         'lecturers', 'programs', 'curricula', 'publications', 'journals', 'organizations',
         'hero_slides',
     ];

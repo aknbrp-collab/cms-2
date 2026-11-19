@@ -60,6 +60,7 @@ class SitemapController extends Controller
             'leaders' => 'site.leaders', 'admissions' => 'site.admissions.show', 'facilities' => 'site.facilities',
             'extracurriculars' => 'site.extracurriculars', 'achievements' => 'site.achievements',
             'education_units' => 'site.education-units.index',
+            'alumni' => 'site.alumni.index', 'testimonials' => 'site.alumni.testimonials',
             'lecturers' => 'site.lecturers.index', 'programs' => 'site.programs.index',
             'publications' => 'site.publications.index', 'journals' => 'site.journals.index',
             'organizations' => 'site.organizations', 'legal_questions' => 'site.legal-questions.index',

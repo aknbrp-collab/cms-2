@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Site;
 use App\Enums\PublicationType;
 use App\Http\Controllers\Controller;
 use App\Models\Achievement;
+use App\Models\Alumnus;
 use App\Models\EducationUnit;
 use App\Models\Extracurricular;
 use App\Models\Facility;
@@ -14,6 +15,7 @@ use App\Models\Organization;
 use App\Models\Program;
 use App\Models\Publication;
 use App\Models\Site;
+use App\Models\Testimonial;
 use App\Support\Seo;
 use App\Support\SiteTheme;
 use Illuminate\Contracts\View\View;
@@ -80,6 +82,41 @@ class DirectoryController extends Controller
             'unit' => $unit,
             'curriculum' => $unit->curriculum(),
             'others' => EducationUnit::query()->published()->whereKeyNot($unit->id)->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'slug']),
+        ]);
+    }
+
+    public function alumni(Request $request): View
+    {
+        $site = $this->site('alumni');
+        $search = trim((string) $request->query('q'));
+        $year = (int) $request->query('angkatan');
+
+        return $this->theme->view('alumni.index', [
+            'seo' => Seo::forSite($site, __('Data Alumni')),
+            'search' => $search,
+            'year' => $year ?: null,
+            'years' => Alumnus::query()->published()->distinct()->orderByDesc('graduation_year')->pluck('graduation_year'),
+            'total' => Alumnus::query()->published()->count(),
+            'alumni' => Alumnus::query()
+                ->published()
+                ->when($search !== '', fn ($query) => $query->where(fn ($query) => $query
+                    ->whereLike('name', "%{$search}%")
+                    ->orWhereLike('city', "%{$search}%")))
+                ->when($year > 0, fn ($query) => $query->where('graduation_year', $year))
+                ->orderByDesc('graduation_year')
+                ->orderBy('name')
+                ->paginate(30)
+                ->withQueryString(),
+        ]);
+    }
+
+    public function testimonials(): View
+    {
+        $site = $this->site('testimonials');
+
+        return $this->theme->view('alumni.testimonials', [
+            'seo' => Seo::forSite($site, __('Testimoni Alumni')),
+            'testimonials' => Testimonial::query()->published()->with('photo.media')->orderBy('sort_order')->latest()->get(),
         ]);
     }
 

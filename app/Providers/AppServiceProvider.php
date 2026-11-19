@@ -165,6 +165,8 @@ class AppServiceProvider extends ServiceProvider
             'course' => Models\Course::class,
             'education_unit' => Models\EducationUnit::class,
             'education_unit_subject' => Models\EducationUnitSubject::class,
+            'alumnus' => Models\Alumnus::class,
+            'testimonial' => Models\Testimonial::class,
             'journal' => Models\Journal::class,
             'organization' => Models\Organization::class,
             'publication' => Models\Publication::class,
