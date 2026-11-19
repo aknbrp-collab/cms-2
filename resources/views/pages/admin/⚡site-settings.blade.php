@@ -90,6 +90,7 @@ new #[Title('Site settings')] class extends Component {
             'branding.logo' => ['nullable', 'image', 'max:4096'],
             'branding.logo_dark' => ['nullable', 'image', 'max:4096'],
             'branding.calligraphy' => ['nullable', 'file', 'mimes:png,svg,webp', 'max:4096'],
+            'branding.calligraphy_dark' => ['nullable', 'file', 'mimes:png,svg,webp', 'max:4096'],
             'branding.favicon' => ['nullable', 'file', 'mimes:png,ico,svg', 'max:1024'],
             'branding.og_default' => ['nullable', 'image', 'max:4096'],
         ]);
@@ -149,12 +150,12 @@ new #[Title('Site settings')] class extends Component {
                     <flux:textarea wire:model="settings.identity__description" :label="__('Short description')" rows="3" :description="__('Used as the default meta description.')" />
 
                     <div class="grid gap-5 sm:grid-cols-2">
-                        @foreach (['logo' => __('Logo'), 'logo_dark' => __('Logo for dark mode (optional)'), 'calligraphy' => __('Name in Arabic calligraphy'), 'favicon' => __('Favicon'), 'og_default' => __('Default social share image')] as $collection => $label)
+                        @foreach (['logo' => __('Logo'), 'logo_dark' => __('Logo for dark mode (optional)'), 'calligraphy' => __('Name in Arabic calligraphy'), 'calligraphy_dark' => __('Calligraphy for dark mode (optional)'), 'favicon' => __('Favicon'), 'og_default' => __('Default social share image')] as $collection => $label)
                             <flux:field wire:key="branding-{{ $collection }}">
                                 <flux:label>{{ $label }}</flux:label>
                                 @if ($url = $this->site->brandingUrl($collection))
                                     <div class="flex items-center gap-3">
-                                        <img src="{{ $url }}" alt="" class="h-14 max-w-40 rounded border border-zinc-200 bg-zinc-50 object-contain p-1 dark:border-zinc-700">
+                                        <img src="{{ $url }}" alt="" @class(['h-14 max-w-40 rounded border border-zinc-200 object-contain p-1 dark:border-zinc-700', 'bg-zinc-800' => str_ends_with($collection, '_dark'), 'bg-zinc-50' => ! str_ends_with($collection, '_dark')])>
                                         <flux:button size="xs" variant="ghost" wire:click="removeBranding('{{ $collection }}')">{{ __('Remove') }}</flux:button>
                                     </div>
                                 @endif

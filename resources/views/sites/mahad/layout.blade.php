@@ -10,6 +10,7 @@
     $logo = $site->brandingUrl('logo');
     $logoDark = $site->brandingUrl('logo_dark');
     $calligraphy = $site->brandingUrl('calligraphy');
+    $calligraphyDark = $site->brandingUrl('calligraphy_dark');
     $hasCta = $site->setting('header.cta_url') && $site->setting('header.cta_label');
     $navLink = 'border-b-2 py-1 text-sm font-bold transition-colors duration-150';
 @endphp
@@ -63,7 +64,13 @@
                     <span class="flex size-12 shrink-0 items-center justify-center rounded-md bg-primary text-secondary-container"><x-site.icon name="account_balance" class="text-2xl!" /></span>
                 @endif
                 @if ($calligraphy)
-                    <img src="{{ $calligraphy }}" alt="" class="h-10 w-auto max-w-[220px] object-contain">
+                    <img src="{{ $calligraphy }}" alt="" @class(['h-10 w-auto max-w-[220px] object-contain', 'dark:hidden' => $calligraphyDark])>
+                    @if ($calligraphyDark)
+                        <img src="{{ $calligraphyDark }}" alt="" class="hidden h-10 w-auto max-w-[220px] object-contain dark:block">
+                    @endif
+                @elseif ($calligraphyDark)
+                    {{-- Only a dark-mode version uploaded: it is made for dark backgrounds. --}}
+                    <img src="{{ $calligraphyDark }}" alt="" class="hidden h-10 w-auto max-w-[220px] object-contain dark:block">
                 @elseif (! $logo)
                     {{-- Nothing uploaded yet: show the name so the header is not empty. --}}
                     <span class="truncate font-display text-2xl leading-none font-semibold text-brand" aria-hidden="true">{{ $site->name }}</span>

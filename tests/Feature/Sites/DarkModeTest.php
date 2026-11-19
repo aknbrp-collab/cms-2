@@ -49,6 +49,28 @@ test('a dark mode logo swaps in when uploaded', function () {
         ->assertSee('src="'.$darkLogo.'"', false);
 });
 
+test("a dark mode calligraphy swaps in on the Ma'had header when uploaded", function () {
+    $site = Site::findByKey(SiteKey::Mahad);
+
+    onSite(SiteKey::Mahad);
+    $this->actingAs(cmsUser(Role::Superadmin));
+    Livewire::test('pages::admin.site-settings')
+        ->set('branding.calligraphy', UploadedFile::fake()->image('calligraphy.png'))
+        ->set('branding.calligraphy_dark', UploadedFile::fake()->image('calligraphy-dark.png'))
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $site = $site->fresh();
+    $light = $site->brandingUrl('calligraphy');
+    $dark = $site->brandingUrl('calligraphy_dark');
+    expect($dark)->not->toBe('')->not->toBe($light);
+
+    $this->get('http://mahad.test/')
+        ->assertOk()
+        ->assertSee('src="'.$light.'" alt="" class="h-10 w-auto max-w-[220px] object-contain dark:hidden"', false)
+        ->assertSee('src="'.$dark.'" alt="" class="hidden h-10 w-auto max-w-[220px] object-contain dark:block"', false);
+});
+
 test('public views use the brand token, not primary, for text, borders and rings', function () {
     $files = collect(['sites', 'components/site', 'errors', 'legal', 'social'])
         ->flatMap(fn (string $directory) => File::allFiles(resource_path("views/{$directory}")));
