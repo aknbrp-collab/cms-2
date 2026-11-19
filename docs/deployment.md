@@ -19,7 +19,7 @@ Files in [`deploy/`](../deploy): `nginx.conf`, `horizon.conf` (Supervisor), `dep
 | Component | Version / notes |
 |---|---|
 | OS | Ubuntu 24.04 LTS (or Debian 12) |
-| PHP | 8.4 (8.3 minimum), FPM + CLI, extensions: `pgsql`, `pdo_pgsql`, `redis`, `gd`, `intl`, `mbstring`, `xml`, `curl`, `zip`, `bcmath`, `exif`, `pcntl`, `posix` |
+| PHP | 8.4 (required by the locked Symfony 8 packages), FPM + CLI, extensions: `pgsql`, `pdo_pgsql`, `redis`, `gd`, `intl`, `mbstring`, `xml`, `curl`, `zip`, `bcmath`, `exif`, `pcntl`, `posix` |
 | PostgreSQL | 16 or 17, plus `postgresql-client` (provides `pg_dump` for backups) |
 | Redis | 7, bound to `127.0.0.1`, with a password |
 | nginx, Supervisor, certbot | from the distribution |
