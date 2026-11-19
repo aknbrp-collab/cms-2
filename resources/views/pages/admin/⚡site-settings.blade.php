@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\WhatsAppEvent;
 use App\Models\Site;
 use App\Support\Embed;
 use App\Support\PondokHero;
 use App\Support\SvgSanitizer;
+use App\Support\WhatsApp;
 use Flux\Flux;
 use Illuminate\Http\UploadedFile;
 use Livewire\Attributes\Computed;
@@ -95,10 +97,18 @@ new #[Title('Site settings')] class extends Component {
             'branding.favicon' => ['nullable', 'file', 'mimes:png,ico,svg', 'max:1024'],
             'branding.og_default' => ['nullable', 'image', 'max:4096'],
             ...$this->heroRules(),
+            ...$this->whatsAppRules(),
         ]);
 
         foreach (array_filter($this->branding) as $collection => $file) {
             SvgSanitizer::clean($file, "branding.{$collection}");
+        }
+
+        foreach (WhatsAppEvent::cases() as $event) {
+            $key = str_replace('.', '__', $event->settingKey());
+            if (trim((string) ($this->settings[$key] ?? '')) === trim($event->defaultTemplate())) {
+                $this->settings[$key] = '';
+            }
         }
 
         $site->name = $this->name;
@@ -156,6 +166,31 @@ new #[Title('Site settings')] class extends Component {
         return $rules;
     }
 
+    /**
+     * Validation of the WhatsApp templates (sites with admissions).
+     *
+     * @return array<string, list<string>>
+     */
+    protected function whatsAppRules(): array
+    {
+        if (! $this->site?->hasModule('admissions')) {
+            return [];
+        }
+
+        $rules = [];
+        foreach (WhatsAppEvent::cases() as $event) {
+            $rules['settings.'.str_replace('.', '__', $event->settingKey())] = ['nullable', 'string', 'max:2000'];
+        }
+
+        return $rules;
+    }
+
+    public function resetTemplate(string $event): void
+    {
+        $event = WhatsAppEvent::from($event);
+        $this->settings[str_replace('.', '__', $event->settingKey())] = $event->defaultTemplate();
+    }
+
     public function removeBranding(string $collection): void
     {
         $this->authorize('sites.update');
@@ -177,7 +212,7 @@ new #[Title('Site settings')] class extends Component {
     @else
         <form wire:submit="save" class="flex flex-col gap-6">
             <flux:navbar class="-mb-2 overflow-x-auto">
-                @foreach (['identity' => __('Identity'), 'contact' => __('Contact & social'), 'theme' => __('Theme'), 'layout' => __('Header & footer'), ...($this->site->hasModule('home_hero') ? ['hero' => __('Home hero')] : []), 'analytics' => __('Analytics'), 'prayer' => __('Prayer times')] as $key => $label)
+                @foreach (['identity' => __('Identity'), 'contact' => __('Contact & social'), 'theme' => __('Theme'), 'layout' => __('Header & footer'), ...($this->site->hasModule('home_hero') ? ['hero' => __('Home hero')] : []), ...($this->site->hasModule('admissions') ? ['whatsapp' => __('WhatsApp')] : []), 'analytics' => __('Analytics'), 'prayer' => __('Prayer times')] as $key => $label)
                     <flux:navbar.item as="button" type="button" wire:click="$set('tab', '{{ $key }}')" :current="$tab === $key">{{ $label }}</flux:navbar.item>
                 @endforeach
             </flux:navbar>
@@ -261,6 +296,26 @@ new #[Title('Site settings')] class extends Component {
                             <option value="egyptian">{{ __('Egyptian General Authority') }}</option>
                         </flux:select>
                     </div>
+                @elseif ($tab === 'whatsapp' && $this->site->hasModule('admissions'))
+                    <flux:text>{{ __('Ready messages for guardians of applicants. Admins open them in WhatsApp from a registration with one click and can still change the text before sending.') }}</flux:text>
+                    <div class="rounded-lg bg-zinc-50 p-3 text-sm dark:bg-zinc-800/60">
+                        <div class="mb-1 font-medium">{{ __('Placeholders') }}</div>
+                        <dl class="grid gap-x-4 gap-y-1 sm:grid-cols-2">
+                            @foreach (WhatsApp::placeholders() as $placeholder => $meaning)
+                                <div class="flex gap-2"><dt class="font-mono text-xs">{{ $placeholder }}</dt><dd class="text-xs text-zinc-500">{{ $meaning }}</dd></div>
+                            @endforeach
+                        </dl>
+                    </div>
+                    @foreach (WhatsAppEvent::cases() as $event)
+                        <flux:field wire:key="wa-template-{{ $event->value }}">
+                            <div class="flex items-center justify-between gap-3">
+                                <flux:label>{{ $event->label() }}</flux:label>
+                                <flux:button size="xs" variant="ghost" wire:click="resetTemplate('{{ $event->value }}')">{{ __('Reset to default') }}</flux:button>
+                            </div>
+                            <flux:textarea wire:model="settings.whatsapp__template_{{ $event->value }}" rows="6" class="text-sm" />
+                            <flux:error name="settings.whatsapp__template_{{ $event->value }}" />
+                        </flux:field>
+                    @endforeach
                 @elseif ($tab === 'hero' && $this->site->hasModule('home_hero'))
                     <flux:switch wire:model.live="settings.hero__enabled" :label="__('Show the hero at the top of the home page')" :description="__('Photos come from the Homepage slider. The hero needs at least a title.')" />
                     <flux:input wire:model="settings.hero__badge" :label="__('Badge')" :placeholder="__('e.g. Penerimaan Santri Baru (PSB) 2026/2027 Dibuka')" :description="__('Small pill with a pulsing dot above the title. Leave empty to hide it.')" />

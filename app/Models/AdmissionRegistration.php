@@ -99,6 +99,16 @@ class AdmissionRegistration extends Model
     }
 
     /**
+     * WhatsApp messages to the guardian, newest first.
+     *
+     * @return HasMany<AdmissionMessage, $this>
+     */
+    public function messages(): HasMany
+    {
+        return $this->hasMany(AdmissionMessage::class)->latest();
+    }
+
+    /**
      * Upload progress against the period's requirements. Expects
      * period.documentRequirements and documents to be loaded for lists.
      *

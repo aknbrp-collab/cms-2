@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\Auditable;
 use App\Enums\SiteKey;
+use App\Enums\WhatsAppEvent;
 use Database\Factories\SiteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -92,6 +93,14 @@ class Site extends Model implements HasMedia
         'hero.stat4_icon' => 'apartment',
         'hero.stat4_title' => '',
         'hero.stat4_text' => '',
+        // WhatsApp templates for admission guardians; empty falls back to
+        // WhatsAppEvent::defaultTemplate(), see defaultSetting().
+        'whatsapp.template_received' => null,
+        'whatsapp.template_verified' => null,
+        'whatsapp.template_accepted' => null,
+        'whatsapp.template_rejected' => null,
+        'whatsapp.template_needs_fix' => null,
+        'whatsapp.template_reminder' => null,
     ];
 
     /**
@@ -159,6 +168,10 @@ class Site extends Model implements HasMedia
     {
         if (str_starts_with($key, 'theme.')) {
             return config("cms.sites.{$this->key->value}.theme.".substr($key, 6));
+        }
+
+        if (str_starts_with($key, 'whatsapp.template_')) {
+            return WhatsAppEvent::tryFrom(substr($key, 18))?->defaultTemplate();
         }
 
         return self::SETTING_DEFAULTS[$key] ?? null;

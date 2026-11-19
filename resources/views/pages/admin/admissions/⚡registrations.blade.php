@@ -2,10 +2,12 @@
 
 use App\Enums\DocumentStatus;
 use App\Enums\RegistrationStatus;
+use App\Enums\WhatsAppEvent;
 use App\Models\AdmissionDocument;
 use App\Models\AdmissionPeriod;
 use App\Models\AdmissionRegistration;
 use App\Services\AdmissionDocuments;
+use App\Support\WhatsApp;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -42,6 +44,11 @@ new #[Title('Registrations')] class extends Component {
     public string $newStatus = '';
 
     public string $adminNotes = '';
+
+    /** WhatsApp message being prepared for the guardian (see WhatsAppEvent). */
+    public string $waEvent = '';
+
+    public string $waMessage = '';
 
     public function mount(): void
     {
@@ -97,7 +104,7 @@ new #[Title('Registrations')] class extends Component {
         $this->viewingId = $registration->id;
         $this->newStatus = $registration->status->value;
         $this->adminNotes = (string) $registration->admin_notes;
-        $this->reset('fixingDocumentId', 'fixNote');
+        $this->reset('fixingDocumentId', 'fixNote', 'waEvent', 'waMessage');
 
         Flux::modal('registration-detail')->show();
     }
@@ -128,6 +135,7 @@ new #[Title('Registrations')] class extends Component {
         $documents->review($document, DocumentStatus::NeedsFix, $this->fixNote, Auth::user());
         $this->reset('fixingDocumentId', 'fixNote');
         unset($this->viewing, $this->registrations);
+        $this->prepareWhatsApp(WhatsAppEvent::NeedsFix);
 
         Flux::toast(variant: 'success', text: filled($document->registration->email)
             ? __('Marked as needing a fix. The applicant was emailed.')
@@ -144,10 +152,85 @@ new #[Title('Registrations')] class extends Component {
             'adminNotes' => ['nullable', 'string', 'max:5000'],
         ]);
 
+        $changed = $registration->status->value !== $this->newStatus;
         $registration->forceFill(['status' => $this->newStatus, 'admin_notes' => $this->adminNotes ?: null])->save();
+        unset($this->viewing, $this->registrations);
+
+        // A new status the guardian should hear about: keep the dialog open with the message ready.
+        $event = $changed ? WhatsAppEvent::forStatus($registration->status) : null;
+        if ($event && $this->prepareWhatsApp($event)) {
+            Flux::toast(variant: 'success', text: __('Registration updated. The WhatsApp message to the guardian is ready below.'));
+
+            return;
+        }
 
         Flux::modal('registration-detail')->close();
         Flux::toast(variant: 'success', text: __('Registration updated.'));
+    }
+
+    /**
+     * The guardian's number in WhatsApp form, or null when it is not valid.
+     */
+    #[Computed]
+    public function waPhone(): ?string
+    {
+        return WhatsApp::normalizePhone($this->viewing?->parent_phone);
+    }
+
+    public function composeWhatsApp(string $event): void
+    {
+        $this->authorize('admissions.update');
+        $this->prepareWhatsApp(WhatsAppEvent::from($event));
+    }
+
+    /**
+     * Record a message the admin opened in WhatsApp (called when the link is clicked).
+     */
+    public function logWhatsApp(): void
+    {
+        $this->authorize('admissions.update');
+        $registration = $this->find((string) $this->viewingId);
+
+        $this->validate([
+            'waEvent' => ['required', Rule::enum(WhatsAppEvent::class)],
+            'waMessage' => ['required', 'string', 'max:4000'],
+        ]);
+
+        abort_if($this->waPhone === null, 422);
+
+        $registration->messages()->create([
+            'user_id' => Auth::id(),
+            'event' => $this->waEvent,
+            'channel' => 'link',
+            'status' => 'opened',
+            'phone' => $this->waPhone,
+            'body' => $this->waMessage,
+        ]);
+
+        $this->reset('waEvent', 'waMessage');
+        unset($this->viewing);
+    }
+
+    public function cancelWhatsApp(): void
+    {
+        $this->reset('waEvent', 'waMessage');
+    }
+
+    /**
+     * Fill in the template for an event; false when the phone number is not usable.
+     */
+    protected function prepareWhatsApp(WhatsAppEvent $event): bool
+    {
+        $registration = $this->viewing;
+
+        if ($registration === null || $this->waPhone === null) {
+            return false;
+        }
+
+        $this->waEvent = $event->value;
+        $this->waMessage = WhatsApp::message($event, $registration);
+
+        return true;
     }
 
     protected function findDocument(string $id): AdmissionDocument
@@ -158,7 +241,7 @@ new #[Title('Registrations')] class extends Component {
     protected function find(string $id): AdmissionRegistration
     {
         return AdmissionRegistration::query()
-            ->with(['period.documentRequirements', 'documents.media'])
+            ->with(['site', 'period.documentRequirements', 'documents.media', 'messages.user'])
             ->whereIn('site_id', Auth::user()->accessibleSites()->modelKeys())
             ->findOrFail($id);
     }
@@ -262,6 +345,8 @@ new #[Title('Registrations')] class extends Component {
                 @if ($registration->period->documentRequirements->isNotEmpty())
                     @include('pages.admin.admissions.partials.registration-documents')
                 @endif
+
+                @include('pages.admin.admissions.partials.registration-whatsapp')
 
                 @can('admissions.update')
                     <form wire:submit="update" class="space-y-4 border-t border-zinc-200 pt-4 dark:border-zinc-700">
