@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\EducationUnit;
 use App\Models\Event;
 use App\Models\Gallery;
 use App\Models\Lecturer;
@@ -58,6 +59,7 @@ class SitemapController extends Controller
             'events' => 'site.events.index', 'galleries' => 'site.galleries.index', 'faqs' => 'site.faqs',
             'leaders' => 'site.leaders', 'admissions' => 'site.admissions.show', 'facilities' => 'site.facilities',
             'extracurriculars' => 'site.extracurriculars', 'achievements' => 'site.achievements',
+            'education_units' => 'site.education-units.index',
             'lecturers' => 'site.lecturers.index', 'programs' => 'site.programs.index',
             'publications' => 'site.publications.index', 'journals' => 'site.journals.index',
             'organizations' => 'site.organizations', 'legal_questions' => 'site.legal-questions.index',
@@ -92,12 +94,13 @@ class SitemapController extends Controller
         $details = [
             'programs' => [Program::class, 'site.programs.show'],
             'lecturers' => [Lecturer::class, 'site.lecturers.show'],
+            'education_units' => [EducationUnit::class, 'site.education-units.show'],
         ];
 
         foreach ($details as $module => [$modelClass, $route]) {
             if ($site->hasModule($module)) {
                 $urls = $urls->concat($modelClass::query()->published()->get(['slug', 'updated_at'])
-                    ->map(fn (Program|Lecturer $item) => ['loc' => route($route, $item->slug), 'lastmod' => $item->updated_at]));
+                    ->map(fn (Program|Lecturer|EducationUnit $item) => ['loc' => route($route, $item->slug), 'lastmod' => $item->updated_at]));
             }
         }
 

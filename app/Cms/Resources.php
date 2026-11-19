@@ -3,6 +3,7 @@
 namespace App\Cms;
 
 use App\Cms\Resources\Achievements;
+use App\Cms\Resources\EducationUnits;
 use App\Cms\Resources\Extracurriculars;
 use App\Cms\Resources\Facilities;
 use App\Cms\Resources\Journals;
@@ -19,6 +20,7 @@ class Resources
         Facilities::class,
         Achievements::class,
         Extracurriculars::class,
+        EducationUnits::class,
         Programs::class,
         Lecturers::class,
         Journals::class,

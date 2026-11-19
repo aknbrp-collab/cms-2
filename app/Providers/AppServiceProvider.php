@@ -163,6 +163,8 @@ class AppServiceProvider extends ServiceProvider
             'lecturer' => Models\Lecturer::class,
             'program' => Models\Program::class,
             'course' => Models\Course::class,
+            'education_unit' => Models\EducationUnit::class,
+            'education_unit_subject' => Models\EducationUnitSubject::class,
             'journal' => Models\Journal::class,
             'organization' => Models\Organization::class,
             'publication' => Models\Publication::class,

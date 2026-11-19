@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified', EnsureAdminAccess::class, SetAdminSite::c
         ->whereIn('resource', array_keys(Resources::all()))
         ->name('admin.resources');
     Route::livewire('programs/{program}/curriculum', 'pages::admin.programs.curriculum')->name('admin.programs.curriculum');
+    Route::livewire('education-units/{unit}/curriculum', 'pages::admin.education-units.curriculum')->name('admin.education-units.curriculum');
 
     Route::livewire('publications', 'pages::admin.publications.index')->name('admin.publications.index');
     Route::livewire('publications/create', 'pages::admin.publications.edit')->name('admin.publications.create');

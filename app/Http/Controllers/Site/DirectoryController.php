@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Site;
 use App\Enums\PublicationType;
 use App\Http\Controllers\Controller;
 use App\Models\Achievement;
+use App\Models\EducationUnit;
 use App\Models\Extracurricular;
 use App\Models\Facility;
 use App\Models\Journal;
@@ -56,6 +57,29 @@ class DirectoryController extends Controller
         return $this->theme->view('achievements', [
             'seo' => Seo::forSite($site, __('Prestasi Santri')),
             'achievements' => Achievement::query()->published()->with('image.media')->orderByDesc('achieved_on')->paginate(18),
+        ]);
+    }
+
+    public function educationUnits(): View
+    {
+        $site = $this->site('education_units');
+
+        return $this->theme->view('education-units.index', [
+            'seo' => Seo::forSite($site, __('Program Pendidikan')),
+            'units' => EducationUnit::query()->published()->with('image.media')->withCount('subjects')->orderBy('sort_order')->orderBy('name')->get(),
+        ]);
+    }
+
+    public function educationUnit(string $slug): View
+    {
+        $site = $this->site('education_units');
+        $unit = EducationUnit::query()->published()->with(['image.media', 'subjects'])->where('slug', $slug)->firstOrFail();
+
+        return $this->theme->view('education-units.show', [
+            'seo' => Seo::forSite($site, $unit->name),
+            'unit' => $unit,
+            'curriculum' => $unit->curriculum(),
+            'others' => EducationUnit::query()->published()->whereKeyNot($unit->id)->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'slug']),
         ]);
     }
 
